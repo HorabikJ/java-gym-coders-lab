@@ -45,6 +45,6 @@ public class TrainingClass {
     private TrainingType trainingType;
 
     @ManyToMany
-    private List<User> customerList = new ArrayList<>();
+    private List<User> customers = new ArrayList<>();
 
 }

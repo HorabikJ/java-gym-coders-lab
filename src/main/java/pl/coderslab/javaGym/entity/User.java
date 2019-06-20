@@ -47,8 +47,8 @@ public class User {
     @NotNull(message = "*Please agree or disagree for newsletter.")
     private Boolean newsletter;
 
-    @ManyToMany(mappedBy = "customerList")
-    private List<TrainingClass> trainingClassList = new ArrayList<>();
+    @ManyToMany(mappedBy = "customers")
+    private List<TrainingClass> trainingClasses = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))

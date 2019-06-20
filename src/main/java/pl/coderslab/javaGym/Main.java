@@ -1,5 +1,7 @@
 package pl.coderslab.javaGym;
 
+import java.time.LocalDate;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -14,6 +16,9 @@ public class Main {
 //
 //        String uniqueID = UUID.randomUUID().toString();
 //        System.out.println(uniqueID);
+
+        LocalDate localDate = LocalDate.now();
+        System.out.println(localDate);
     }
 
 }
