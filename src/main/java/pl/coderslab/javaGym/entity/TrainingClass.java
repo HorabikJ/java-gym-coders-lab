@@ -25,7 +25,7 @@ public class TrainingClass {
     private Long id;
 
     @Column
-    private String trainingClassId;
+    private String uniqueClassId;
 
     @NotNull
     @Column
@@ -45,6 +45,6 @@ public class TrainingClass {
     private TrainingType trainingType;
 
     @ManyToMany
-    private List<User> userList = new ArrayList<>();
+    private List<User> customerList = new ArrayList<>();
 
 }

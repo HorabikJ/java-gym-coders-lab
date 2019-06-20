@@ -47,7 +47,7 @@ public class User {
     @NotNull(message = "*Please agree or disagree for newsletter.")
     private Boolean newsletter;
 
-    @ManyToMany(mappedBy = "customer")
+    @ManyToMany(mappedBy = "customerList")
     private List<TrainingClass> trainingClassList = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
