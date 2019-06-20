@@ -17,8 +17,6 @@ public class Main {
 //        String uniqueID = UUID.randomUUID().toString();
 //        System.out.println(uniqueID);
 
-        LocalDate localDate = LocalDate.now();
-        System.out.println(localDate);
     }
 
 }
