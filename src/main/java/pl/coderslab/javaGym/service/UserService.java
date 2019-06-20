@@ -11,6 +11,7 @@ import pl.coderslab.javaGym.repository.UserRepository;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -32,20 +33,24 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public void saveAsUser(User user) {
+    public List<String> getAllUsersEmails() {
+        return userRepository.getAllUsersEmails();
+    }
+
+    public User saveAsUser(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setActive(1);
         Role userRole = roleRepository.findByRole(RoleEnum.ROLE_USER.toString());
         user.setRoles(new HashSet<Role>(Arrays.asList(userRole)));
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
-    public void saveAsAdmin(User user) {
+    public User saveAsAdmin(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setActive(1);
         Role userRole = roleRepository.findByRole(RoleEnum.ROLE_USER.toString());
         Role adminRole = roleRepository.findByRole(RoleEnum.ROLE_ADMIN.toString());
         user.setRoles(new HashSet<Role>(Arrays.asList(userRole, adminRole)));
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 }

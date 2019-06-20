@@ -3,6 +3,7 @@ package pl.coderslab.javaGym.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pl.coderslab.javaGym.error.customValidator.UniqueEmail;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -23,6 +24,7 @@ public class User {
     private Long id;
 
     @Column(unique = true)
+    @UniqueEmail(message = "*User with given email already exists in database.")
     @Email(message = "*Please provide a valid email.")
     @NotBlank(message = "*Please provide an email.")
     private String email;
