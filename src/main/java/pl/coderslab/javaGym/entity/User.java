@@ -18,11 +18,11 @@ import java.util.Set;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long id;
 
-    @Column
+    @Column(unique = true)
     @Email(message = "*Please provide a valid email.")
     @NotBlank(message = "*Please provide an email.")
     private String email;
@@ -41,6 +41,8 @@ public class User {
     private String lastName;
 
     @Column
+    @Max(value = 1, message = "*Only 0 as inactive or 1 as active are acceptable.")
+    @Min(value = 0, message = "*Only 0 as inactive or 1 as active are acceptable.")
     private Integer active;
 
     @Column
