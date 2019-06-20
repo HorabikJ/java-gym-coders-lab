@@ -24,7 +24,7 @@ public class RegistrationController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public User registerUser(@RequestBody @Valid User user) {
-        return userService.findUserByEmail(user.getEmail());
+        return userService.saveAsUser(user);
     }
 
 
