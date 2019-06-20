@@ -5,10 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -25,20 +24,20 @@ public class User {
 
     @Column
     @Email(message = "*Please provide a valid email.")
-    @NotEmpty(message = "*Please provide an email.")
+    @NotBlank(message = "*Please provide an email.")
     private String email;
 
     @Column
     @Size(min = 5, message = "*Your password must have at least 5 characters.")
-    @NotEmpty(message = "*Please provide your password.")
+    @NotBlank(message = "*Please provide your password.")
     private String password;
 
     @Column
-    @NotEmpty(message = "*Please provide your name.")
+    @NotBlank(message = "*Name can not be empty.")
     private String firstName;
 
     @Column(name = "last_name")
-    @NotEmpty(message = "*Please provide your last name.")
+    @NotBlank(message = "*Last name can not be empty.")
     private String lastName;
 
     @Column
@@ -47,6 +46,9 @@ public class User {
     @Column
     @NotNull(message = "*Please agree or disagree for newsletter.")
     private Boolean newsletter;
+
+    @ManyToMany(mappedBy = "customer")
+    private List<TrainingClass> trainingClassList = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
