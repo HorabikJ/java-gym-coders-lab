@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
 
 @Data
 public class CustomErrorResponse {
@@ -14,6 +14,6 @@ public class CustomErrorResponse {
 
     private Integer status;
 
-    private List<String> errors;
+    private Map<String, String> errors;
 
 }
