@@ -14,6 +14,7 @@ import pl.coderslab.javaGym.repository.UserRepository;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -39,25 +40,25 @@ public class UserService {
         return userRepository.getAllUsersEmails();
     }
 
-    public User saveAsUser(User user) {
+    public User saveUser(User user, boolean asAdmin) {
         try {
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            user.setActive(1);
-            Role userRole = roleRepository.findByRole(RoleEnum.ROLE_USER.toString());
-            user.setRoles(new HashSet<Role>(Arrays.asList(userRole)));
+            setUserProperties(user, asAdmin);
             return userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
             throw new DomainObjectException();
         }
     }
 
-    public User saveAsAdmin(User user) {
+    private void setUserProperties(User user, boolean asAdmin) {
+        Set<Role> roles = new HashSet<>();
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setActive(1);
         Role userRole = roleRepository.findByRole(RoleEnum.ROLE_USER.toString());
-        Role adminRole = roleRepository.findByRole(RoleEnum.ROLE_ADMIN.toString());
-        user.setRoles(new HashSet<Role>(Arrays.asList(userRole, adminRole)));
-        return userRepository.save(user);
+        roles.add(userRole);
+        if (asAdmin) {
+            Role adminRole = roleRepository.findByRole(RoleEnum.ROLE_ADMIN.toString());
+            roles.add(adminRole);
+        }
+        user.setRoles(roles);
     }
-
 }
