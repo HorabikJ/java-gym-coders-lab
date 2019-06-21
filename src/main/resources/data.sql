@@ -1,3 +1,4 @@
+
 -- insert roles
 REPLACE INTO `role` VALUES (1,'ROLE_ADMIN');
 REPLACE INTO `role` VALUES (2,'ROLE_USER');

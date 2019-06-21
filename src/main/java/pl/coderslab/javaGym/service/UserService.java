@@ -1,11 +1,13 @@
 package pl.coderslab.javaGym.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.coderslab.javaGym.entity.Role;
 import pl.coderslab.javaGym.entity.User;
 import pl.coderslab.javaGym.enumClass.RoleEnum;
+import pl.coderslab.javaGym.error.customException.DomainObjectException;
 import pl.coderslab.javaGym.repository.RoleRepository;
 import pl.coderslab.javaGym.repository.UserRepository;
 
@@ -38,11 +40,15 @@ public class UserService {
     }
 
     public User saveAsUser(User user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user.setActive(1);
-        Role userRole = roleRepository.findByRole(RoleEnum.ROLE_USER.toString());
-        user.setRoles(new HashSet<Role>(Arrays.asList(userRole)));
-        return userRepository.save(user);
+        try {
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            user.setActive(1);
+            Role userRole = roleRepository.findByRole(RoleEnum.ROLE_USER.toString());
+            user.setRoles(new HashSet<Role>(Arrays.asList(userRole)));
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new DomainObjectException();
+        }
     }
 
     public User saveAsAdmin(User user) {
@@ -53,4 +59,5 @@ public class UserService {
         user.setRoles(new HashSet<Role>(Arrays.asList(userRole, adminRole)));
         return userRepository.save(user);
     }
+
 }
