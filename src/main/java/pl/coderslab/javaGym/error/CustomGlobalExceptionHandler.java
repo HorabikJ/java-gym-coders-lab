@@ -14,10 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -28,31 +25,27 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
         CustomErrorResponse errors = new CustomErrorResponse();
         errors.setTimestamp(LocalDateTime.now());
-        errors.setError(exception.getMessage());
         errors.setStatus(HttpStatus.BAD_REQUEST.value());
+        errors.setErrors(new ArrayList<String>(Arrays.asList(exception.getMessage())));
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid
-                (MethodArgumentNotValidException exception,
-                 HttpHeaders headers, HttpStatus status, WebRequest request) {
+            (MethodArgumentNotValidException exception,
+             HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", new Date());
-        body.put("status", status.value());
-
-        List<String> errors = exception.getBindingResult()
+        CustomErrorResponse errors = new CustomErrorResponse();
+        errors.setTimestamp(LocalDateTime.now());
+        errors.setStatus(status.value());
+        errors.setErrors(exception.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(ex -> ex.getDefaultMessage())
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
 
-        body.put("errors", errors);
-
-        return new ResponseEntity<>(body, headers, status);
+        return new ResponseEntity<>(errors, headers, status);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

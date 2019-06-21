@@ -10,7 +10,6 @@ import pl.coderslab.javaGym.entity.User;
 import pl.coderslab.javaGym.service.UserService;
 
 import javax.validation.Valid;
-import java.sql.SQLIntegrityConstraintViolationException;
 
 @RestController
 public class RegistrationController {
@@ -25,7 +24,7 @@ public class RegistrationController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public User registerUser(@RequestBody @Valid User user) {
-        return userService.saveAsUser(user);
+        return userService.saveUser(user, false);
     }
 
 }
