@@ -56,7 +56,7 @@ public class UserService implements AbstractService<User> {
     public User save(User user) {
         try {
             setUserProperties(user, false);
-//            emailSender.sendEmail(user, EmailTypeEnum.WELCOME_EMAIL);
+//            emailSender.sendEmail(user, EmailTypeEnum.ACCOUNT_ACTIVATION_EMAIL);
 //            TODO handle exception
             return userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
@@ -76,7 +76,7 @@ public class UserService implements AbstractService<User> {
     private void setUserProperties(User user, boolean asAdmin) {
         Set<Role> roles = new HashSet<>();
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user.setActive(1);
+        user.setActive(0);
         Role userRole = roleRepository.findByRole(RoleEnum.ROLE_USER.toString());
         roles.add(userRole);
         if (asAdmin) {
@@ -133,10 +133,24 @@ public class UserService implements AbstractService<User> {
         return user;
     }
 
-//    @Transactional
+    //    @Transactional
     public User changeNewsletterConsent(Long userId, Boolean newsletter) {
         User user = getAuthenticatedUser(userId);
         user.setNewsletter(newsletter);
         return userRepository.save(user);
+    }
+
+    public Boolean confirmUserAccount(String param) {
+        List<String> emails = userRepository.getAllUsersEmails();
+        for (String email : emails) {
+            if (bCryptPasswordEncoder.matches(email, param)) {
+                User user = userRepository.findByEmail(email);
+                user.setActive(1);
+                userRepository.save(user);
+                emailSender.sendEmail(user, EmailTypeEnum.WELCOME_EMAIL);
+                return true;
+            }
+        }
+        throw new ResourceNotFoundException();
     }
 }
