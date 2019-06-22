@@ -7,12 +7,12 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @Data
-public class CustomErrorResponse {
+class CustomErrorResponse {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
     private LocalDateTime timestamp;
 
-    private Integer status;
+    private String HttpStatus;
 
     private Map<String, String> errors;
 

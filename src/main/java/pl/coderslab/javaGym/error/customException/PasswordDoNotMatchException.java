@@ -1,12 +1,12 @@
 package pl.coderslab.javaGym.error.customException;
 
-public class NotAuthenticatedException extends RuntimeException {
+public class PasswordDoNotMatchException extends RuntimeException {
 
-    private String message = "*Not authenticated exception.";
+    private String message = "*Old password do not match with actual one.";
 
-    public NotAuthenticatedException() {}
+    public PasswordDoNotMatchException() {}
 
-    public NotAuthenticatedException(String message) {
+    public PasswordDoNotMatchException(String message) {
         this.message = message;
     }
 

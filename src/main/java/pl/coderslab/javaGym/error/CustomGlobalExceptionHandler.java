@@ -13,6 +13,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import pl.coderslab.javaGym.error.customException.DomainObjectException;
 import pl.coderslab.javaGym.error.customException.NotAuthenticatedException;
+import pl.coderslab.javaGym.error.customException.PasswordDoNotMatchException;
 import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
 
 import javax.validation.ConstraintViolation;
@@ -24,20 +25,24 @@ import java.util.Map;
 @ControllerAdvice
 public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler({DomainObjectException.class, NotAuthenticatedException.class, ResourceNotFoundException.class})
+    @ExceptionHandler({DomainObjectException.class,
+            NotAuthenticatedException.class,
+            ResourceNotFoundException.class,
+            PasswordDoNotMatchException.class})
     public ResponseEntity<CustomErrorResponse> handleCustomException
             (Exception exception, WebRequest request) {
 
         String fieldName = getErrorMessageFieldName(exception);
+        HttpStatus httpStatus = getHttpStatus(exception);
         CustomErrorResponse errors = new CustomErrorResponse();
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put(fieldName, exception.getMessage());
 
         errors.setTimestamp(LocalDateTime.now());
-        errors.setStatus(HttpStatus.BAD_REQUEST.value());
+        errors.setHttpStatus(httpStatus.toString());
         errors.setErrors(errorMessage);
 
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errors, httpStatus);
     }
 
     private String getErrorMessageFieldName(Exception exception) {
@@ -49,8 +54,25 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
             fieldName = "user";
         } else if (exceptionClass.equals(ResourceNotFoundException.class)) {
             fieldName = "error";
+        } else if (exceptionClass.equals(PasswordDoNotMatchException.class)) {
+            fieldName = "password";
         }
         return fieldName;
+    }
+
+    private HttpStatus getHttpStatus(Exception exception) {
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        Class exceptionClass = exception.getClass();
+        if (exceptionClass.equals(DomainObjectException.class)) {
+            httpStatus = HttpStatus.BAD_REQUEST;
+        } else if (exceptionClass.equals(NotAuthenticatedException.class)) {
+            httpStatus = HttpStatus.UNAUTHORIZED;
+        } else if (exceptionClass.equals(ResourceNotFoundException.class)) {
+            httpStatus = HttpStatus.NOT_FOUND;
+        } else if (exceptionClass.equals(PasswordDoNotMatchException.class)) {
+            httpStatus = HttpStatus.BAD_REQUEST;
+        }
+        return httpStatus;
     }
 
     // error handle for @Valid
@@ -70,7 +92,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         }
 
         errors.setTimestamp(LocalDateTime.now());
-        errors.setStatus(status.value());
+        errors.setHttpStatus(status.toString());
         errors.setErrors(errorMessages);
 
         return new ResponseEntity<>(errors, headers, status);
@@ -87,7 +109,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
         CustomErrorResponse errors = new CustomErrorResponse();
         errors.setTimestamp(LocalDateTime.now());
-        errors.setStatus(HttpStatus.BAD_REQUEST.value());
+        errors.setHttpStatus(HttpStatus.BAD_REQUEST.toString());
         errors.setErrors(errorMessages);
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
