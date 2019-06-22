@@ -1,7 +1,12 @@
 package pl.coderslab.javaGym.controller;
 
-import org.springframework.web.bind.annotation.*;
-import pl.coderslab.javaGym.entity.User;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import pl.coderslab.javaGym.service.UserService;
 
 import javax.validation.constraints.Min;
@@ -10,17 +15,24 @@ import javax.validation.constraints.Size;
 
 @RestController
 @RequestMapping("/user")
+@Validated
 public class UserController {
 
     private UserService userService;
 
-    @PatchMapping("/password/{id}")
-    public String updateUserPassword(@PathVariable @Min(1) Long id,
-            @Size(min = 5, message = "*Your password must have at least 5 characters.")
-            @NotBlank(message = "*Please provide your password.")
-            @RequestParam String password) {
-//        userService.updatePassword(...);
-            return password + id;
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
+
+    @PatchMapping("/change-password")
+    public Boolean updateUserPassword(@RequestParam @Min(1) Long userId,
+                                     @Size(min = 5) @NotBlank @RequestParam String oldPassword,
+                                     @Size(min = 5) @NotBlank @RequestParam String newPassword) {
+        return userService.changePassword(userId, oldPassword, newPassword);
+    }
+
+//    TODO resetPassword(situation when user forgotten his password), changeNewsletter, change Name and Surname,
+
 
 }
