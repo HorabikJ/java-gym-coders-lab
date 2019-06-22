@@ -2,12 +2,17 @@ package pl.coderslab.javaGym.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.coderslab.javaGym.entity.Role;
 import pl.coderslab.javaGym.entity.User;
 import pl.coderslab.javaGym.enumClass.RoleEnum;
 import pl.coderslab.javaGym.error.customException.DomainObjectException;
+import pl.coderslab.javaGym.error.customException.NotAuthenticatedException;
+import pl.coderslab.javaGym.error.customException.PasswordDoNotMatchException;
+import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
 import pl.coderslab.javaGym.repository.RoleRepository;
 import pl.coderslab.javaGym.repository.UserRepository;
 
@@ -84,6 +89,31 @@ public class UserService implements AbstractService<User> {
         return userRepository.getAllUsersEmails();
     }
 
+    public Boolean changePassword(Long userId, String oldPassword, String newPassword) {
+        User user = getAuthenticatedUser(userId);
+        if (bCryptPasswordEncoder.matches(oldPassword, user.getPassword())) {
+            user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return true;
+        } else {
+            throw new PasswordDoNotMatchException();
+        }
+    }
 
+    private User getAuthenticatedUser(Long userId)
+            throws NotAuthenticatedException, ResourceNotFoundException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User user = userRepository.findById(userId).orElse(null);
 
+        if (user != null) {
+            if (user.getEmail().equals(email)) {
+                return user;
+            } else {
+                throw new NotAuthenticatedException();
+            }
+        } else {
+            throw new ResourceNotFoundException();
+        }
+    }
 }
