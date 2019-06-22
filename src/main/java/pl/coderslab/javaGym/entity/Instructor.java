@@ -46,7 +46,7 @@ public class Instructor {
     @Size(min = 1, max = 1000, message = "*Description can not be empty and can not be longer that 1000 signs.")
     private String description;
 
-    @OneToMany(mappedBy = "instructor")
+    @OneToMany(mappedBy = "instructor", cascade = CascadeType.REMOVE)
     private List<TrainingClass> trainingClassList = new ArrayList<>();
 
 }
