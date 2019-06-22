@@ -22,7 +22,7 @@ public class User {
     @Column
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, updatable = false)
     @Email(message = "*Please provide a valid email.")
     @NotBlank(message = "*Please provide an email.")
     private String email;

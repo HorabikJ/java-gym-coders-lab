@@ -44,7 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
-                .antMatchers( "/login", "/register").anonymous()
+                .antMatchers("/login", "/register").anonymous()
                 .antMatchers("/logout").authenticated()
                 .antMatchers("/").permitAll()
                 .antMatchers("/user/**").hasRole("USER")
@@ -53,16 +53,39 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .formLogin()
-                .loginPage("/login")
-                .defaultSuccessUrl("/",true)
-                .failureUrl("/login?error=true")
-                .usernameParameter("email")
-                .passwordParameter("password")
+                .defaultSuccessUrl("/")
+                .and()
+                .httpBasic()
                 .and()
                 .logout()
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/");
     }
+
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//
+//        http
+//                .authorizeRequests()
+//                .antMatchers( "/login", "/register").anonymous()
+//                .antMatchers("/logout").authenticated()
+//                .antMatchers("/").permitAll()
+//                .antMatchers("/user/**").hasRole("USER")
+//                .antMatchers("/admin/**").hasRole("ADMIN")
+//                .anyRequest().authenticated()
+//                .and()
+//                .csrf().disable()
+//                .formLogin()
+//                .loginPage("/login")
+//                .defaultSuccessUrl("/",true)
+//                .failureUrl("/login?error=true")
+//                .usernameParameter("email")
+//                .passwordParameter("password")
+//                .and()
+//                .logout()
+//                .logoutUrl("/logout")
+//                .logoutSuccessUrl("/");
+//    }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
