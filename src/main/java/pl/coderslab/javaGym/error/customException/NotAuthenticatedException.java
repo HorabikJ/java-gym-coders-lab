@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class DomainObjectException extends RuntimeException {
+public class NotAuthenticatedException extends RuntimeException {
 
-    private final String fieldName = "email";
+    private final String fieldName = "user";
 
-    private String message = "*Provided email is already registered in database.";
+    private String message = "*Not authenticated exception.";
 
 }
