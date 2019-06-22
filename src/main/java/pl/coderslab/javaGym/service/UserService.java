@@ -11,13 +11,12 @@ import pl.coderslab.javaGym.error.customException.DomainObjectException;
 import pl.coderslab.javaGym.repository.RoleRepository;
 import pl.coderslab.javaGym.repository.UserRepository;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Service
-public class UserService {
+public class UserService implements AbstractService<User> {
 
     private UserRepository userRepository;
     private RoleRepository roleRepository;
@@ -32,17 +31,27 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
-    public List<String> getAllUsersEmails() {
-        return userRepository.getAllUsersEmails();
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
-    public User saveUser(User user, boolean asAdmin) {
+    public User save(User user) {
         try {
-            setUserProperties(user, asAdmin);
+            setUserProperties(user, false);
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new DomainObjectException();
+        }
+    }
+
+    public User saveAsAdmin(User user) {
+        try {
+            setUserProperties(user, true);
             return userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
             throw new DomainObjectException();
@@ -61,5 +70,20 @@ public class UserService {
         }
         user.setRoles(roles);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public List<String> getAllUsersEmails() {
+        return userRepository.getAllUsersEmails();
+    }
+
+
 
 }
