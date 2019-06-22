@@ -2,12 +2,17 @@ package pl.coderslab.javaGym.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.coderslab.javaGym.email.EmailSender;
 import pl.coderslab.javaGym.entity.Role;
 import pl.coderslab.javaGym.entity.User;
+import pl.coderslab.javaGym.enumClass.EmailTypeEnum;
 import pl.coderslab.javaGym.enumClass.RoleEnum;
 import pl.coderslab.javaGym.error.customException.DomainObjectException;
 import pl.coderslab.javaGym.error.customException.NotAuthenticatedException;
@@ -23,6 +28,7 @@ import java.util.Set;
 @Service
 public class UserService implements AbstractService<User> {
 
+    private EmailSender emailSender;
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -30,7 +36,9 @@ public class UserService implements AbstractService<User> {
     @Autowired
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
-                       BCryptPasswordEncoder bCryptPasswordEncoder) {
+                       BCryptPasswordEncoder bCryptPasswordEncoder,
+                       EmailSender emailSender) {
+        this.emailSender = emailSender;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -48,6 +56,8 @@ public class UserService implements AbstractService<User> {
     public User save(User user) {
         try {
             setUserProperties(user, false);
+//            emailSender.sendEmail(user, EmailTypeEnum.WELCOME_EMAIL);
+//            TODO handle exception
             return userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
             throw new DomainObjectException();
@@ -115,5 +125,18 @@ public class UserService implements AbstractService<User> {
         } else {
             throw new ResourceNotFoundException();
         }
+    }
+
+    public User getUserById(Long userId) {
+        User user = getAuthenticatedUser(userId);
+        user.setPassword(null);
+        return user;
+    }
+
+//    @Transactional
+    public User changeNewsletterConsent(Long userId, Boolean newsletter) {
+        User user = getAuthenticatedUser(userId);
+        user.setNewsletter(newsletter);
+        return userRepository.save(user);
     }
 }

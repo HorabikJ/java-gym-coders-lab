@@ -20,10 +20,12 @@ public class EmailSender {
     public void sendEmail(User user, EmailTypeEnum emailType) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());
+        setEmailTitleAndContent(message, user, emailType);
+        javaMailSender.send(message);
     }
 
-    private void setEmailTitleAndContent(User user,
-                 EmailTypeEnum emailTypeEnum, SimpleMailMessage message) {
+    private void setEmailTitleAndContent(SimpleMailMessage message, User user,
+                 EmailTypeEnum emailTypeEnum) {
         if (emailTypeEnum.equals(EmailTypeEnum.WELCOME_EMAIL)) {
             message.setSubject(user.getFirstName() + " welcome in JavaSpringGym application!");
             message.setText(user.getFirstName() + ", we are very pleased that you joined us!");
