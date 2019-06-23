@@ -6,6 +6,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import pl.coderslab.javaGym.entity.Person;
 import pl.coderslab.javaGym.entity.User;
 import pl.coderslab.javaGym.enumClass.EmailTypeEnum;
 
@@ -22,23 +23,23 @@ public class EmailSender {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public void sendEmail(User user, EmailTypeEnum emailType) throws MailException {
+    public void sendEmail(Person person, EmailTypeEnum emailType) throws MailException {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(user.getEmail());
-        setEmailTitleAndContent(message, user, emailType);
+        message.setTo(person.getEmail());
+        setEmailTitleAndContent(message, person, emailType);
         javaMailSender.send(message);
     }
 
-    private void setEmailTitleAndContent(SimpleMailMessage message, User user,
+    private void setEmailTitleAndContent(SimpleMailMessage message, Person person,
                  EmailTypeEnum emailTypeEnum) {
         if (emailTypeEnum.equals(EmailTypeEnum.ACCOUNT_ACTIVATION_EMAIL))
             message.setSubject("JavaSpringGym account activation.");
             message.setText(this.activationEmailText +
                     "http://localhost:8080/confirm-account?param="
-                    + bCryptPasswordEncoder.encode(user.getEmail()));
+                    + bCryptPasswordEncoder.encode(person.getEmail()));
         if (emailTypeEnum.equals(EmailTypeEnum.WELCOME_EMAIL)) {
-            message.setSubject(user.getFirstName() + " welcome in JavaSpringGym application!");
-            message.setText(user.getFirstName() + ", we are very pleased that you joined us!");
+            message.setSubject(person.getFirstName() + " welcome in JavaSpringGym application!");
+            message.setText(person.getFirstName() + ", we are very pleased that you joined us!");
         } else if (emailTypeEnum.equals(EmailTypeEnum.CLASS_CANCELED_EMAIL)) {
 //            something
         } else if (emailTypeEnum.equals((EmailTypeEnum.CLASS_RESERVED_EMAIL))) {
