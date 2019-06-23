@@ -1,6 +1,7 @@
 package pl.coderslab.javaGym.email;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 import pl.coderslab.javaGym.entity.User;
 import pl.coderslab.javaGym.enumClass.EmailTypeEnum;
 
+//TODO Optimize email sending mechanizm
 @Component
 public class EmailSender {
 
@@ -20,7 +22,7 @@ public class EmailSender {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public void sendEmail(User user, EmailTypeEnum emailType) {
+    public void sendEmail(User user, EmailTypeEnum emailType) throws MailException {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());
         setEmailTitleAndContent(message, user, emailType);

@@ -25,9 +25,10 @@ public class RegistrationController {
         return userService.save(user);
     }
 
+//    TODO set link expiration time
     @GetMapping("/confirm-account")
     public Boolean userAccountConfirmation(@RequestParam @Size(min = 1) String param) {
-        return userService.confirmUserAccount(param);
+        return userService.authenticateUserAccount(param);
     }
 
 }

@@ -34,5 +34,4 @@ public class AccessTestController {
         return homepage + userContent + adminContent + login + logout;
     }
 
-
 }
