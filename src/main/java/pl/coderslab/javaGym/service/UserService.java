@@ -2,22 +2,18 @@ package pl.coderslab.javaGym.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.MailException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.coderslab.javaGym.email.EmailSender;
 import pl.coderslab.javaGym.entity.Role;
 import pl.coderslab.javaGym.entity.User;
 import pl.coderslab.javaGym.enumClass.EmailTypeEnum;
 import pl.coderslab.javaGym.enumClass.RoleEnum;
-import pl.coderslab.javaGym.error.customException.DomainObjectException;
-import pl.coderslab.javaGym.error.customException.NotAuthenticatedException;
-import pl.coderslab.javaGym.error.customException.PasswordDoNotMatchException;
-import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
+import pl.coderslab.javaGym.error.customException.*;
 import pl.coderslab.javaGym.repository.RoleRepository;
 import pl.coderslab.javaGym.repository.UserRepository;
 
@@ -49,25 +45,29 @@ public class UserService implements AbstractService<User> {
         return userRepository.findAll();
     }
 
+//    method for admins
     public User findById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
 
+    @Transactional
     public User save(User user) {
         try {
             setUserProperties(user, false);
-//            emailSender.sendEmail(user, EmailTypeEnum.ACCOUNT_ACTIVATION_EMAIL);
-//            TODO handle exception
+            emailSender.sendEmail(user, EmailTypeEnum.ACCOUNT_ACTIVATION_EMAIL);
             return userRepository.save(user);
+        } catch (MailException e) {
+            throw new EmailSendingException();
         } catch (DataIntegrityViolationException e) {
             throw new DomainObjectException();
         }
     }
 
-    public User saveAsAdmin(User user) {
+    @Transactional
+    public User saveAsAdmin(User admin) {
         try {
-            setUserProperties(user, true);
-            return userRepository.save(user);
+            setUserProperties(admin, true);
+            return userRepository.save(admin);
         } catch (DataIntegrityViolationException e) {
             throw new DomainObjectException();
         }
@@ -87,6 +87,7 @@ public class UserService implements AbstractService<User> {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         userRepository.deleteById(id);
     }
@@ -99,6 +100,7 @@ public class UserService implements AbstractService<User> {
         return userRepository.getAllUsersEmails();
     }
 
+    @Transactional
     public Boolean changePassword(Long userId, String oldPassword, String newPassword) {
         User user = getAuthenticatedUser(userId);
         if (bCryptPasswordEncoder.matches(oldPassword, user.getPassword())) {
@@ -110,8 +112,7 @@ public class UserService implements AbstractService<User> {
         }
     }
 
-    private User getAuthenticatedUser(Long userId)
-            throws NotAuthenticatedException, ResourceNotFoundException {
+    private User getAuthenticatedUser(Long userId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         User user = userRepository.findById(userId).orElse(null);
@@ -127,20 +128,22 @@ public class UserService implements AbstractService<User> {
         }
     }
 
+//    method for users
     public User getUserById(Long userId) {
         User user = getAuthenticatedUser(userId);
         user.setPassword(null);
         return user;
     }
 
-    //    @Transactional
+    @Transactional
     public User changeNewsletterConsent(Long userId, Boolean newsletter) {
         User user = getAuthenticatedUser(userId);
         user.setNewsletter(newsletter);
         return userRepository.save(user);
     }
 
-    public Boolean confirmUserAccount(String param) {
+    @Transactional
+    public Boolean authenticateUserAccount(String param) {
         List<String> emails = userRepository.getAllUsersEmails();
         for (String email : emails) {
             if (bCryptPasswordEncoder.matches(email, param)) {
@@ -152,5 +155,13 @@ public class UserService implements AbstractService<User> {
             }
         }
         throw new ResourceNotFoundException();
+    }
+
+    @Transactional
+    public User changeFirstAndLastName(Long userId, String firstName, String lastName) {
+        User user = getAuthenticatedUser(userId);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        return userRepository.save(user);
     }
 }

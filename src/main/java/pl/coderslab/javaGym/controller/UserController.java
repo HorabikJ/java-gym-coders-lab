@@ -29,13 +29,12 @@ public class UserController {
     }
 
     @PatchMapping("/change-password")
-    public Boolean updateUserPassword(@RequestParam @Min(1) Long userId,
+    public Boolean changeUserPassword(@RequestParam @Min(1) Long userId,
                                      @Size(min = 5) @NotBlank @RequestParam String oldPassword,
                                      @Size(min = 5) @NotBlank @RequestParam String newPassword) {
         return userService.changePassword(userId, oldPassword, newPassword);
     }
 
-//    TODO test
     @PatchMapping("/newsletter")
     public User changeNewsletterConsent(@RequestParam @Min(1) Long userId,
                                         @RequestParam @NotNull Boolean newsletter) {
@@ -43,20 +42,15 @@ public class UserController {
     }
 
     @PatchMapping("/change-names")
-    public User updateUserNameAndSurname(@RequestParam @Min(1) Long userId,
-                                @NotBlank @RequestParam String name,
+    public User changeUserFirstAndLastName(@RequestParam @Min(1) Long userId,
+                                @NotBlank @RequestParam String firstName,
                                 @NotBlank @RequestParam String lastName) {
-//        return userService.changeNameAndSurname(userId, name, lastName);
-        return null;
+        return userService.changeFirstAndLastName(userId, firstName, lastName);
     }
 
 //    TODO
 //     resetPassword(situation when user forgotten his password),
-//     changeNewsletter,
-//     change Name and Surname,
 //     reserve classes,
 //     cancel classes,
-
-
 
 }
