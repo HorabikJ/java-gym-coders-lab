@@ -1,18 +1,24 @@
 package pl.coderslab.javaGym.email;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import pl.coderslab.javaGym.entity.Person;
-import pl.coderslab.javaGym.entity.User;
-import pl.coderslab.javaGym.enumClass.EmailTypeEnum;
 
-//TODO Optimize email sending mechanizm
 @Component
 public class EmailSender {
+
+    private final String changeEmailSubject = "JavaSpringGym change of email.";
+    private final String changeEmailText = "Please click below link to confirm change of your email:\n";
+
+    private final String confirmAccountSubject = "JavaGymSpring account activation email.";
+    private final String confirmAccountText = "Please click below link to activate your account:\n" +
+                                              "***DO NOT MANIPULATE IT!\n";
+
+    private final String welcomeEmailSubject = " welcome in JavaSpringGym application!";
+    private final String welcomeEmailText = " we are very pleased that you joined us!";
 
     private JavaMailSender javaMailSender;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -23,31 +29,43 @@ public class EmailSender {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public void sendEmail(Person person, EmailTypeEnum emailType) throws MailException {
+    public void sendUserWelcomeEmail(Person person) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(person.getEmail());
-        setEmailTitleAndContent(message, person, emailType);
+        message.setSubject(person.getFirstName() + welcomeEmailSubject);
+        message.setText(person.getFirstName() + welcomeEmailText);
         javaMailSender.send(message);
     }
 
-    private void setEmailTitleAndContent(SimpleMailMessage message, Person person,
-                 EmailTypeEnum emailTypeEnum) {
-        if (emailTypeEnum.equals(EmailTypeEnum.ACCOUNT_ACTIVATION_EMAIL))
-            message.setSubject("JavaSpringGym account activation.");
-            message.setText(this.activationEmailText +
-                    "http://localhost:8080/confirm-account?param="
-                    + bCryptPasswordEncoder.encode(person.getEmail()));
-        if (emailTypeEnum.equals(EmailTypeEnum.WELCOME_EMAIL)) {
-            message.setSubject(person.getFirstName() + " welcome in JavaSpringGym application!");
-            message.setText(person.getFirstName() + ", we are very pleased that you joined us!");
-        } else if (emailTypeEnum.equals(EmailTypeEnum.CLASS_CANCELED_EMAIL)) {
-//            something
-        } else if (emailTypeEnum.equals((EmailTypeEnum.CLASS_RESERVED_EMAIL))) {
-//               something
-        }
+    public void sendAccountActivationEmail(Person person) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        StringBuffer messageText = new StringBuffer();
+        String hashedEmail = bCryptPasswordEncoder.encode(person.getEmail());
+
+        messageText.append(confirmAccountText)
+                .append("http://localhost:8080/confirm-account?param=")
+                .append(hashedEmail);
+
+        message.setTo(person.getEmail());
+        message.setSubject(confirmAccountSubject);
+        message.setText(messageText.toString());
+        javaMailSender.send(message);
     }
 
-    private String activationEmailText = "click in below link to activate your account\n";
+    public void sendChangeEmailMessage(Person person, String newEmail) {
+        StringBuffer messageText = new StringBuffer();
+        SimpleMailMessage message = new SimpleMailMessage();
+        String hashedCurrentEmail = bCryptPasswordEncoder.encode(person.getEmail());
 
+        messageText.append(changeEmailText)
+                .append("http://localhost:8080/change-email?param=")
+                .append(hashedCurrentEmail)
+                .append("&newEmail=")
+                .append(newEmail);
 
+        message.setTo(newEmail);
+        message.setSubject(changeEmailSubject);
+        message.setText(messageText.toString());
+        javaMailSender.send(message);
+    }
 }
