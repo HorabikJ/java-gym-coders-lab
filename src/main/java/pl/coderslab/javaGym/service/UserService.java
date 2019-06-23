@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class UserService implements AbstractService<User> {
+public class UserService implements AbstractUserService<User> {
 
     private EmailSender emailSender;
     private UserRepository userRepository;
@@ -50,10 +50,10 @@ public class UserService implements AbstractService<User> {
         return userRepository.findById(id).orElse(null);
     }
 
-    public User save(User user) {
+    public User save(User user, Boolean asAdmin) {
         if (user.getId() == null) {
             try {
-                setUserProperties(user, false);
+                setUserProperties(user, asAdmin);
                 emailSender.sendEmail(user, EmailTypeEnum.ACCOUNT_ACTIVATION_EMAIL);
                 return userRepository.save(user);
             } catch (MailException e) {
@@ -66,16 +66,7 @@ public class UserService implements AbstractService<User> {
         }
     }
 
-    public User saveAsAdmin(User admin) {
-        try {
-            setUserProperties(admin, true);
-            return userRepository.save(admin);
-        } catch (DataIntegrityViolationException e) {
-            throw new DomainObjectException();
-        }
-    }
-
-    private void setUserProperties(User user, boolean asAdmin) {
+    private void setUserProperties(User user, Boolean asAdmin) {
         Set<Role> roles = new HashSet<>();
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setActive(0);
