@@ -45,25 +45,27 @@ public class UserService implements AbstractService<User> {
         return userRepository.findAll();
     }
 
-//    method for admins
+    //    method for admins
     public User findById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
 
-    @Transactional
     public User save(User user) {
-        try {
-            setUserProperties(user, false);
-            emailSender.sendEmail(user, EmailTypeEnum.ACCOUNT_ACTIVATION_EMAIL);
-            return userRepository.save(user);
-        } catch (MailException e) {
-            throw new EmailSendingException();
-        } catch (DataIntegrityViolationException e) {
-            throw new DomainObjectException();
+        if (user.getId() == null) {
+            try {
+                setUserProperties(user, false);
+                emailSender.sendEmail(user, EmailTypeEnum.ACCOUNT_ACTIVATION_EMAIL);
+                return userRepository.save(user);
+            } catch (MailException e) {
+                throw new EmailSendingException();
+            } catch (DataIntegrityViolationException e) {
+                throw new DomainObjectException();
+            }
+        } else {
+            throw new NotAuthenticatedException();
         }
     }
 
-    @Transactional
     public User saveAsAdmin(User admin) {
         try {
             setUserProperties(admin, true);
@@ -128,7 +130,7 @@ public class UserService implements AbstractService<User> {
         }
     }
 
-//    method for users
+    //    method for users
     public User getUserById(Long userId) {
         User user = getAuthenticatedUser(userId);
         user.setPassword(null);
