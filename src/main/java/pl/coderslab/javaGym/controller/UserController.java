@@ -49,6 +49,7 @@ public class UserController {
     }
 
 //    TODO
+//     change email
 //     resetPassword(situation when user forgotten his password),
 //     reserve classes,
 //     cancel classes,
