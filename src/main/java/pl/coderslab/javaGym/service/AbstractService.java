@@ -8,8 +8,6 @@ public interface AbstractService<T> {
 
     T findById(Long Id);
 
-    T save(T t);
-
     void deleteById(Long id);
 
 }
