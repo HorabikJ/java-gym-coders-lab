@@ -18,14 +18,14 @@ import java.util.List;
 @Entity
 @Data
 @Table
-public class Instructor {
+public class Instructor implements Person {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long id;
 
-    @Column
+    @Column(unique = true)
     @Email(message = "*Please provide a valid email.")
     @NotBlank(message = "*Please provide an email.")
     private String email;

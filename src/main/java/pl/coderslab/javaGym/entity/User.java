@@ -15,14 +15,14 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table
-public class User {
+public class User implements Person {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long id;
 
-    @Column(unique = true, updatable = false)
+    @Column(unique = true)
     @Email(message = "*Please provide a valid email.")
     @NotBlank(message = "*Please provide an email.")
     private String email;
@@ -40,9 +40,7 @@ public class User {
     @NotBlank(message = "*Last name can not be empty.")
     private String lastName;
 
-    @Column
-    @Max(value = 1, message = "*Only 0 as inactive or 1 as active are acceptable.")
-    @Min(value = 0, message = "*Only 0 as inactive or 1 as active are acceptable.")
+    @Column(nullable = false)
     private Integer active;
 
     @Column
