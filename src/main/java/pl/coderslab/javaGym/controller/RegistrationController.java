@@ -22,7 +22,7 @@ public class RegistrationController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public User registerUser(@RequestBody @Valid User user) {
-        return userService.save(user);
+        return userService.save(user, false);
     }
 
 //    TODO set link expiration time
