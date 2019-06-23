@@ -54,7 +54,7 @@ public class UserService implements AbstractUserService<User> {
         if (user.getId() == null) {
             try {
                 setUserProperties(user, asAdmin);
-                emailSender.sendEmail(user, EmailTypeEnum.ACCOUNT_ACTIVATION_EMAIL);
+//                emailSender.sendAccountActivationEmail(user);
                 return userRepository.save(user);
             } catch (MailException e) {
                 throw new EmailSendingException();
@@ -136,14 +136,14 @@ public class UserService implements AbstractUserService<User> {
     }
 
     @Transactional
-    public Boolean authenticateUserAccount(String param) {
+    public Boolean activateUserAccount(String param) {
         List<String> emails = userRepository.getAllUsersEmails();
         for (String email : emails) {
             if (bCryptPasswordEncoder.matches(email, param)) {
                 User user = userRepository.findByEmail(email);
                 user.setActive(1);
                 userRepository.save(user);
-                emailSender.sendEmail(user, EmailTypeEnum.WELCOME_EMAIL);
+                emailSender.sendUserWelcomeEmail(user);
                 return true;
             }
         }
@@ -156,5 +156,28 @@ public class UserService implements AbstractUserService<User> {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         return userRepository.save(user);
+    }
+
+    public Boolean changeUserEmail(Long userId, String newEmail) {
+        if (userRepository.getAllUsersEmails().contains(newEmail)) {
+            throw new DomainObjectException();
+        } else {
+            User user = getAuthenticatedUser(userId);
+            emailSender.sendChangeEmailMessage(user, newEmail);
+            return true;
+        }
+    }
+
+    public Boolean confirmUserEmailChange(String param, String newEmail) {
+        List<String> emails = userRepository.getAllUsersEmails();
+        for (String email : emails) {
+            if (bCryptPasswordEncoder.matches(email, param)) {
+                User user = userRepository.findByEmail(email);
+                user.setEmail(newEmail);
+                userRepository.save(user);
+                return true;
+            }
+        }
+        throw new ResourceNotFoundException();
     }
 }

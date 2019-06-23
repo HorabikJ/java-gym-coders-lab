@@ -7,7 +7,7 @@ import pl.coderslab.javaGym.entity.User;
 import pl.coderslab.javaGym.service.UserService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.NotBlank;
 
 @RestController
 public class RegistrationController {
@@ -27,8 +27,8 @@ public class RegistrationController {
 
 //    TODO set link expiration time
     @GetMapping("/confirm-account")
-    public Boolean userAccountConfirmation(@RequestParam @Size(min = 1) String param) {
-        return userService.authenticateUserAccount(param);
+    public Boolean userAccountActivation(@RequestParam @NotBlank String param) {
+        return userService.activateUserAccount(param);
     }
 
 }

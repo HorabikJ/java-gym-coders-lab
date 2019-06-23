@@ -6,10 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.coderslab.javaGym.entity.User;
 import pl.coderslab.javaGym.service.UserService;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 @RestController
 @RequestMapping("/user")
@@ -30,8 +27,11 @@ public class UserController {
 
     @PatchMapping("/change-password")
     public Boolean changeUserPassword(@RequestParam @Min(1) Long userId,
-                                     @Size(min = 5) @NotBlank @RequestParam String oldPassword,
-                                     @Size(min = 5) @NotBlank @RequestParam String newPassword) {
+         @NotBlank(message = "*Please provide your old password.")
+         @RequestParam String oldPassword,
+         @Size(min = 5, message = "*Your password must have at least 5 characters.")
+         @NotBlank(message = "*Please provide your old password.")
+         @RequestParam String newPassword) {
         return userService.changePassword(userId, oldPassword, newPassword);
     }
 
@@ -43,15 +43,23 @@ public class UserController {
 
     @PatchMapping("/change-names")
     public User changeUserFirstAndLastName(@RequestParam @Min(1) Long userId,
-                                @NotBlank @RequestParam String firstName,
-                                @NotBlank @RequestParam String lastName) {
+                @NotBlank(message = "*Name can not be empty.") @RequestParam String firstName,
+                @NotBlank(message = "*Last name can not be empty.") @RequestParam String lastName) {
         return userService.changeFirstAndLastName(userId, firstName, lastName);
     }
 
+    @PostMapping("/change-email")
+    public Boolean changeUserEmail(@RequestParam @Min(1) Long userId,
+                                @Email(message = "*Please provide a valid email.")
+                                @NotBlank(message = "*Please provide an email.")
+                                @RequestParam String newEmail) {
+        return userService.changeUserEmail(userId, newEmail);
+    }
+
 //    TODO
-//     change email
 //     resetPassword(situation when user forgotten his password),
 //     reserve classes,
 //     cancel classes,
+//     check response status for other methods,
 
 }
