@@ -1,4 +1,4 @@
-package pl.coderslab.javaGym.entity;
+package pl.coderslab.javaGym.entity.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
