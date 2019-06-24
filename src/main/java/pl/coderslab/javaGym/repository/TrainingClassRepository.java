@@ -2,7 +2,7 @@ package pl.coderslab.javaGym.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import pl.coderslab.javaGym.entity.TrainingClass;
+import pl.coderslab.javaGym.entity.data.TrainingClass;
 
 import java.util.List;
 
