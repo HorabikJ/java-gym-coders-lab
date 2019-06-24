@@ -5,7 +5,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-import pl.coderslab.javaGym.entity.Person;
+import pl.coderslab.javaGym.entity.data.Person;
 
 @Component
 public class EmailSender {

@@ -3,7 +3,7 @@ package pl.coderslab.javaGym.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import pl.coderslab.javaGym.entity.User;
+import pl.coderslab.javaGym.entity.user.User;
 import pl.coderslab.javaGym.service.UserService;
 
 import javax.validation.Valid;
