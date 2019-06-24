@@ -1,8 +1,10 @@
-package pl.coderslab.javaGym.entity;
+package pl.coderslab.javaGym.entity.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pl.coderslab.javaGym.entity.data.Person;
+import pl.coderslab.javaGym.entity.data.TrainingClass;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
