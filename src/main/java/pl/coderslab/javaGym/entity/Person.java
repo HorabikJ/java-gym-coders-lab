@@ -1,4 +1,4 @@
-package pl.coderslab.javaGym.entity.data;
+package pl.coderslab.javaGym.entity;
 
 public interface Person {
 
