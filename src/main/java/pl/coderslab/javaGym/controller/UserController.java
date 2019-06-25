@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.javaGym.entity.user.User;
-import pl.coderslab.javaGym.service.UserService;
+import pl.coderslab.javaGym.service.userService.UserService;
 
 import javax.validation.constraints.*;
 
@@ -22,7 +22,7 @@ public class UserController {
 
     @GetMapping("/show-details")
     public User getUser(@RequestParam @Min(1) Long userId) {
-        return userService.getUserById(userId);
+        return userService.getAuthenticatedUserById(userId);
     }
 
     @PatchMapping("/change-password")
@@ -53,7 +53,7 @@ public class UserController {
                                 @Email(message = "*Please provide a valid email.")
                                 @NotBlank(message = "*Please provide an email.")
                                 @RequestParam String newEmail) {
-        return userService.changeUserEmail(userId, newEmail);
+        return userService.sendUserEmailChangeMessage(userId, newEmail);
     }
 
 //    TODO

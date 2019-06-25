@@ -1,4 +1,6 @@
-package pl.coderslab.javaGym.service;
+package pl.coderslab.javaGym.service.userService;
+
+import pl.coderslab.javaGym.service.AbstractService;
 
 public interface AbstractUserService<T> extends AbstractService<T> {
 

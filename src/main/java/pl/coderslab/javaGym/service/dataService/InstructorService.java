@@ -1,4 +1,4 @@
-package pl.coderslab.javaGym.service;
+package pl.coderslab.javaGym.service.dataService;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import pl.coderslab.javaGym.repository.InstructorRepository;
 import java.util.List;
 
 @Service
-public class InstructorService implements AbstractStandardService<Instructor> {
+public class InstructorService implements AbstractDataService<Instructor> {
 
     private InstructorRepository instructorRepository;
     private EmailSender emailSender;

@@ -26,7 +26,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
             NotAuthenticatedException.class,
             ResourceNotFoundException.class,
             PasswordDoNotMatchException.class,
-            LinkExpiredException.class})
+            LinkExpiredException.class,
+            EmailSendingException.class})
     public ResponseEntity<CustomErrorResponse> handleCustomException
             (Exception exception, WebRequest request) {
 

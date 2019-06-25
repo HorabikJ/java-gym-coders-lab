@@ -1,4 +1,4 @@
-package pl.coderslab.javaGym.service;
+package pl.coderslab.javaGym.service.emailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,10 +13,10 @@ import pl.coderslab.javaGym.repository.UserRepository;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @Service
-public class ActivationEmailService implements AbstractStandardService<ActivationEmailDetails> {
+public class ActivationEmailService implements
+        AbstractConfirmationEmailService<ActivationEmailDetails> {
 
     private final static ZoneId ZONE_POLAND = ZoneId.of("Poland");
 
@@ -40,21 +40,6 @@ public class ActivationEmailService implements AbstractStandardService<Activatio
             newEmailDetails.setId(oldEmailDetails.getId());
             return activationEmailRepository.save(newEmailDetails);
         }
-    }
-
-    @Override
-    public List<ActivationEmailDetails> findAll() {
-        return null;
-    }
-
-    @Override
-    public ActivationEmailDetails findById(Long Id) {
-        return null;
-    }
-
-    @Override
-    public void deleteById(Long id) {
-
     }
 
     @Transactional

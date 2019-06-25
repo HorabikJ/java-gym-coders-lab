@@ -1,10 +1,15 @@
 package pl.coderslab.javaGym;
 
-import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 public class Main {
 
     public static void main(String[] args) {
+
+        ZoneId zoneId = ZoneId.of("Poland");
+        System.out.println(zoneId);
+        System.out.println(ZonedDateTime.now(zoneId));
 
 ////        Integer recurency = 5;
 ////

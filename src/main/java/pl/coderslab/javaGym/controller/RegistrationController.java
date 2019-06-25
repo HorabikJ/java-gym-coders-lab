@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.javaGym.entity.user.User;
-import pl.coderslab.javaGym.service.ActivationEmailService;
-import pl.coderslab.javaGym.service.UserService;
+import pl.coderslab.javaGym.service.emailService.ActivationEmailService;
+import pl.coderslab.javaGym.service.userService.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;

@@ -1,5 +1,6 @@
-package pl.coderslab.javaGym.service;
+package pl.coderslab.javaGym.service.userService;
 
+import com.sun.mail.util.MailConnectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mail.MailException;
@@ -16,6 +17,7 @@ import pl.coderslab.javaGym.error.customException.*;
 import pl.coderslab.javaGym.repository.RoleRepository;
 import pl.coderslab.javaGym.repository.UserRepository;
 
+import javax.mail.MessagingException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,7 +41,6 @@ public class UserService implements AbstractUserService<User> {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    @Override
     public List<User> findAll() {
         return userRepository.findAll();
     }
@@ -49,11 +50,12 @@ public class UserService implements AbstractUserService<User> {
         return userRepository.findById(id).orElse(null);
     }
 
+    @Transactional
     public User save(User user, Boolean asAdmin) {
         if (user.getId() == null) {
             try {
                 setUserProperties(user, asAdmin);
-//                emailSender.sendAccountActivationEmail(user);
+                emailSender.sendAccountActivationEmail(user);
                 return userRepository.save(user);
             } catch (MailException e) {
                 throw new EmailSendingException();
@@ -78,7 +80,6 @@ public class UserService implements AbstractUserService<User> {
         user.setRoles(roles);
     }
 
-    @Override
     @Transactional
     public void deleteById(Long id) {
         userRepository.deleteById(id);
@@ -121,7 +122,7 @@ public class UserService implements AbstractUserService<User> {
     }
 
     //    method for users
-    public User getUserById(Long userId) {
+    public User getAuthenticatedUserById(Long userId) {
         User user = getAuthenticatedUser(userId);
         user.setPassword(null);
         return user;
@@ -135,21 +136,6 @@ public class UserService implements AbstractUserService<User> {
     }
 
     @Transactional
-    public Boolean activateUserAccount(String param) {
-        List<String> emails = userRepository.getAllUsersEmails();
-        for (String email : emails) {
-            if (bCryptPasswordEncoder.matches(email, param)) {
-                User user = userRepository.findByEmail(email);
-                user.setActive(1);
-                userRepository.save(user);
-                emailSender.sendUserWelcomeEmail(user);
-                return true;
-            }
-        }
-        throw new ResourceNotFoundException();
-    }
-
-    @Transactional
     public User changeFirstAndLastName(Long userId, String firstName, String lastName) {
         User user = getAuthenticatedUser(userId);
         user.setFirstName(firstName);
@@ -157,26 +143,23 @@ public class UserService implements AbstractUserService<User> {
         return userRepository.save(user);
     }
 
-    public Boolean changeUserEmail(Long userId, String newEmail) {
-        if (userRepository.getAllUsersEmails().contains(newEmail)) {
-            throw new DomainObjectException();
-        } else {
-            User user = getAuthenticatedUser(userId);
-            emailSender.sendChangeEmailMessage(user, newEmail);
-            return true;
-        }
-    }
-
-    public Boolean confirmUserEmailChange(String param, String newEmail) {
-        List<String> emails = userRepository.getAllUsersEmails();
-        for (String email : emails) {
-            if (bCryptPasswordEncoder.matches(email, param)) {
-                User user = userRepository.findByEmail(email);
-                user.setEmail(newEmail);
-                userRepository.save(user);
-                return true;
+    @Transactional
+    public Boolean sendUserEmailChangeMessage(Long userId, String newEmail) {
+        User user = getAuthenticatedUser(userId);
+        if (user != null) {
+            Boolean newEmailExistInDB = userRepository.existsByEmail(newEmail);
+            if (!newEmailExistInDB) {
+                try {
+                    emailSender.sendChangeEmailMessage(user, newEmail);
+                    return true;
+                } catch (MailException e) {
+                    throw new EmailSendingException();
+                }
+            } else {
+                throw new DomainObjectException();
             }
+        } else {
+            throw new NotAuthenticatedException();
         }
-        throw new ResourceNotFoundException();
     }
 }

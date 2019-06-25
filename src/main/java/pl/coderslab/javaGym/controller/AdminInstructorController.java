@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.javaGym.entity.data.Instructor;
-import pl.coderslab.javaGym.service.InstructorService;
+import pl.coderslab.javaGym.service.dataService.InstructorService;
 
 import javax.validation.Valid;
 
