@@ -1,8 +1,7 @@
 package pl.coderslab.javaGym.entity.data;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import pl.coderslab.javaGym.entity.Person;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -13,6 +12,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -25,23 +25,28 @@ public class Instructor implements Person {
     @Column
     private Long id;
 
+    @NonNull
     @Column(unique = true)
     @Email(message = "*Please provide a valid email.")
     @NotBlank(message = "*Please provide an email.")
     private String email;
 
+    @NonNull
     @Column
     @NotBlank(message = "*Name can not be empty.")
     private String firstName;
 
+    @NonNull
     @Column
     @NotBlank(message = "*Last name can not be empty.")
     private String lastName;
 
+    @NonNull
     @Column
     @NotNull(message = "*Please provide a valid date of birth.")
     private LocalDate dateOfBirth;
 
+    @NonNull
     @Column(length = 1000)
     @Size(min = 1, max = 1000, message = "*Description can not be empty and can not be longer that 1000 signs.")
     private String description;
