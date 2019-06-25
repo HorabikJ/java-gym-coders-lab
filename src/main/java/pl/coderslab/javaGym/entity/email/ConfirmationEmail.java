@@ -3,6 +3,7 @@ package pl.coderslab.javaGym.entity.email;
 import pl.coderslab.javaGym.entity.user.User;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public interface ConfirmationEmail {
 
@@ -14,12 +15,16 @@ public interface ConfirmationEmail {
 
     void setUser(User user);
 
-    String getUniqueParam();
+    String getParam();
 
-    void setUniqueParam(String uniqueParam);
+    void setParam(String uniqueParam);
 
-    LocalDateTime getSendTime();
+    ZonedDateTime getSendTime();
 
-    void setSendTime(LocalDateTime sendTime);
+    void setSendTime(ZonedDateTime sendTime);
+
+    Integer getMinutesExpirationTime();
+
+    void setMinutesExpirationTime(Integer minutesExpirationTime);
 
 }

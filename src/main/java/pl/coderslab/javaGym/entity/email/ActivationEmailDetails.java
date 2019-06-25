@@ -1,16 +1,15 @@
 package pl.coderslab.javaGym.entity.email;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pl.coderslab.javaGym.entity.user.User;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 
-@NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
+@NoArgsConstructor
 @Data
 @Entity
 @Table
@@ -20,13 +19,20 @@ public class ActivationEmailDetails implements ConfirmationEmail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NonNull
     @OneToOne
     private User user;
 
+    @NonNull
     @Column
-    private String uniqueParam;
+    private String param;
 
+    @NonNull
     @Column
-    private LocalDateTime sendTime;
+    private ZonedDateTime sendTime;
+
+    @NonNull
+    @Column
+    private Integer minutesExpirationTime;
 
 }
