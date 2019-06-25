@@ -5,7 +5,6 @@ import lombok.*;
 import javax.persistence.*;
 
 @Data
-@RequiredArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -17,8 +16,10 @@ public class Role {
     @Column
     private Long id;
 
-    @NonNull
     @Column
     private String role;
 
+    public Role(String role) {
+        this.role = role;
+    }
 }

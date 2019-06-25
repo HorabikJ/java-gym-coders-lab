@@ -2,7 +2,7 @@ package pl.coderslab.javaGym.service.emailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.coderslab.javaGym.entity.email.ActivationEmailDetails;
+import org.springframework.transaction.annotation.Transactional;
 import pl.coderslab.javaGym.entity.email.ChangeEmailDetails;
 import pl.coderslab.javaGym.entity.user.User;
 import pl.coderslab.javaGym.error.customException.DomainObjectException;
@@ -14,10 +14,11 @@ import pl.coderslab.javaGym.repository.UserRepository;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
+import java.util.UUID;
 
 @Service
-public class ChangeEmailDetailsService implements AbstractConfirmationEmailService<ChangeEmailDetails>  {
+public class ChangeEmailDetailsService implements
+        AbstractConfirmationEmailService<ChangeEmailDetails>  {
 
     private final static ZoneId ZONE_POLAND = ZoneId.of("Poland");
 
@@ -43,6 +44,7 @@ public class ChangeEmailDetailsService implements AbstractConfirmationEmailServi
         }
     }
 
+    @Transactional
     public Boolean confirmEmailChange(String param) {
         ChangeEmailDetails emailDetails = changeEmailDetailsRepository.findByParam(param);
         if (emailDetails != null) {
@@ -66,6 +68,8 @@ public class ChangeEmailDetailsService implements AbstractConfirmationEmailServi
         User user = emailDetails.getUser();
         user.setEmail(emailDetails.getNewEmail());
         userRepository.save(user);
+        emailDetails.setParam(UUID.randomUUID().toString());
+        changeEmailDetailsRepository.save(emailDetails);
     }
 
     private Boolean isLinkActive(ChangeEmailDetails emailDetails) {

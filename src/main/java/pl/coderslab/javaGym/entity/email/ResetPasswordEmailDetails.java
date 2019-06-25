@@ -7,31 +7,33 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @NoArgsConstructor
-@RequiredArgsConstructor
 @AllArgsConstructor
 @Data
 @Entity
 @Table
-public class ResetPasswordDetails implements ConfirmationEmail {
+public class ResetPasswordEmailDetails implements ConfirmationEmail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     @OneToOne
     private User user;
 
-    @NonNull
     @Column
     private String param;
 
-    @NonNull
     @Column
     private ZonedDateTime sendTime;
 
-    @NonNull
     @Column
     private Integer minutesExpirationTime;
 
+    public ResetPasswordEmailDetails(User user, String param, ZonedDateTime sendTime,
+                                     Integer minutesExpirationTime) {
+        this.user = user;
+        this.param = param;
+        this.sendTime = sendTime;
+        this.minutesExpirationTime = minutesExpirationTime;
+    }
 }

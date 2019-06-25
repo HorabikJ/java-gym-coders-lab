@@ -8,7 +8,6 @@ import java.time.ZonedDateTime;
 
 
 @AllArgsConstructor
-@RequiredArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
@@ -19,20 +18,23 @@ public class ActivationEmailDetails implements ConfirmationEmail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     @OneToOne
     private User user;
 
-    @NonNull
     @Column
     private String param;
 
-    @NonNull
     @Column
     private ZonedDateTime sendTime;
 
-    @NonNull
     @Column
     private Integer minutesExpirationTime;
 
+    public ActivationEmailDetails(User user, String param, ZonedDateTime sendTime,
+                                  Integer minutesExpirationTime) {
+        this.user = user;
+        this.param = param;
+        this.sendTime = sendTime;
+        this.minutesExpirationTime = minutesExpirationTime;
+    }
 }

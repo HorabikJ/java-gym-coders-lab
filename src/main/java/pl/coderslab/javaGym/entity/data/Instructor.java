@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@RequiredArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -25,28 +24,23 @@ public class Instructor implements Person {
     @Column
     private Long id;
 
-    @NonNull
     @Column(unique = true)
     @Email(message = "*Please provide a valid email.")
     @NotBlank(message = "*Please provide an email.")
     private String email;
 
-    @NonNull
     @Column
     @NotBlank(message = "*Name can not be empty.")
     private String firstName;
 
-    @NonNull
     @Column
     @NotBlank(message = "*Last name can not be empty.")
     private String lastName;
 
-    @NonNull
     @Column
     @NotNull(message = "*Please provide a valid date of birth.")
     private LocalDate dateOfBirth;
 
-    @NonNull
     @Column(length = 1000)
     @Size(min = 1, max = 1000, message = "*Description can not be empty and can not be longer that 1000 signs.")
     private String description;
@@ -54,4 +48,12 @@ public class Instructor implements Person {
     @OneToMany(mappedBy = "instructor", cascade = CascadeType.REMOVE)
     private List<TrainingClass> trainingClassList = new ArrayList<>();
 
+    public Instructor(String email, String firstName, String lastName,
+                      LocalDate dateOfBirth, String description) {
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+        this.description = description;
+    }
 }

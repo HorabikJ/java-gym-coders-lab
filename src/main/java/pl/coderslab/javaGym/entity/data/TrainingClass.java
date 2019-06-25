@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
-@RequiredArgsConstructor
 @AllArgsConstructor
 @Data
 @Entity
@@ -25,27 +24,22 @@ public class TrainingClass {
     @Column
     private Long id;
 
-    @NonNull
     @Column
     private String uniqueClassId;
 
-    @NonNull
     @NotNull
     @Column
     @Min(value = 1, message = "*Minimum value for capacity is 1.")
     private Integer maxCapacity;
 
-    @NonNull
     @Column
     @Future(message = "*Start date for a class must be in future.")
     private ZonedDateTime startDate;
 
-    @NonNull
     @ManyToOne
     @NotNull(message = "*Please provide instructor for a class.")
     private Instructor instructor;
 
-    @NonNull
     @ManyToOne
     @NotNull(message = "*Please provide training type for a class.")
     private TrainingType trainingType;
@@ -53,4 +47,12 @@ public class TrainingClass {
     @ManyToMany
     private List<User> customers = new ArrayList<>();
 
+    public TrainingClass(String uniqueClassId, Integer maxCapacity, ZonedDateTime startDate,
+                         Instructor instructor, TrainingType trainingType) {
+        this.uniqueClassId = uniqueClassId;
+        this.maxCapacity = maxCapacity;
+        this.startDate = startDate;
+        this.instructor = instructor;
+        this.trainingType = trainingType;
+    }
 }

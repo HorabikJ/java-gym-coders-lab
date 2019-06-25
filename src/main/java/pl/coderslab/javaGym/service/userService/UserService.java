@@ -1,6 +1,5 @@
 package pl.coderslab.javaGym.service.userService;
 
-import com.sun.mail.util.MailConnectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mail.MailException;
@@ -17,7 +16,6 @@ import pl.coderslab.javaGym.error.customException.*;
 import pl.coderslab.javaGym.repository.RoleRepository;
 import pl.coderslab.javaGym.repository.UserRepository;
 
-import javax.mail.MessagingException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -160,6 +158,21 @@ public class UserService implements AbstractUserService<User> {
             }
         } else {
             throw new NotAuthenticatedException();
+        }
+    }
+
+    @Transactional
+    public Boolean resetUserPassword(String userEmail) {
+        User user = userRepository.findByEmail(userEmail);
+        if (user != null) {
+            try {
+                emailSender.sendResetPasswordEmail(user);
+                return true;
+            } catch (MailException e) {
+                throw new EmailSendingException();
+            }
+        } else {
+            throw new ResourceNotFoundException();
         }
     }
 }

@@ -6,7 +6,6 @@ import pl.coderslab.javaGym.entity.user.User;
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 
-@RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -18,23 +17,27 @@ public class ChangeEmailDetails implements ConfirmationEmail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     @OneToOne
     private User user;
 
-    @NonNull
     @Column
     private String param;
 
-    @NonNull
     @Column
     private ZonedDateTime sendTime;
 
-    @NonNull
     @Column
     private String newEmail;
 
-    @NonNull
     @Column
     private Integer minutesExpirationTime;
+
+    public ChangeEmailDetails(User user, String param, ZonedDateTime sendTime,
+                              String newEmail, Integer minutesExpirationTime) {
+        this.user = user;
+        this.param = param;
+        this.sendTime = sendTime;
+        this.newEmail = newEmail;
+        this.minutesExpirationTime = minutesExpirationTime;
+    }
 }

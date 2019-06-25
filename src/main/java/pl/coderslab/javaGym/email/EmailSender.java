@@ -7,9 +7,12 @@ import org.springframework.stereotype.Component;
 import pl.coderslab.javaGym.entity.Person;
 import pl.coderslab.javaGym.entity.email.ActivationEmailDetails;
 import pl.coderslab.javaGym.entity.email.ChangeEmailDetails;
+import pl.coderslab.javaGym.entity.email.ResetPasswordEmailDetails;
 import pl.coderslab.javaGym.entity.user.User;
+import pl.coderslab.javaGym.repository.ResetPasswordEmailRepository;
 import pl.coderslab.javaGym.service.emailService.ActivationEmailService;
 import pl.coderslab.javaGym.service.emailService.ChangeEmailDetailsService;
+import pl.coderslab.javaGym.service.emailService.ResetPasswordEmailService;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -24,12 +27,17 @@ public class EmailSender {
     private final static String CHANGE_EMAIL_URL = "http://localhost:8080/change-email?param=";
     private final static String CHANGE_EMAIL_SUBJECT = "JavaSpringGym change of email.";
     private final static String CHANGE_EMAIL_TEXT = "Please click below link to confirm change of your email,\n" +
-                                                    "this link will expire in " + LINK_EXPIRATION_TIME + " minutes.\n";
+                                        "this link will expire in " + LINK_EXPIRATION_TIME + " minutes.\n";
 
-    private final static String CONFIRM_ACCOUNT_URL = "http://localhost:8080/confirm-account?param=";
+    private final static String CONFIRM_ACCOUNT_URL = "http://localhost:8080/register/confirm-account?param=";
     private final static String CONFIRM_ACCOUNT_SUBJECT = "JavaGymSpring account activation email.";
     private final static String CONFIRM_ACCOUNT_TEXT = "Please click below link to activate your account,\n" +
-                                                       "This link will expire in " + LINK_EXPIRATION_TIME + " minutes.\n";
+                                        "this link will expire in " + LINK_EXPIRATION_TIME + " minutes.\n";
+
+    private final static String RESET_PASSWORD_URL = "http://localhost:8080/reset-password/show-form?param=";
+    private final static String RESET_PASSWORD_SUBJECT = "JavaSpringGym reset password.";
+    private final static String RESET_PASSWORD_TEXT = "Please click below link to go to reset password site,\n" +
+                                        "it will be possible for the next " + LINK_EXPIRATION_TIME + " minutes.\n";
 
     private final static String WELCOME_EMAIL_SUBJECT = ", welcome in JavaSpringGym application!";
     private final static String WELCOME_EMAIL_TEXT = ", we are very pleased that you joined us!";
@@ -37,14 +45,17 @@ public class EmailSender {
     private JavaMailSender javaMailSender;
     private ActivationEmailService activationEmailService;
     private ChangeEmailDetailsService changeEmailDetailsService;
+    private ResetPasswordEmailService resetPasswordEmailService;
 
     @Autowired
     public EmailSender(JavaMailSender javaMailSender,
                        ChangeEmailDetailsService changeEmailDetailsService,
-                       ActivationEmailService activationEmailService) {
+                       ActivationEmailService activationEmailService,
+                       ResetPasswordEmailService resetPasswordEmailService) {
         this.changeEmailDetailsService = changeEmailDetailsService;
         this.javaMailSender = javaMailSender;
         this.activationEmailService = activationEmailService;
+        this.resetPasswordEmailService = resetPasswordEmailService;
     }
 
     public void sendUserWelcomeEmail(Person person) {
@@ -93,6 +104,26 @@ public class EmailSender {
                 newEmail, LINK_EXPIRATION_TIME);
 
         changeEmailDetailsService.save(emailDetails);
+        javaMailSender.send(message);
+    }
+
+    public void sendResetPasswordEmail(User user) {
+        StringBuffer messageText = new StringBuffer();
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        String param = UUID.randomUUID().toString();
+        messageText.append(RESET_PASSWORD_TEXT)
+                .append(RESET_PASSWORD_URL)
+                .append(param);
+
+        message.setTo(user.getEmail());
+        message.setSubject(RESET_PASSWORD_SUBJECT);
+        message.setText(messageText.toString());
+        ResetPasswordEmailDetails resetPasswordEmailDetails =
+                new ResetPasswordEmailDetails
+                (user, param, ZonedDateTime.now(ZONE_POLAND), LINK_EXPIRATION_TIME);
+
+        resetPasswordEmailService.save(resetPasswordEmailDetails);
         javaMailSender.send(message);
     }
 }

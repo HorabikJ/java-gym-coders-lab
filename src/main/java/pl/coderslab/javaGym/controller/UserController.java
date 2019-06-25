@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.javaGym.entity.user.User;
+import pl.coderslab.javaGym.service.emailService.ChangeEmailDetailsService;
 import pl.coderslab.javaGym.service.userService.UserService;
 
 import javax.validation.constraints.*;
@@ -14,10 +15,13 @@ import javax.validation.constraints.*;
 public class UserController {
 
     private UserService userService;
+    private ChangeEmailDetailsService changeEmailDetailsService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService,
+                          ChangeEmailDetailsService changeEmailDetailsService) {
         this.userService = userService;
+        this.changeEmailDetailsService = changeEmailDetailsService;
     }
 
     @GetMapping("/show-details")

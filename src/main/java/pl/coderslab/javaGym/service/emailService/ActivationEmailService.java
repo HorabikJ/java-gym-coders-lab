@@ -1,10 +1,13 @@
 package pl.coderslab.javaGym.service.emailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.coderslab.javaGym.email.EmailSender;
 import pl.coderslab.javaGym.entity.email.ActivationEmailDetails;
 import pl.coderslab.javaGym.entity.user.User;
+import pl.coderslab.javaGym.error.customException.EmailSendingException;
 import pl.coderslab.javaGym.error.customException.LinkExpiredException;
 import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
 import pl.coderslab.javaGym.repository.ActivationEmailRepository;
@@ -13,6 +16,7 @@ import pl.coderslab.javaGym.repository.UserRepository;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Service
 public class ActivationEmailService implements
@@ -43,12 +47,12 @@ public class ActivationEmailService implements
     }
 
     @Transactional
-    public Boolean activateUserAccount(String param) {
+    public User activateUserAccount(String param) {
         ActivationEmailDetails emailDetails = activationEmailRepository.findByParam(param);
         if (emailDetails != null) {
             if (isLinkActive(emailDetails)) {
                 activateUserAccount(emailDetails);
-                return true;
+                return emailDetails.getUser();
             } else {
                 throw new LinkExpiredException();
             }
@@ -68,6 +72,8 @@ public class ActivationEmailService implements
         User user = emailDetails.getUser();
         user.setActive(1);
         userRepository.save(user);
+        emailDetails.setParam(UUID.randomUUID().toString());
+        activationEmailRepository.save(emailDetails);
     }
 
 }
