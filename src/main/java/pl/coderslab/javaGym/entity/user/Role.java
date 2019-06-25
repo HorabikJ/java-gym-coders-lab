@@ -1,12 +1,11 @@
 package pl.coderslab.javaGym.entity.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Data
+@RequiredArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -18,6 +17,7 @@ public class Role {
     @Column
     private Long id;
 
+    @NonNull
     @Column
     private String role;
 
