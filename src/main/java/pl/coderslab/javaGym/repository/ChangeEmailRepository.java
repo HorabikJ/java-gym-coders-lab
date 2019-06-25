@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 import pl.coderslab.javaGym.entity.email.ChangeEmailDetails;
 
 @Repository
-public interface ChangeEmailDetailsRepository
+public interface ChangeEmailRepository
         extends JpaRepository<ChangeEmailDetails, Long> {
 
 }

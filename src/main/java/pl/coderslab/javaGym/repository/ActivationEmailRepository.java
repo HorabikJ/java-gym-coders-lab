@@ -5,7 +5,13 @@ import org.springframework.stereotype.Repository;
 import pl.coderslab.javaGym.entity.email.ActivationEmailDetails;
 
 @Repository
-public interface ActivationEmailDetailsRepository
+public interface ActivationEmailRepository
         extends JpaRepository<ActivationEmailDetails, Long> {
+
+    ActivationEmailDetails findByUserId(Long id);
+
+    ActivationEmailDetails findByParam(String param);
+
+
 
 }
