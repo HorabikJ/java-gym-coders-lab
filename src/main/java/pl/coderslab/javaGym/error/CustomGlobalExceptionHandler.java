@@ -11,10 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import pl.coderslab.javaGym.error.customException.DomainObjectException;
-import pl.coderslab.javaGym.error.customException.NotAuthenticatedException;
-import pl.coderslab.javaGym.error.customException.PasswordDoNotMatchException;
-import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
+import pl.coderslab.javaGym.error.customException.*;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -28,7 +25,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     @ExceptionHandler({DomainObjectException.class,
             NotAuthenticatedException.class,
             ResourceNotFoundException.class,
-            PasswordDoNotMatchException.class})
+            PasswordDoNotMatchException.class,
+            LinkExpiredException.class})
     public ResponseEntity<CustomErrorResponse> handleCustomException
             (Exception exception, WebRequest request) {
 
@@ -52,8 +50,6 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
             fieldName = "email";
         } else if (exceptionClass.equals(NotAuthenticatedException.class)) {
             fieldName = "user";
-        } else if (exceptionClass.equals(ResourceNotFoundException.class)) {
-            fieldName = "error";
         } else if (exceptionClass.equals(PasswordDoNotMatchException.class)) {
             fieldName = "password";
         }
@@ -71,6 +67,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
             httpStatus = HttpStatus.NOT_FOUND;
         } else if (exceptionClass.equals(PasswordDoNotMatchException.class)) {
             httpStatus = HttpStatus.BAD_REQUEST;
+        } else if (exceptionClass.equals(LinkExpiredException.class)) {
+            httpStatus = HttpStatus.REQUEST_TIMEOUT;
         }
         return httpStatus;
     }
