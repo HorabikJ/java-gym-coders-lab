@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.javaGym.entity.user.User;
+import pl.coderslab.javaGym.service.ActivationEmailService;
 import pl.coderslab.javaGym.service.UserService;
 
 import javax.validation.Valid;
@@ -13,10 +14,13 @@ import javax.validation.constraints.NotBlank;
 public class RegistrationController {
 
     private UserService userService;
+    private ActivationEmailService activationEmailService;
 
     @Autowired
-    public RegistrationController(UserService userService) {
+    public RegistrationController(UserService userService,
+                                  ActivationEmailService activationEmailService) {
         this.userService = userService;
+        this.activationEmailService = activationEmailService;
     }
 
     @PostMapping("/register")
@@ -25,10 +29,9 @@ public class RegistrationController {
         return userService.save(user, false);
     }
 
-//    TODO set link expiration time
     @GetMapping("/confirm-account")
-    public Boolean userAccountActivation(@RequestParam @NotBlank String param) {
-        return userService.activateUserAccount(param);
+    public Boolean activateUserAccount(@RequestParam @NotBlank String param) {
+        return activationEmailService.activateUserAccount(param);
     }
 
 }
