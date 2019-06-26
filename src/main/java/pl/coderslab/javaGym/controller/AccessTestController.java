@@ -1,21 +1,20 @@
 package pl.coderslab.javaGym.controller;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import pl.coderslab.javaGym.email.EmailSender;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import pl.coderslab.javaGym.entity.user.User;
-import pl.coderslab.javaGym.repository.UserRepository;
+import pl.coderslab.javaGym.service.userService.UserService;
 
 @Controller
 public class AccessTestController {
 
-    private EmailSender emailSender;
-    private UserRepository userRepository;
+    private UserService userService;
 
-    public AccessTestController(EmailSender emailSender,
-                                UserRepository userRepository) {
-        this.emailSender = emailSender;
-        this.userRepository = userRepository;
+    public AccessTestController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/user/user-content")
@@ -33,11 +32,23 @@ public class AccessTestController {
         return "access-test";
     }
 
-    @GetMapping("/test")
-    public String test() {
-        User user = userRepository.findById(4L).orElse(null);
-        emailSender.sendAccountActivationEmail(user);
-        return "aaaa";
+    @GetMapping("/super/super-admin-content")
+    public String superAdminContent() {
+        return "super-admin-content";
     }
+
+    @ModelAttribute("loggedUser")
+    public User getLoggedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userService.findUserByEmail(authentication.getName());
+    }
+
+
+//    @GetMapping("/test")
+//    public String test() {
+//        User user = userRepository.findById(4L).orElse(null);
+//        emailSender.sendAccountActivationEmail(user);
+//        return "aaaa";
+//    }
 
 }
