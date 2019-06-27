@@ -5,22 +5,18 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.coderslab.javaGym.service.emailService.ChangeEmailDetailsService;
-import pl.coderslab.javaGym.service.userService.UserService;
+import pl.coderslab.javaGym.service.confirmationEmailService.ChangeEmailDetailsService;
 
 import javax.validation.constraints.NotBlank;
 
 @RestController
 @Validated
-public class EmailController {
+public class ChangeEmailController {
 
-    private UserService userService;
     private ChangeEmailDetailsService changeEmailDetailsService;
 
     @Autowired
-    public EmailController(UserService userService,
-                           ChangeEmailDetailsService changeEmailDetailsService) {
-        this.userService = userService;
+    public ChangeEmailController(ChangeEmailDetailsService changeEmailDetailsService) {
         this.changeEmailDetailsService = changeEmailDetailsService;
     }
 

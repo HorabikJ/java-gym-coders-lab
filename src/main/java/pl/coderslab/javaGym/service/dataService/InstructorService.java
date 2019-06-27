@@ -4,7 +4,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import pl.coderslab.javaGym.email.EmailSender;
+import pl.coderslab.javaGym.emailSender.EmailSender;
 import pl.coderslab.javaGym.entity.data.Instructor;
 import pl.coderslab.javaGym.error.customException.DomainObjectException;
 import pl.coderslab.javaGym.repository.InstructorRepository;

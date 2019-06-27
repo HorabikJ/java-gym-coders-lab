@@ -1,10 +1,10 @@
-package pl.coderslab.javaGym.service.emailService;
+package pl.coderslab.javaGym.service.confirmationEmailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.coderslab.javaGym.entity.email.ResetPasswordEmailDetails;
+import pl.coderslab.javaGym.entity.confirmationEmail.ResetPasswordEmailDetails;
 import pl.coderslab.javaGym.entity.user.User;
 import pl.coderslab.javaGym.error.customException.LinkExpiredException;
 import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;

@@ -25,8 +25,8 @@ public class Instructor implements Person {
     private Long id;
 
     @Column(unique = true)
-    @Email(message = "*Please provide a valid email.")
-    @NotBlank(message = "*Please provide an email.")
+    @Email(message = "*Please provide a valid confirmationEmail.")
+    @NotBlank(message = "*Please provide an confirmationEmail.")
     private String email;
 
     @Column

@@ -1,9 +1,9 @@
-package pl.coderslab.javaGym.service.emailService;
+package pl.coderslab.javaGym.service.confirmationEmailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.coderslab.javaGym.entity.email.ChangeEmailDetails;
+import pl.coderslab.javaGym.entity.confirmationEmail.ChangeEmailDetails;
 import pl.coderslab.javaGym.entity.user.User;
 import pl.coderslab.javaGym.error.customException.DomainObjectException;
 import pl.coderslab.javaGym.error.customException.LinkExpiredException;

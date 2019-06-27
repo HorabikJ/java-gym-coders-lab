@@ -1,4 +1,4 @@
-package pl.coderslab.javaGym.entity.email;
+package pl.coderslab.javaGym.entity.confirmationEmail;
 
 import lombok.*;
 import pl.coderslab.javaGym.entity.user.User;
@@ -6,13 +6,12 @@ import pl.coderslab.javaGym.entity.user.User;
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 
-
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Entity
 @Table
-public class ActivationEmailDetails implements ConfirmationEmail {
+public class ChangeEmailDetails implements ConfirmationEmail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,13 +27,17 @@ public class ActivationEmailDetails implements ConfirmationEmail {
     private ZonedDateTime sendTime;
 
     @Column
+    private String newEmail;
+
+    @Column
     private Integer minutesExpirationTime;
 
-    public ActivationEmailDetails(User user, String param, ZonedDateTime sendTime,
-                                  Integer minutesExpirationTime) {
+    public ChangeEmailDetails(User user, String param, ZonedDateTime sendTime,
+                              String newEmail, Integer minutesExpirationTime) {
         this.user = user;
         this.param = param;
         this.sendTime = sendTime;
+        this.newEmail = newEmail;
         this.minutesExpirationTime = minutesExpirationTime;
     }
 }

@@ -23,7 +23,7 @@ import java.util.Map;
 public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({DomainObjectException.class,
-            NotAuthenticatedException.class,
+            UserUnauthorizedException.class,
             ResourceNotFoundException.class,
             PasswordDoNotMatchException.class,
             LinkExpiredException.class,
@@ -48,8 +48,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         String fieldName = "error";
         Class exceptionClass = exception.getClass();
         if (exceptionClass.equals(DomainObjectException.class)) {
-            fieldName = "email";
-        } else if (exceptionClass.equals(NotAuthenticatedException.class)) {
+            fieldName = "confirmationEmail";
+        } else if (exceptionClass.equals(UserUnauthorizedException.class)) {
             fieldName = "user";
         } else if (exceptionClass.equals(PasswordDoNotMatchException.class)) {
             fieldName = "password";
@@ -62,7 +62,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         Class exceptionClass = exception.getClass();
         if (exceptionClass.equals(DomainObjectException.class)) {
             httpStatus = HttpStatus.BAD_REQUEST;
-        } else if (exceptionClass.equals(NotAuthenticatedException.class)) {
+        } else if (exceptionClass.equals(UserUnauthorizedException.class)) {
             httpStatus = HttpStatus.UNAUTHORIZED;
         } else if (exceptionClass.equals(ResourceNotFoundException.class)) {
             httpStatus = HttpStatus.NOT_FOUND;

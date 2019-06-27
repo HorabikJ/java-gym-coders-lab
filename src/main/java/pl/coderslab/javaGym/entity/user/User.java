@@ -6,9 +6,7 @@ import pl.coderslab.javaGym.entity.data.TrainingClass;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -23,8 +21,8 @@ public class User implements Person {
     private Long id;
 
     @Column(unique = true)
-    @Email(message = "*Please provide a valid email.")
-    @NotBlank(message = "*Please provide an email.")
+    @Email(message = "*Please provide a valid confirmationEmail.")
+    @NotBlank(message = "*Please provide an confirmationEmail.")
     private String email;
 
     @Column
@@ -41,18 +39,21 @@ public class User implements Person {
     private String lastName;
 
     @Column(nullable = false)
-    private Integer active;
+    private Boolean active;
 
     @Column
     @NotNull(message = "*Please agree or disagree for newsletter.")
     private Boolean newsletter;
 
     @ManyToMany(mappedBy = "customers")
-    private List<TrainingClass> trainingClasses = new ArrayList<>();
+    private List<TrainingClass> trainingClasses = new LinkedList<>();
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "awaitingCustomers")
+    private List<TrainingClass> awaitingClasses = new LinkedList<>();
+
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     public User(String email, String password, String firstName, String lastName, Boolean newsletter) {
         this.email = email;

@@ -1,4 +1,4 @@
-package pl.coderslab.javaGym.entity.email;
+package pl.coderslab.javaGym.entity.confirmationEmail;
 
 import lombok.*;
 import pl.coderslab.javaGym.entity.user.User;
@@ -6,12 +6,13 @@ import pl.coderslab.javaGym.entity.user.User;
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 
-@NoArgsConstructor
+
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 @Entity
 @Table
-public class ResetPasswordEmailDetails implements ConfirmationEmail {
+public class ActivationEmailDetails implements ConfirmationEmail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,8 +30,8 @@ public class ResetPasswordEmailDetails implements ConfirmationEmail {
     @Column
     private Integer minutesExpirationTime;
 
-    public ResetPasswordEmailDetails(User user, String param, ZonedDateTime sendTime,
-                                     Integer minutesExpirationTime) {
+    public ActivationEmailDetails(User user, String param, ZonedDateTime sendTime,
+                                  Integer minutesExpirationTime) {
         this.user = user;
         this.param = param;
         this.sendTime = sendTime;

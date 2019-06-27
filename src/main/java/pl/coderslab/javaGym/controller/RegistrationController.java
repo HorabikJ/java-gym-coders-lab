@@ -5,10 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mail.MailException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.coderslab.javaGym.email.EmailSender;
+import pl.coderslab.javaGym.emailSender.EmailSender;
 import pl.coderslab.javaGym.entity.user.User;
 import pl.coderslab.javaGym.error.customException.EmailSendingException;
-import pl.coderslab.javaGym.service.emailService.ActivationEmailService;
+import pl.coderslab.javaGym.service.confirmationEmailService.ActivationEmailService;
 import pl.coderslab.javaGym.service.userService.UserService;
 
 import javax.validation.Valid;

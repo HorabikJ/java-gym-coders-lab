@@ -1,22 +1,25 @@
-package pl.coderslab.javaGym.email;
+package pl.coderslab.javaGym.emailSender;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import pl.coderslab.javaGym.entity.Person;
-import pl.coderslab.javaGym.entity.email.ActivationEmailDetails;
-import pl.coderslab.javaGym.entity.email.ChangeEmailDetails;
-import pl.coderslab.javaGym.entity.email.ResetPasswordEmailDetails;
+import pl.coderslab.javaGym.entity.confirmationEmail.ActivationEmailDetails;
+import pl.coderslab.javaGym.entity.confirmationEmail.ChangeEmailDetails;
+import pl.coderslab.javaGym.entity.confirmationEmail.ResetPasswordEmailDetails;
 import pl.coderslab.javaGym.entity.user.User;
-import pl.coderslab.javaGym.repository.ResetPasswordEmailRepository;
-import pl.coderslab.javaGym.service.emailService.ActivationEmailService;
-import pl.coderslab.javaGym.service.emailService.ChangeEmailDetailsService;
-import pl.coderslab.javaGym.service.emailService.ResetPasswordEmailService;
+import pl.coderslab.javaGym.model.Email;
+import pl.coderslab.javaGym.service.confirmationEmailService.ActivationEmailService;
+import pl.coderslab.javaGym.service.confirmationEmailService.ChangeEmailDetailsService;
+import pl.coderslab.javaGym.service.confirmationEmailService.ResetPasswordEmailService;
 
+import java.lang.reflect.Array;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class EmailSender {
@@ -30,7 +33,7 @@ public class EmailSender {
                                         "this link will expire in " + LINK_EXPIRATION_TIME + " minutes.\n";
 
     private final static String CONFIRM_ACCOUNT_URL = "http://localhost:8080/register/confirm-account?param=";
-    private final static String CONFIRM_ACCOUNT_SUBJECT = "JavaGymSpring account activation email.";
+    private final static String CONFIRM_ACCOUNT_SUBJECT = "JavaSpringGym account activation email.";
     private final static String CONFIRM_ACCOUNT_TEXT = "Please click below link to activate your account,\n" +
                                         "this link will expire in " + LINK_EXPIRATION_TIME + " minutes.\n";
 
@@ -52,8 +55,8 @@ public class EmailSender {
                        ChangeEmailDetailsService changeEmailDetailsService,
                        ActivationEmailService activationEmailService,
                        ResetPasswordEmailService resetPasswordEmailService) {
-        this.changeEmailDetailsService = changeEmailDetailsService;
         this.javaMailSender = javaMailSender;
+        this.changeEmailDetailsService = changeEmailDetailsService;
         this.activationEmailService = activationEmailService;
         this.resetPasswordEmailService = resetPasswordEmailService;
     }
@@ -125,5 +128,23 @@ public class EmailSender {
 
         resetPasswordEmailService.save(resetPasswordEmailDetails);
         javaMailSender.send(message);
+    }
+
+    public void sendEmailToUser(User user, Email email) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject(email.getTitle());
+        message.setText(email.getText());
+        javaMailSender.send(message);
+    }
+
+    public void sendNewsletter(Email newsletter, List<User> newsletterUsers) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        for (User user : newsletterUsers) {
+            message.setTo(user.getEmail());
+            message.setSubject(newsletter.getTitle());
+            message.setText(newsletter.getText());
+            javaMailSender.send(message);
+        }
     }
 }

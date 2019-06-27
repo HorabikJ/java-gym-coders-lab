@@ -44,7 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
-                .antMatchers("/", "/change-email", "/test").permitAll()
+                .antMatchers("/", "/change-confirmationEmail", "/test").permitAll()
                 .antMatchers("/login", "/register/**", "/reset-password/**").anonymous()
                 .antMatchers("/logout").authenticated()
                 .antMatchers("/user/**").hasRole("USER")
@@ -79,7 +79,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .loginPage("/login")
 //                .defaultSuccessUrl("/",true)
 //                .failureUrl("/login?error=true")
-//                .usernameParameter("email")
+//                .usernameParameter("confirmationEmail")
 //                .passwordParameter("password")
 //                .and()
 //                .logout()

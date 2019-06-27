@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.javaGym.entity.user.User;
-import pl.coderslab.javaGym.service.emailService.ChangeEmailDetailsService;
 import pl.coderslab.javaGym.service.userService.UserService;
 
 import javax.validation.constraints.*;
@@ -15,13 +14,10 @@ import javax.validation.constraints.*;
 public class UserController {
 
     private UserService userService;
-    private ChangeEmailDetailsService changeEmailDetailsService;
 
     @Autowired
-    public UserController(UserService userService,
-                          ChangeEmailDetailsService changeEmailDetailsService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.changeEmailDetailsService = changeEmailDetailsService;
     }
 
     @GetMapping("/show-details")
@@ -54,16 +50,22 @@ public class UserController {
 
     @PostMapping("/change-email")
     public Boolean changeUserEmail(@RequestParam @Min(1) Long userId,
-                                @Email(message = "*Please provide a valid email.")
-                                @NotBlank(message = "*Please provide an email.")
+                                @Email(message = "*Please provide a valid confirmationEmail.")
+                                @NotBlank(message = "*Please provide an confirmationEmail.")
                                 @RequestParam String newEmail) {
         return userService.sendUserEmailChangeMessage(userId, newEmail);
     }
 
+//    User can do:
+//    - show his details
+//    - change his password
+//    - change newsletter consent
+//    - change his names
+//    - change his email
 //    TODO
-//     resetPassword(situation when user forgotten his password),
-//     reserve classes,
-//     cancel classes,
-//     check response status for other methods,
+//     - reserve classes,
+//     - cancel classes,
+//     - show reserved classes,
+//     - check response status for other methods,
 
 }

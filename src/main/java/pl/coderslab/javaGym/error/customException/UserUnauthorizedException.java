@@ -1,12 +1,12 @@
 package pl.coderslab.javaGym.error.customException;
 
-public class NotAuthenticatedException extends RuntimeException {
+public class UserUnauthorizedException extends RuntimeException {
 
-    private String message = "*Not authenticated exception.";
+    private String message = "*User unauthorized exception.";
 
-    public NotAuthenticatedException() {}
+    public UserUnauthorizedException() {}
 
-    public NotAuthenticatedException(String message) {
+    public UserUnauthorizedException(String message) {
         this.message = message;
     }
 

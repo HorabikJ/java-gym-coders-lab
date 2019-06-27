@@ -17,11 +17,11 @@ REPLACE INTO `user_role` VALUES (2, 2);
 REPLACE INTO `user_role` VALUES (2, 3);
 
 -- insert regular user
-REPLACE INTO `user` VALUES (3, 1, 'jacek@wp.pl', 'Jacek', 'Horabik', true ,'$2a$10$G9tN3.tOA788nw1HyCyl9ui71y57MgP8w/rQz15Zo3BR7Gg5tSeq2');
+REPLACE INTO `user` VALUES (3, 1, 'jacek@wp.pl', 'Jacek', 'Horabik', false ,'$2a$10$G9tN3.tOA788nw1HyCyl9ui71y57MgP8w/rQz15Zo3BR7Gg5tSeq2');
 -- -- password for login: "jacek@wp.pl" is: "12345"
 REPLACE INTO `user_role` VALUES (3, 3);
 
-REPLACE INTO `user` VALUES (4, 1, 'marcin@wp.pl', 'Marcin', 'Kowalski', true ,'$2a$10$tcsaqZgdcyMD5VGqHN5gY.mJJXS7r/FFfg81Chsaoy5YKTKQCP4jq');
+REPLACE INTO `user` VALUES (4, 1, 'marcin@wp.pl', 'Marcin', 'Kowalski', false ,'$2a$10$tcsaqZgdcyMD5VGqHN5gY.mJJXS7r/FFfg81Chsaoy5YKTKQCP4jq');
 -- -- password for login: "jacek@wp.pl" is: "123123"
 REPLACE INTO `user_role` VALUES (4, 3);
 

@@ -4,7 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.coderslab.javaGym.service.emailService.ResetPasswordEmailService;
+import pl.coderslab.javaGym.service.confirmationEmailService.ResetPasswordEmailService;
 import pl.coderslab.javaGym.service.userService.UserService;
 
 import javax.validation.constraints.Email;
@@ -28,8 +28,8 @@ public class ResetPasswordController {
     @PostMapping(value = "/request", produces = "text/html")
     @ResponseBody
     public String sendResetPasswordRequest(@RequestParam
-               @Email(message = "*Please provide a valid email.")
-               @NotBlank(message = "*Please provide an email.")
+               @Email(message = "*Please provide a valid confirmationEmail.")
+               @NotBlank(message = "*Please provide an confirmationEmail.")
                String userEmail) {
         Boolean result = userService.resetUserPassword(userEmail);
         return result.toString();

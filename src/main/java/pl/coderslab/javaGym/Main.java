@@ -2,25 +2,21 @@ package pl.coderslab.javaGym;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        ZoneId zoneId = ZoneId.of("Poland");
-        System.out.println(zoneId);
-        System.out.println(ZonedDateTime.now(zoneId));
+        List<String> list = new ArrayList<>();
 
-////        Integer recurency = 5;
-////
-////        for (int i = 0; i < recurency; i ++) {
-////            Period weekly = Period.ofDays(7 * i);
-////            LocalDateTime time = LocalDateTime.now().plus(weekly);
-////            System.out.println(time.toString());
-////        }
-//
-//        String uniqueID = UUID.randomUUID().toString();
-//        System.out.println(uniqueID);
+        list.add("123");
+        list.add("12334");
+        list.add("12334657");
+
+        System.out.println(String.valueOf(list));
 
     }
 

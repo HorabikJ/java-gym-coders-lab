@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -27,14 +28,19 @@ public class TrainingClass {
     @Column
     private String uniqueClassId;
 
-    @NotNull
     @Column
+    @NotNull
     @Min(value = 1, message = "*Minimum value for capacity is 1.")
     private Integer maxCapacity;
 
     @Column
     @Future(message = "*Start date for a class must be in future.")
     private ZonedDateTime startDate;
+
+    @Column
+    @NotNull
+    @Min(value = 1, message = "*Please provide valid duration time in minutes.")
+    private Integer durationInMinutes;
 
     @ManyToOne
     @NotNull(message = "*Please provide instructor for a class.")
@@ -45,7 +51,10 @@ public class TrainingClass {
     private TrainingType trainingType;
 
     @ManyToMany
-    private List<User> customers = new ArrayList<>();
+    private List<User> customers = new LinkedList<>();
+
+    @ManyToMany
+    private List<User> awaitingCustomers = new LinkedList<>();
 
     public TrainingClass(String uniqueClassId, Integer maxCapacity, ZonedDateTime startDate,
                          Instructor instructor, TrainingType trainingType) {

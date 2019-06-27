@@ -2,7 +2,7 @@ package pl.coderslab.javaGym.error.customException;
 
 public class EmailSendingException extends RuntimeException {
 
-    private String message = "*There was a problem with email sending service.";
+    private String message = "*There was a problem with confirmationEmail sending service.";
 
     public EmailSendingException() {}
 

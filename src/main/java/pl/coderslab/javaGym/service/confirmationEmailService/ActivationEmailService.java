@@ -1,13 +1,10 @@
-package pl.coderslab.javaGym.service.emailService;
+package pl.coderslab.javaGym.service.confirmationEmailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.coderslab.javaGym.email.EmailSender;
-import pl.coderslab.javaGym.entity.email.ActivationEmailDetails;
+import pl.coderslab.javaGym.entity.confirmationEmail.ActivationEmailDetails;
 import pl.coderslab.javaGym.entity.user.User;
-import pl.coderslab.javaGym.error.customException.EmailSendingException;
 import pl.coderslab.javaGym.error.customException.LinkExpiredException;
 import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
 import pl.coderslab.javaGym.repository.ActivationEmailRepository;
@@ -70,7 +67,7 @@ public class ActivationEmailService implements
 
     private void activateUserAccount(ActivationEmailDetails emailDetails) {
         User user = emailDetails.getUser();
-        user.setActive(1);
+        user.setActive(true);
         userRepository.save(user);
         emailDetails.setParam(UUID.randomUUID().toString());
         activationEmailRepository.save(emailDetails);

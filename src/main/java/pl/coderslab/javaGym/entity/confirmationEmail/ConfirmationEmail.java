@@ -1,8 +1,7 @@
-package pl.coderslab.javaGym.entity.email;
+package pl.coderslab.javaGym.entity.confirmationEmail;
 
 import pl.coderslab.javaGym.entity.user.User;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 public interface ConfirmationEmail {
