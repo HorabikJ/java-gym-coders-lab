@@ -47,9 +47,7 @@ public class UserService implements AbstractUserService<User> {
 
     //    method for admins
     public User findById(Long userId) {
-        User user = getUserByIdFromDB(userId);
-        user.setPassword(null);
-        return user;
+        return getUserByIdFromDB(userId);
     }
 
     private User getUserByIdFromDB(Long userId) {
@@ -102,13 +100,13 @@ public class UserService implements AbstractUserService<User> {
         user.setRoles(roles);
     }
 
-// method for super admin only
+    // method for super admin only
     @Transactional
     public Boolean deleteAnyUserById(Long userId) {
         User user = getUserByIdFromDB(userId);
         if (!isUserASuperAdmin(user)) {
-             userRepository.delete(user);
-             return true;
+            userRepository.delete(user);
+            return true;
         } else {
             throw new UserUnauthorizedException();
         }
@@ -118,11 +116,12 @@ public class UserService implements AbstractUserService<User> {
         return user.getRoles().contains(roleRepository.findByRole(RoleEnum.ROLE_SUPER.toString()));
     }
 
-//    method to check if it will be used later
+    //    method to check if it will be used later
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
+    //    TODO
     public List<String> getAllUsersEmails() {
         return userRepository.getAllUsersEmails();
     }
@@ -152,9 +151,7 @@ public class UserService implements AbstractUserService<User> {
 
     //    method for users only
     public User getAuthenticatedUserById(Long userId) {
-        User user = getAuthenticatedUser(userId);
-        user.setPassword(null);
-        return user;
+        return getAuthenticatedUser(userId);
     }
 
     @Transactional
@@ -275,6 +272,17 @@ public class UserService implements AbstractUserService<User> {
             return true;
         } catch (MailException e) {
             throw new EmailSendingException();
+        }
+    }
+
+    @Transactional
+    public User changeAnyUserActiveAccount(Long userId, Boolean active) {
+        User user = getUserByIdFromDB(userId);
+        if (!isUserASuperAdmin(user)) {
+            user.setActive(active);
+            return userRepository.save(user);
+        } else {
+            throw new UserUnauthorizedException();
         }
     }
 }

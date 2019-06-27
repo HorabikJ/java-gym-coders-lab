@@ -1,5 +1,6 @@
 package pl.coderslab.javaGym.entity.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import pl.coderslab.javaGym.entity.Person;
 import pl.coderslab.javaGym.entity.data.TrainingClass;
@@ -45,9 +46,11 @@ public class User implements Person {
     @NotNull(message = "*Please agree or disagree for newsletter.")
     private Boolean newsletter;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "customers")
     private List<TrainingClass> trainingClasses = new LinkedList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "awaitingCustomers")
     private List<TrainingClass> awaitingClasses = new LinkedList<>();
 
