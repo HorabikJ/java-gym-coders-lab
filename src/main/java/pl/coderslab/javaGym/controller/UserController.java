@@ -48,7 +48,7 @@ public class UserController {
         return userService.changeFirstAndLastName(userId, firstName, lastName);
     }
 
-    @PostMapping("/change-email")
+    @PatchMapping("/change-email")
     public Boolean changeUserEmail(@RequestParam @Min(1) Long userId,
                                 @Email(message = "*Please provide a valid confirmationEmail.")
                                 @NotBlank(message = "*Please provide an confirmationEmail.")
@@ -64,8 +64,8 @@ public class UserController {
 //    - change his email
 //    TODO
 //     - reserve classes,
-//     - cancel classes,
+//     - cancel reserved classes if future,
 //     - show reserved classes,
-//     - check response status for other methods,
+//     - show reserved classes in past,
 
 }

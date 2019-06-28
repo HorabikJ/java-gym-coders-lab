@@ -2,7 +2,7 @@ package pl.coderslab.javaGym.error.customException;
 
 public class DomainObjectException extends RuntimeException {
 
-    private String message = "*Provided confirmationEmail is already registered in database.";
+    private String message = "*Provided email is already registered in database.";
 
     public DomainObjectException() { }
 

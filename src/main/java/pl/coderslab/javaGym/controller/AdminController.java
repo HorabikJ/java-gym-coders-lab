@@ -93,16 +93,16 @@ public class AdminController {
 
 }
 
-//TODO
-// add new admin                    - done
-// show any user by id              - done
-// delete any user                  - done
-// show all users                   - done
-// show all admins                  - done
-// search for user by email         - done
-// search for admin by email        - done
-// set any user as active/inactive  - done
-// send email any to user           - done
-// send new activation email to any user -done
-// send newsletter email            - done
+// regular admin can do:
+// - add new admin
+// - show any user by id
+// - delete any user
+// - show all users
+// - show all admins
+// - search for user by email
+// - search for admin by email
+// - set any user as active/inactive
+// - send email any to user
+// - send new activation email to any user
+// - send newsletter email
 

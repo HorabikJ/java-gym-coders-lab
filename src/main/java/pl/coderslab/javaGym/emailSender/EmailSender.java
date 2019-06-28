@@ -14,12 +14,10 @@ import pl.coderslab.javaGym.service.confirmationEmailService.ActivationEmailServ
 import pl.coderslab.javaGym.service.confirmationEmailService.ChangeEmailDetailsService;
 import pl.coderslab.javaGym.service.confirmationEmailService.ResetPasswordEmailService;
 
-import java.lang.reflect.Array;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Component
 public class EmailSender {
@@ -61,11 +59,11 @@ public class EmailSender {
         this.resetPasswordEmailService = resetPasswordEmailService;
     }
 
-    public void sendUserWelcomeEmail(Person person) {
+    public void sendUserWelcomeEmail(User user) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(person.getEmail());
-        message.setSubject(person.getFirstName() + WELCOME_EMAIL_SUBJECT);
-        message.setText(person.getFirstName() + WELCOME_EMAIL_TEXT);
+        message.setTo(user.getEmail());
+        message.setSubject(user.getFirstName() + WELCOME_EMAIL_SUBJECT);
+        message.setText(user.getFirstName() + WELCOME_EMAIL_TEXT);
         javaMailSender.send(message);
     }
 
@@ -130,9 +128,9 @@ public class EmailSender {
         javaMailSender.send(message);
     }
 
-    public void sendEmailToUser(User user, Email email) {
+    public void sendEmailToPerson(Person person, Email email) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(user.getEmail());
+        message.setTo(person.getEmail());
         message.setSubject(email.getTitle());
         message.setText(email.getText());
         javaMailSender.send(message);

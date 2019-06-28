@@ -246,7 +246,7 @@ public class UserService implements AbstractUserService<User> {
     public Boolean sendEmailToUser(Long userId, Email email) {
         User user = getUserByIdFromDB(userId);
         try {
-            emailSender.sendEmailToUser(user, email);
+            emailSender.sendEmailToPerson(user, email);
             return true;
         } catch (MailException e) {
             throw new EmailSendingException();
