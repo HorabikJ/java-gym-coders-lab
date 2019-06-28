@@ -6,7 +6,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pl.coderslab.javaGym.emailSender.EmailSender;
 import pl.coderslab.javaGym.entity.data.Instructor;
+import pl.coderslab.javaGym.error.customException.ActionNotAllowedException;
 import pl.coderslab.javaGym.error.customException.DomainObjectException;
+import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
 import pl.coderslab.javaGym.repository.InstructorRepository;
 
 import java.util.List;
@@ -29,19 +31,48 @@ public class InstructorService implements AbstractDataService<Instructor> {
     }
 
     @Override
-    public Instructor findById(Long Id) {
-        return null;
+    public Instructor findById(Long id) {
+        return getInstructorByIdFromDB(id);
     }
 
     @Override
     public Instructor save(Instructor instructor) {
-        try {
-            if (instructor.getId() == null) {
-//                emailSender.sendEmail(instructor, EmailTypeEnum.WELCOME_INSTR_EMAIL);
+        if (instructor.getId() == null) {
+            if (!isInstructorEmailAlreadyInDB(instructor)) {
+                return instructorRepository.save(instructor);
+            } else {
+                throw new DomainObjectException();
             }
-            return instructorRepository.save(instructor);
-        } catch (DataIntegrityViolationException | ConstraintViolationException e) {
-            throw new DomainObjectException();
+        } else {
+            throw new ActionNotAllowedException();
+        }
+    }
+
+    public Instructor edit(Instructor newInstructor, Long id) {
+        Instructor instructorFromDB = getInstructorByIdFromDB(id);
+        if (newInstructor.getEmail().equals(instructorFromDB.getEmail())) {
+            newInstructor.setId(instructorFromDB.getId());
+            return instructorRepository.save(newInstructor);
+        } else {
+            if (!isInstructorEmailAlreadyInDB(newInstructor)) {
+                newInstructor.setId(instructorFromDB.getId());
+                return instructorRepository.save(newInstructor);
+            } else {
+                throw new DomainObjectException();
+            }
+        }
+    }
+
+    private Boolean isInstructorEmailAlreadyInDB(Instructor instructor) {
+        return instructorRepository.existsByEmail(instructor.getEmail());
+    }
+
+    private Instructor getInstructorByIdFromDB(Long id) {
+        Instructor instructor = instructorRepository.findById(id).orElse(null);
+        if (instructor != null) {
+            return instructor;
+        } else {
+            throw new ResourceNotFoundException();
         }
     }
 

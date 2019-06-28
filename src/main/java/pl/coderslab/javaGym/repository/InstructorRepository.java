@@ -7,6 +7,6 @@ import pl.coderslab.javaGym.entity.data.Instructor;
 @Repository
 public interface InstructorRepository extends JpaRepository<Instructor, Long> {
 
-
+    Boolean existsByEmail(String email);
 
 }

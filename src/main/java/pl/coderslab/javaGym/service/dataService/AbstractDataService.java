@@ -10,7 +10,7 @@ public interface AbstractDataService<T> extends AbstractService<T> {
 
     List<T> findAll();
 
-    T findById(Long Id);
+    T findById(Long id);
 
     void deleteById(Long id);
 
