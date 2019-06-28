@@ -27,7 +27,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
             ResourceNotFoundException.class,
             PasswordDoNotMatchException.class,
             LinkExpiredException.class,
-            EmailSendingException.class})
+            EmailSendingException.class,
+            ActionNotAllowedException.class})
     public ResponseEntity<CustomErrorResponse> handleCustomException
             (Exception exception, WebRequest request) {
 
@@ -48,7 +49,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         String fieldName = "error";
         Class exceptionClass = exception.getClass();
         if (exceptionClass.equals(DomainObjectException.class)) {
-            fieldName = "confirmationEmail";
+            fieldName = "email";
         } else if (exceptionClass.equals(UserUnauthorizedException.class)) {
             fieldName = "user";
         } else if (exceptionClass.equals(PasswordDoNotMatchException.class)) {
@@ -58,16 +59,12 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     }
 
     private HttpStatus getHttpStatus(Exception exception) {
-        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         Class exceptionClass = exception.getClass();
-        if (exceptionClass.equals(DomainObjectException.class)) {
-            httpStatus = HttpStatus.BAD_REQUEST;
-        } else if (exceptionClass.equals(UserUnauthorizedException.class)) {
+        if (exceptionClass.equals(UserUnauthorizedException.class)) {
             httpStatus = HttpStatus.UNAUTHORIZED;
         } else if (exceptionClass.equals(ResourceNotFoundException.class)) {
             httpStatus = HttpStatus.NOT_FOUND;
-        } else if (exceptionClass.equals(PasswordDoNotMatchException.class)) {
-            httpStatus = HttpStatus.BAD_REQUEST;
         } else if (exceptionClass.equals(LinkExpiredException.class)) {
             httpStatus = HttpStatus.REQUEST_TIMEOUT;
         }
