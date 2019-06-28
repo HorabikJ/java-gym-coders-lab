@@ -28,8 +28,8 @@ public class ResetPasswordController {
     @PostMapping(value = "/request", produces = "text/html")
     @ResponseBody
     public String sendResetPasswordRequest(@RequestParam
-               @Email(message = "*Please provide a valid confirmationEmail.")
-               @NotBlank(message = "*Please provide an confirmationEmail.")
+               @Email(message = "*Please provide a valid email.")
+               @NotBlank(message = "*Please provide an email.")
                String userEmail) {
         Boolean result = userService.resetUserPassword(userEmail);
         return result.toString();

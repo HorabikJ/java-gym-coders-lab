@@ -30,16 +30,16 @@ public class AdminController {
         return userService.save(user, true);
     }
 
-    @GetMapping("/show-user")
-    public User showUserDetails(@RequestParam
-            @Min(value = 1, message = "*Please provide id grater than 0.") Long userId) {
-        return userService.findById(userId);
+    @GetMapping("/show-user/{id}")
+    public User showUserDetails(@PathVariable
+            @Min(value = 1, message = "*Please provide id grater than 0.") Long id) {
+        return userService.findById(id);
     }
 
-    @DeleteMapping("/delete-user")
-    public Boolean deleteUser(@RequestParam
-              @Min(value = 1, message = "*Please provide id grater than 0.") Long userId) {
-        return userService.deleteUserById(userId);
+    @DeleteMapping("/delete-user/{id}")
+    public Boolean deleteUser(@PathVariable
+              @Min(value = 1, message = "*Please provide id grater than 0.") Long id) {
+        return userService.deleteUserById(id);
     }
 
     @GetMapping("/show-all-users")
@@ -66,24 +66,25 @@ public class AdminController {
         return userService.searchForAdminsByEmail(email);
     }
 
-    @PatchMapping("/set-active")
+    @PatchMapping("/set-active/{id}")
     public User changeAccountActiveValue
-            (@RequestParam @Min(value = 1,  message = "*Please provide user id grater than 0.") Long userId,
+            (@PathVariable @Min(value = 1,  message = "*Please provide user id grater than 0.") Long id,
              @RequestParam @NotNull(message = "*Active can not be null.") Boolean active) {
-        return userService.changeUserActiveAccount(userId, active);
+        return userService.changeUserActiveAccount(id, active);
     }
 
-    @PostMapping("/send-activation-email")
+    @GetMapping("/send-activation-email/{id}")
     public Boolean sendActivationEmail
-            (@RequestParam @Min( value = 1, message = "*Please provide user id grater than 0.")
-             Long userId) {
-        return userService.sendActivationEmail(userId);
+            (@PathVariable @Min( value = 1, message = "*Please provide user id grater than 0.")
+             Long id) {
+        return userService.sendActivationEmail(id);
     }
 
-    @PostMapping("/send-email")
-    public Boolean sendEmailToUser(@RequestBody @Valid Email email,
-           @RequestParam @Min(value = 1, message = "*Please provide user id grater than 0.") Long userId) {
-        return userService.sendEmailToUser(userId, email);
+    @PostMapping("/send-email/{id}")
+    public Boolean sendEmailToUser
+            (@PathVariable @Min(value = 1, message = "*Please provide user id grater than 0.") Long id,
+            @RequestBody @Valid Email email) {
+        return userService.sendEmailToUser(id, email);
     }
 
     @PostMapping("/send-newsletter")

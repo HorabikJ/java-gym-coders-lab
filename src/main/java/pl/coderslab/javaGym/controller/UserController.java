@@ -25,35 +25,35 @@ public class UserController {
         return userService.getAuthenticatedUserById(userId);
     }
 
-    @PatchMapping("/change-password")
-    public Boolean changeUserPassword(@RequestParam @Min(1) Long userId,
+    @PatchMapping("/change-password/{id}")
+    public Boolean changeUserPassword(@PathVariable @Min(1) Long id,
          @NotBlank(message = "*Please provide your old password.")
          @RequestParam String oldPassword,
          @Size(min = 5, message = "*Your password must have at least 5 characters.")
          @NotBlank(message = "*Please provide your old password.")
          @RequestParam String newPassword) {
-        return userService.changePassword(userId, oldPassword, newPassword);
+        return userService.changePassword(id, oldPassword, newPassword);
     }
 
-    @PatchMapping("/newsletter")
-    public User changeNewsletterConsent(@RequestParam @Min(1) Long userId,
+    @PatchMapping("/newsletter/{id]")
+    public User changeNewsletterConsent(@PathVariable @Min(1) Long id,
                                         @RequestParam @NotNull Boolean newsletter) {
-        return userService.changeNewsletterConsent(userId, newsletter);
+        return userService.changeNewsletterConsent(id, newsletter);
     }
 
-    @PatchMapping("/change-names")
-    public User changeUserFirstAndLastName(@RequestParam @Min(1) Long userId,
+    @PatchMapping("/change-names/{id}")
+    public User changeUserFirstAndLastName(@PathVariable @Min(1) Long id,
                 @NotBlank(message = "*Name can not be empty.") @RequestParam String firstName,
                 @NotBlank(message = "*Last name can not be empty.") @RequestParam String lastName) {
-        return userService.changeFirstAndLastName(userId, firstName, lastName);
+        return userService.changeFirstAndLastName(id, firstName, lastName);
     }
 
-    @PatchMapping("/change-email")
-    public Boolean changeUserEmail(@RequestParam @Min(1) Long userId,
+    @PatchMapping("/change-email/{id}")
+    public Boolean changeUserEmail(@PathVariable @Min(1) Long id,
                                 @Email(message = "*Please provide a valid confirmationEmail.")
                                 @NotBlank(message = "*Please provide an confirmationEmail.")
                                 @RequestParam String newEmail) {
-        return userService.sendUserEmailChangeMessage(userId, newEmail);
+        return userService.sendUserEmailChangeMessage(id, newEmail);
     }
 
 //    User can do:

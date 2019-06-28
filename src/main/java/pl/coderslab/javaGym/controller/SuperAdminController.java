@@ -21,18 +21,18 @@ public class SuperAdminController {
         this.userService = userService;
     }
 
-    @DeleteMapping("/delete-user")
+    @DeleteMapping("/delete-user/{id}")
     public Boolean deleteAnyUser
-            (@RequestParam @Min(value = 1, message = "*Please provide user id grater than 0.")
-            Long userId) {
-        return userService.deleteAnyUserById(userId);
+            (@PathVariable @Min(value = 1, message = "*Please provide user id grater than 0.")
+            Long id) {
+        return userService.deleteAnyUserById(id);
     }
 
-    @PatchMapping("/set-active")
+    @PatchMapping("/set-active/{id}")
     public User changeAccountActiveValue
-            (@RequestParam @Min(value = 1,  message = "*Please provide user id grater than 0.") Long userId,
+            (@PathVariable @Min(value = 1,  message = "*Please provide user id grater than 0.") Long id,
              @RequestParam @NotNull(message = "*Active can not be null.") Boolean active) {
-        return userService.changeAnyUserActiveAccount(userId, active);
+        return userService.changeAnyUserActiveAccount(id, active);
     }
 
 }
