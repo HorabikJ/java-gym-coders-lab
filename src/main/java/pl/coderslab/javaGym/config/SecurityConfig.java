@@ -44,7 +44,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
-                .antMatchers("/", "/change-email","/swagger-ui.html", "/test").permitAll()
+                .antMatchers("/", "/change-email",
+                        "/swagger-ui.html", "/swagger-ui.html/**" ,
+                        "/test").permitAll()
                 .antMatchers("/login", "/register/**", "/reset-password/**").anonymous()
                 .antMatchers("/logout").authenticated()
                 .antMatchers("/user/**").hasRole("USER")

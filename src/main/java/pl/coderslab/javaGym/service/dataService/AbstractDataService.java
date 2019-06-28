@@ -12,6 +12,8 @@ public interface AbstractDataService<T> extends AbstractService<T> {
 
     T findById(Long id);
 
-    void deleteById(Long id);
+    Boolean deleteById(Long id);
+
+    T edit (T t, Long id);
 
 }

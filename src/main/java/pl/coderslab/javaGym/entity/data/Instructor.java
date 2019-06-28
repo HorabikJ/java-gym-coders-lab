@@ -1,7 +1,8 @@
 package pl.coderslab.javaGym.entity.data;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import pl.coderslab.javaGym.entity.Person;
 
 import javax.persistence.*;

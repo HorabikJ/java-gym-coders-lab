@@ -66,6 +66,20 @@ public class AdminController {
         return userService.searchForAdminsByEmail(email);
     }
 
+    @GetMapping("/users-by-names")
+    public List<User> searchForUsersByNames
+            (@RequestParam @NotBlank(message = "*Please provide not blank input.") String firstName,
+             @RequestParam @NotBlank(message = "*Please provide not blank input.") String lastName) {
+        return userService.findAllUsersByNames(firstName, lastName);
+    }
+
+    @GetMapping("/admins-by-names")
+    public List<User> searchForAdminsByNames
+            (@RequestParam @NotBlank(message = "*Please provide not blank input.") String firstName,
+             @RequestParam @NotBlank(message = "*Please provide not blank input.") String lastName) {
+        return userService.findAllAdminsByNames(firstName, lastName);
+    }
+
     @PatchMapping("/set-active/{id}")
     public User changeAccountActiveValue
             (@PathVariable @Min(value = 1,  message = "*Please provide user id grater than 0.") Long id,
@@ -102,6 +116,8 @@ public class AdminController {
 // - show all admins
 // - search for user by email
 // - search for admin by email
+// - search for user by names
+// - search for admin by names
 // - set any user as active/inactive
 // - send email any to user
 // - send new activation email to any user

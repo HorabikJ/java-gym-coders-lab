@@ -7,6 +7,6 @@ import pl.coderslab.javaGym.entity.user.Role;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
-    Role findByRole(String Role);
+    Role findByRole(String role);
 
 }

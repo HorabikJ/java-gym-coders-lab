@@ -80,7 +80,7 @@ public class UserService implements AbstractUserService<User> {
             } catch (MailException e) {
                 throw new EmailSendingException();
             } catch (DataIntegrityViolationException e) {
-                throw new DomainObjectException();
+                throw new UniqueDBFieldException();
             }
         } else {
             throw new UserUnauthorizedException();
@@ -173,7 +173,7 @@ public class UserService implements AbstractUserService<User> {
     public Boolean sendUserEmailChangeMessage(Long userId, String newEmail) {
         User user = getAuthenticatedUser(userId);
         if (user != null) {
-            Boolean newEmailExistInDB = userRepository.existsByEmail(newEmail);
+            Boolean newEmailExistInDB = userRepository.existsByEmailIgnoreCase(newEmail);
             if (!newEmailExistInDB) {
                 try {
                     emailSender.sendChangeEmailMessage(user, newEmail);
@@ -182,7 +182,7 @@ public class UserService implements AbstractUserService<User> {
                     throw new EmailSendingException();
                 }
             } else {
-                throw new DomainObjectException();
+                throw new UniqueDBFieldException();
             }
         } else {
             throw new UserUnauthorizedException();
@@ -213,13 +213,23 @@ public class UserService implements AbstractUserService<User> {
     }
 
     public List<User> searchForUsersByEmail(String email) {
-        return userRepository.findAllByRolesIsNotContainingAndEmailIsContaining
+        return userRepository.findAllByRolesIsNotContainingAndEmailIsContainingIgnoreCase
                 (getSetWithAdminRoleOnly(), email);
     }
 
     public List<User> searchForAdminsByEmail(String email) {
-        return userRepository.findAllByRolesIsContainingAndEmailIsContaining
+        return userRepository.findAllByRolesIsContainingAndEmailIsContainingIgnoreCase
                 (getSetWithAdminRoleOnly(), email);
+    }
+
+    public List<User> findAllUsersByNames(String firstName, String lastName) {
+        return userRepository.findAllByRolesIsNotContainingAndFirstNameIsContainingAndLastNameIsContainingAllIgnoreCase
+                (getSetWithAdminRoleOnly(), firstName, lastName);
+    }
+
+    public List<User> findAllAdminsByNames(String firstName, String lastName) {
+        return userRepository.findAllByRolesIsContainingAndFirstNameIsContainingAndLastNameIsContainingAllIgnoreCase
+                (getSetWithAdminRoleOnly(), firstName, lastName);
     }
 
     private Set<Role> getSetWithAdminRoleOnly() {
@@ -285,4 +295,5 @@ public class UserService implements AbstractUserService<User> {
             throw new UserUnauthorizedException();
         }
     }
+
 }

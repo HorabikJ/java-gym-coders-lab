@@ -20,7 +20,7 @@ public class TrainingType {
     @Column
     private Long id;
 
-    @Column
+    @Column(unique = true)
     @NotBlank(message = "*Training name can not be empty.")
     private String name;
 

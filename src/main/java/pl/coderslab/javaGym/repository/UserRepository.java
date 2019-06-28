@@ -21,16 +21,22 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u.email FROM User u")
     List<String> getAllUsersEmails();
 
-    Boolean existsByEmail(String email);
+    Boolean existsByEmailIgnoreCase(String email);
 
     List<User> findAllByRolesIsNotContaining(Set<Role> roles);
 
     List<User> findAllByRolesIsContaining(Set<Role> roles);
 
-    List<User> findAllByRolesIsNotContainingAndEmailIsContaining(Set<Role> roles, String email);
+    List<User> findAllByRolesIsNotContainingAndEmailIsContainingIgnoreCase(Set<Role> roles, String email);
 
-    List<User> findAllByRolesIsContainingAndEmailIsContaining(Set<Role> roles, String email);
+    List<User> findAllByRolesIsContainingAndEmailIsContainingIgnoreCase(Set<Role> roles, String email);
 
     List<User> findAllByNewsletterIsTrue();
+
+    List<User> findAllByRolesIsNotContainingAndFirstNameIsContainingAndLastNameIsContainingAllIgnoreCase
+            (Set<Role> roles, String firstName, String lastName);
+
+    List<User> findAllByRolesIsContainingAndFirstNameIsContainingAndLastNameIsContainingAllIgnoreCase
+            (Set<Role> roles, String firstName, String lastName);
 
 }

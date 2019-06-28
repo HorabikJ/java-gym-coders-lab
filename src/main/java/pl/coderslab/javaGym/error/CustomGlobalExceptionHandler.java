@@ -22,7 +22,7 @@ import java.util.Map;
 @ControllerAdvice
 public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler({DomainObjectException.class,
+    @ExceptionHandler({UniqueDBFieldException.class,
             UserUnauthorizedException.class,
             ResourceNotFoundException.class,
             PasswordDoNotMatchException.class,
@@ -48,10 +48,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     private String getErrorMessageFieldName(Exception exception) {
         String fieldName = "error";
         Class exceptionClass = exception.getClass();
-        if (exceptionClass.equals(DomainObjectException.class)) {
-            fieldName = "email";
-        } else if (exceptionClass.equals(UserUnauthorizedException.class)) {
-            fieldName = "user";
+        if (exceptionClass.equals(UserUnauthorizedException.class)) {
+            fieldName = "user:";
         } else if (exceptionClass.equals(PasswordDoNotMatchException.class)) {
             fieldName = "password";
         }

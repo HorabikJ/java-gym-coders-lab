@@ -1,12 +1,12 @@
 package pl.coderslab.javaGym.error.customException;
 
-public class DomainObjectException extends RuntimeException {
+public class UniqueDBFieldException extends RuntimeException {
 
-    private String message = "*Provided email is already registered in database.";
+    private String message = "*Provided value is already registered in DB. It has to be unique.";
 
-    public DomainObjectException() { }
+    public UniqueDBFieldException() { }
 
-    public DomainObjectException(String message) {
+    public UniqueDBFieldException(String message) {
         this.message = message;
     }
 

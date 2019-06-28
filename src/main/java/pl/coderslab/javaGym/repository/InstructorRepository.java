@@ -9,10 +9,10 @@ import java.util.List;
 @Repository
 public interface InstructorRepository extends JpaRepository<Instructor, Long> {
 
-    Boolean existsByEmail(String email);
+    Boolean existsByEmailIgnoreCase(String email);
 
-    List<Instructor> findAllByEmailIsContaining(String email);
+    List<Instructor> findAllByEmailIsContainingIgnoreCase(String email);
 
-    List<Instructor> findAllByFirstNameIsContainingAndLastNameIsContaining(String firstName, String lastName);
+    List<Instructor> findAllByFirstNameIsContainingAndLastNameIsContainingAllIgnoreCase(String firstName, String lastName);
 
 }

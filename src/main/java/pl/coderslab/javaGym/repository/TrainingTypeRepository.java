@@ -7,4 +7,6 @@ import pl.coderslab.javaGym.entity.data.TrainingType;
 @Repository
 public interface TrainingTypeRepository extends JpaRepository<TrainingType, Long> {
 
+    Boolean existsByNameIgnoreCase(String name);
+
 }

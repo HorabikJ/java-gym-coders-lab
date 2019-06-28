@@ -57,12 +57,12 @@ public class AdminInstructorController {
         return instructorService.sendEmailToInstructor(email, id);
     }
 
-// actions to do:
+// admin can do with instructors:
 // - add new instructor,
 // - edit existing instructor,
 // - delete instructor,
 // - send email to instructor,
-// - find by email
+// - find instructor by email
 
 
 }

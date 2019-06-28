@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.coderslab.javaGym.entity.confirmationEmail.ChangeEmailDetails;
 import pl.coderslab.javaGym.entity.user.User;
-import pl.coderslab.javaGym.error.customException.DomainObjectException;
+import pl.coderslab.javaGym.error.customException.UniqueDBFieldException;
 import pl.coderslab.javaGym.error.customException.LinkExpiredException;
 import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
 import pl.coderslab.javaGym.repository.ChangeEmailDetailsRepository;
@@ -48,7 +48,7 @@ public class ChangeEmailDetailsService implements
     public Boolean confirmEmailChange(String param) {
         ChangeEmailDetails emailDetails = changeEmailDetailsRepository.findByParam(param);
         if (emailDetails != null) {
-            Boolean isNewEmailAlreadyInDB = userRepository.existsByEmail(emailDetails.getNewEmail());
+            Boolean isNewEmailAlreadyInDB = userRepository.existsByEmailIgnoreCase(emailDetails.getNewEmail());
             if (!isNewEmailAlreadyInDB) {
                 if (isLinkActive(emailDetails)) {
                     changeUserEmail(emailDetails);
@@ -57,7 +57,7 @@ public class ChangeEmailDetailsService implements
                     throw new LinkExpiredException();
                 }
             } else {
-                throw new DomainObjectException();
+                throw new UniqueDBFieldException();
             }
         } else {
             throw new ResourceNotFoundException();

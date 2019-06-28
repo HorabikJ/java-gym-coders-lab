@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.coderslab.javaGym.emailSender.EmailSender;
 import pl.coderslab.javaGym.entity.data.Instructor;
 import pl.coderslab.javaGym.error.customException.ActionNotAllowedException;
-import pl.coderslab.javaGym.error.customException.DomainObjectException;
+import pl.coderslab.javaGym.error.customException.UniqueDBFieldException;
 import pl.coderslab.javaGym.error.customException.EmailSendingException;
 import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
 import pl.coderslab.javaGym.model.Email;
@@ -53,7 +53,7 @@ public class InstructorService implements AbstractDataService<Instructor> {
             if (!isInstructorEmailAlreadyInDB(instructor)) {
                 return instructorRepository.save(instructor);
             } else {
-                throw new DomainObjectException();
+                throw new UniqueDBFieldException();
             }
         } else {
             throw new ActionNotAllowedException();
@@ -71,13 +71,13 @@ public class InstructorService implements AbstractDataService<Instructor> {
                 newInstructor.setId(instructorFromDB.getId());
                 return instructorRepository.save(newInstructor);
             } else {
-                throw new DomainObjectException();
+                throw new UniqueDBFieldException();
             }
         }
     }
 
     private Boolean isInstructorEmailAlreadyInDB(Instructor instructor) {
-        return instructorRepository.existsByEmail(instructor.getEmail());
+        return instructorRepository.existsByEmailIgnoreCase(instructor.getEmail());
     }
 
     @Override
@@ -89,12 +89,13 @@ public class InstructorService implements AbstractDataService<Instructor> {
     }
 
     public List<Instructor> findByEmail(String email) {
-        return instructorRepository.findAllByEmailIsContaining(email);
+        return instructorRepository.findAllByEmailIsContainingIgnoreCase(email);
     }
 
     public List<Instructor> findByNames(String firstName, String lastName) {
         return instructorRepository
-                .findAllByFirstNameIsContainingAndLastNameIsContaining(firstName, lastName);
+                .findAllByFirstNameIsContainingAndLastNameIsContainingAllIgnoreCase
+                        (firstName, lastName);
     }
 
     @Transactional
