@@ -5,15 +5,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.coderslab.javaGym.entity.confirmationEmail.ChangeEmailDetails;
 import pl.coderslab.javaGym.entity.user.User;
-import pl.coderslab.javaGym.error.customException.UniqueDBFieldException;
 import pl.coderslab.javaGym.error.customException.LinkExpiredException;
 import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
+import pl.coderslab.javaGym.error.customException.UniqueDBFieldException;
 import pl.coderslab.javaGym.repository.ChangeEmailDetailsRepository;
 import pl.coderslab.javaGym.repository.UserRepository;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Service
@@ -74,8 +73,8 @@ public class ChangeEmailDetailsService implements
 
     private Boolean isLinkActive(ChangeEmailDetails emailDetails) {
         Integer linkExpirationTimeInMinutes = emailDetails.getMinutesExpirationTime();
-        Instant sendTime = emailDetails.getSendTime().toInstant();
-        Instant nowTime = ZonedDateTime.now(ZONE_POLAND).toInstant();
+        LocalDateTime sendTime = emailDetails.getSendTime();
+        LocalDateTime nowTime = LocalDateTime.now();
         return nowTime.isBefore(sendTime.plusSeconds(60 * linkExpirationTimeInMinutes));
     }
 

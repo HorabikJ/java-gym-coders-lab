@@ -26,7 +26,7 @@ public class TrainingType {
     @Column(length = 1000)
     private String description;
 
-    @OneToMany(mappedBy = "trainingTypeEntity", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "trainingType", cascade = CascadeType.REMOVE)
     private List<TrainingClass> trainingClasses = new ArrayList<>();
 
 //    public TrainingType(String name, String description) {

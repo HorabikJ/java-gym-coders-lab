@@ -11,9 +11,8 @@ import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
 import pl.coderslab.javaGym.repository.ResetPasswordEmailRepository;
 import pl.coderslab.javaGym.repository.UserRepository;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Service
@@ -65,8 +64,8 @@ public class ResetPasswordEmailService implements
 
     private Boolean isLinkActive(ResetPasswordEmailDetails emailDetails) {
         Integer linkExpirationTimeInMinutes = emailDetails.getMinutesExpirationTime();
-        Instant sendTime = emailDetails.getSendTime().toInstant();
-        Instant nowTime = ZonedDateTime.now(ZONE_POLAND).toInstant();
+        LocalDateTime sendTime = emailDetails.getSendTime();
+        LocalDateTime nowTime = LocalDateTime.now();
         return nowTime.isBefore(sendTime.plusSeconds(60 * linkExpirationTimeInMinutes));
     }
 

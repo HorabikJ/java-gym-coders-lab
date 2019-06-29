@@ -14,15 +14,13 @@ import pl.coderslab.javaGym.service.confirmationEmailService.ActivationEmailServ
 import pl.coderslab.javaGym.service.confirmationEmailService.ChangeEmailDetailsService;
 import pl.coderslab.javaGym.service.confirmationEmailService.ResetPasswordEmailService;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Component
 public class EmailSender {
 
-    private final static ZoneId ZONE_POLAND = ZoneId.of("Poland");
     private final static Integer LINK_EXPIRATION_TIME = 30;
 
     private final static String CHANGE_EMAIL_URL = "http://localhost:8080/change-email?param=";
@@ -82,7 +80,8 @@ public class EmailSender {
 
         ActivationEmailDetails activationEmailDetails =
                 new ActivationEmailDetails
-                (user, param, ZonedDateTime.now(ZONE_POLAND), LINK_EXPIRATION_TIME);
+                (user, param, LocalDateTime.now(),
+                        LINK_EXPIRATION_TIME);
 
         activationEmailService.save(activationEmailDetails);
         javaMailSender.send(message);
@@ -101,8 +100,8 @@ public class EmailSender {
         message.setSubject(CHANGE_EMAIL_SUBJECT);
         message.setText(messageText.toString());
         ChangeEmailDetails emailDetails =
-                new ChangeEmailDetails(user, param, ZonedDateTime.now(ZONE_POLAND),
-                newEmail, LINK_EXPIRATION_TIME);
+                new ChangeEmailDetails(user, param, LocalDateTime.now(),
+                    newEmail, LINK_EXPIRATION_TIME);
 
         changeEmailDetailsService.save(emailDetails);
         javaMailSender.send(message);
@@ -122,7 +121,7 @@ public class EmailSender {
         message.setText(messageText.toString());
         ResetPasswordEmailDetails resetPasswordEmailDetails =
                 new ResetPasswordEmailDetails
-                (user, param, ZonedDateTime.now(ZONE_POLAND), LINK_EXPIRATION_TIME);
+                (user, param, LocalDateTime.now(), LINK_EXPIRATION_TIME);
 
         resetPasswordEmailService.save(resetPasswordEmailDetails);
         javaMailSender.send(message);

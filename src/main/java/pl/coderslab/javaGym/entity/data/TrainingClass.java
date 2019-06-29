@@ -1,13 +1,12 @@
 package pl.coderslab.javaGym.entity.data;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import pl.coderslab.javaGym.entity.user.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class TrainingClass {
     private Integer maxCapacity;
 
     @Column
-    private ZonedDateTime startDate;
+    private LocalDateTime startDate;
 
     @Column
     private Integer durationInMinutes;
@@ -39,7 +38,7 @@ public class TrainingClass {
     private Instructor instructor;
 
     @ManyToOne
-    private TrainingType trainingTypeEntity;
+    private TrainingType trainingType;
 
     @ManyToMany
     private List<User> customers = new LinkedList<>();

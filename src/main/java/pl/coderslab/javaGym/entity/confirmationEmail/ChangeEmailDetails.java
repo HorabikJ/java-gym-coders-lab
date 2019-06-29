@@ -1,10 +1,12 @@
 package pl.coderslab.javaGym.entity.confirmationEmail;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import pl.coderslab.javaGym.entity.user.User;
 
 import javax.persistence.*;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,7 +26,7 @@ public class ChangeEmailDetails implements ConfirmationEmail {
     private String param;
 
     @Column
-    private ZonedDateTime sendTime;
+    private LocalDateTime sendTime;
 
     @Column
     private String newEmail;
@@ -32,7 +34,7 @@ public class ChangeEmailDetails implements ConfirmationEmail {
     @Column
     private Integer minutesExpirationTime;
 
-    public ChangeEmailDetails(User user, String param, ZonedDateTime sendTime,
+    public ChangeEmailDetails(User user, String param, LocalDateTime sendTime,
                               String newEmail, Integer minutesExpirationTime) {
         this.user = user;
         this.param = param;
