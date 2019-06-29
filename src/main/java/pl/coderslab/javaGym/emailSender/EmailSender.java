@@ -4,12 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
+import pl.coderslab.javaGym.dataTransferObject.EmailDto;
 import pl.coderslab.javaGym.entity.Person;
 import pl.coderslab.javaGym.entity.confirmationEmail.ActivationEmailDetails;
 import pl.coderslab.javaGym.entity.confirmationEmail.ChangeEmailDetails;
 import pl.coderslab.javaGym.entity.confirmationEmail.ResetPasswordEmailDetails;
 import pl.coderslab.javaGym.entity.user.User;
-import pl.coderslab.javaGym.model.Email;
 import pl.coderslab.javaGym.service.confirmationEmailService.ActivationEmailService;
 import pl.coderslab.javaGym.service.confirmationEmailService.ChangeEmailDetailsService;
 import pl.coderslab.javaGym.service.confirmationEmailService.ResetPasswordEmailService;
@@ -128,15 +128,15 @@ public class EmailSender {
         javaMailSender.send(message);
     }
 
-    public void sendEmailToPerson(Person person, Email email) {
+    public void sendEmailToPerson(Person person, EmailDto emailData) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(person.getEmail());
-        message.setSubject(email.getTitle());
-        message.setText(email.getText());
+        message.setSubject(emailData.getTitle());
+        message.setText(emailData.getText());
         javaMailSender.send(message);
     }
 
-    public void sendNewsletter(Email newsletter, List<User> newsletterUsers) {
+    public void sendNewsletter(EmailDto newsletter, List<User> newsletterUsers) {
         SimpleMailMessage message = new SimpleMailMessage();
         for (User user : newsletterUsers) {
             message.setTo(user.getEmail());

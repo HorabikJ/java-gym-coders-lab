@@ -1,4 +1,4 @@
-package pl.coderslab.javaGym.model;
+package pl.coderslab.javaGym.dataTransferObject;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Email {
+public class EmailDto {
 
     @NotBlank(message = "*Title can not be empty.")
     private String title;

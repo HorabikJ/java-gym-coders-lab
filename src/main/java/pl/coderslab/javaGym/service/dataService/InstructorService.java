@@ -4,13 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.coderslab.javaGym.dataTransferObject.EmailDto;
 import pl.coderslab.javaGym.emailSender.EmailSender;
 import pl.coderslab.javaGym.entity.data.Instructor;
 import pl.coderslab.javaGym.error.customException.ActionNotAllowedException;
 import pl.coderslab.javaGym.error.customException.UniqueDBFieldException;
 import pl.coderslab.javaGym.error.customException.EmailSendingException;
 import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
-import pl.coderslab.javaGym.model.Email;
 import pl.coderslab.javaGym.repository.InstructorRepository;
 
 import java.util.List;
@@ -99,10 +99,10 @@ public class InstructorService implements AbstractDataService<Instructor> {
     }
 
     @Transactional
-    public Boolean sendEmailToInstructor(Email email, Long id) {
+    public Boolean sendEmailToInstructor(EmailDto emailData, Long id) {
         try {
             Instructor instructor = getInstructorByIdFromDB(id);
-            emailSender.sendEmailToPerson(instructor, email);
+            emailSender.sendEmailToPerson(instructor, emailData);
             return true;
         } catch (MailException e) {
             throw new EmailSendingException();

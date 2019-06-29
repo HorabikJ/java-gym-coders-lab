@@ -1,10 +1,12 @@
 package pl.coderslab.javaGym.controller;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import pl.coderslab.javaGym.dataTransferObject.EmailDto;
+import pl.coderslab.javaGym.dataTransferObject.UserDto;
 import pl.coderslab.javaGym.entity.user.User;
-import pl.coderslab.javaGym.model.Email;
 import pl.coderslab.javaGym.service.userService.UserService;
 
 import javax.validation.Valid;
@@ -12,6 +14,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin")
@@ -19,21 +22,25 @@ import java.util.List;
 public class AdminController {
 
     private UserService userService;
+    private ModelMapper modelMapper;
 
-    public AdminController(UserService userService) {
+    public AdminController(UserService userService,
+                           ModelMapper modelMapper) {
         this.userService = userService;
+        this.modelMapper = modelMapper;
     }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public User registerNewAdmin(@RequestBody @Valid User user) {
-        return userService.save(user, true);
+    public UserDto registerNewAdmin(@RequestBody @Valid UserDto userDto) {
+        User user = convertToEntity(userDto);
+        return convertToDto(userService.save(user, true));
     }
 
     @GetMapping("/show-user/{id}")
-    public User showUserDetails(@PathVariable
+    public UserDto showUserDetails(@PathVariable
             @Min(value = 1, message = "*Please provide id grater than 0.") Long id) {
-        return userService.findById(id);
+        return convertToDto(userService.findById(id));
     }
 
     @DeleteMapping("/delete-user/{id}")
@@ -43,48 +50,48 @@ public class AdminController {
     }
 
     @GetMapping("/show-all-users")
-    public List<User> showAllUsers() {
-        return userService.showAllUsersWithUserRoleOnly();
+    public List<UserDto> showAllUsers() {
+        return convertEntityToDtoList(userService.showAllUsersWithUserRoleOnly());
     }
 
     @GetMapping("/show-all-admins")
-    public List<User> showAllAdmins() {
-        return userService.showAllAdmins();
+    public List<UserDto> showAllAdmins() {
+        return convertEntityToDtoList(userService.showAllAdmins());
     }
 
     @GetMapping("/users-by-email")
-    public List<User> searchForUsersByEmail
+    public List<UserDto> searchForUsersByEmail
             (@RequestParam @NotBlank(message = "*Please provide not blank input.")
             String email) {
-        return userService.searchForUsersByEmail(email);
+        return convertEntityToDtoList(userService.searchForUsersByEmail(email));
     }
 
     @GetMapping("/admins-by-email")
-    public List<User> searchForAdminsByEmail
+    public List<UserDto> searchForAdminsByEmail
             (@RequestParam @NotBlank(message = "*Please provide not blank input.")
             String email) {
-        return userService.searchForAdminsByEmail(email);
+        return convertEntityToDtoList(userService.searchForAdminsByEmail(email));
     }
 
     @GetMapping("/users-by-names")
-    public List<User> searchForUsersByNames
+    public List<UserDto> searchForUsersByNames
             (@RequestParam @NotBlank(message = "*Please provide not blank input.") String firstName,
              @RequestParam @NotBlank(message = "*Please provide not blank input.") String lastName) {
-        return userService.findAllUsersByNames(firstName, lastName);
+        return convertEntityToDtoList(userService.findAllUsersByNames(firstName, lastName));
     }
 
     @GetMapping("/admins-by-names")
-    public List<User> searchForAdminsByNames
+    public List<UserDto> searchForAdminsByNames
             (@RequestParam @NotBlank(message = "*Please provide not blank input.") String firstName,
              @RequestParam @NotBlank(message = "*Please provide not blank input.") String lastName) {
-        return userService.findAllAdminsByNames(firstName, lastName);
+        return convertEntityToDtoList(userService.findAllAdminsByNames(firstName, lastName));
     }
 
     @PatchMapping("/set-active/{id}")
-    public User changeAccountActiveValue
+    public UserDto changeAccountActiveValue
             (@PathVariable @Min(value = 1,  message = "*Please provide user id grater than 0.") Long id,
              @RequestParam @NotNull(message = "*Active can not be null.") Boolean active) {
-        return userService.changeUserActiveAccount(id, active);
+        return convertToDto(userService.changeUserActiveAccount(id, active));
     }
 
     @GetMapping("/send-activation-email/{id}")
@@ -97,13 +104,29 @@ public class AdminController {
     @PostMapping("/send-email/{id}")
     public Boolean sendEmailToUser
             (@PathVariable @Min(value = 1, message = "*Please provide user id grater than 0.") Long id,
-            @RequestBody @Valid Email email) {
-        return userService.sendEmailToUser(id, email);
+            @RequestBody @Valid EmailDto emailData) {
+        return userService.sendEmailToUser(id, emailData);
     }
 
     @PostMapping("/send-newsletter")
-    public Boolean sendNewsletter(@RequestBody @Valid Email newsletter) {
+    public Boolean sendNewsletter(@RequestBody @Valid EmailDto newsletter) {
         return userService.sendNewsletter(newsletter);
+    }
+
+    private UserDto convertToDto(User user) {
+        UserDto userDto = modelMapper.map(user, UserDto.class);
+        user.setPassword(null);
+        return userDto;
+    }
+
+    private User convertToEntity(UserDto userDto) {
+        return modelMapper.map(userDto, User.class);
+    }
+
+    private List<UserDto> convertEntityToDtoList(List<User> users) {
+        return users.stream()
+                .map(user -> convertToDto(user))
+                .collect(Collectors.toList());
     }
 
 }

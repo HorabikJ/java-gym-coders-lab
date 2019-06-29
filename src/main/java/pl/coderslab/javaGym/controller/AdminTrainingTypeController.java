@@ -1,7 +1,11 @@
 package pl.coderslab.javaGym.controller;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import pl.coderslab.javaGym.dataTransferObject.TrainingTypeDto;
 import pl.coderslab.javaGym.entity.data.TrainingType;
 import pl.coderslab.javaGym.service.dataService.TrainingTypeService;
 
@@ -14,21 +18,28 @@ import javax.validation.constraints.Min;
 public class AdminTrainingTypeController {
 
     private TrainingTypeService trainingTypeService;
+    private ModelMapper modelMapper;
 
-    public AdminTrainingTypeController(TrainingTypeService trainingTypeService) {
+    @Autowired
+    public AdminTrainingTypeController(TrainingTypeService trainingTypeService,
+                                       ModelMapper modelMapper) {
         this.trainingTypeService = trainingTypeService;
+        this.modelMapper = modelMapper;
     }
 
     @PostMapping("/add-new")
-    public TrainingType addTrainingType(@RequestBody @Valid TrainingType trainingType) {
-        return trainingTypeService.save(trainingType);
+    @ResponseStatus(HttpStatus.CREATED)
+    public TrainingTypeDto addTrainingType(@RequestBody @Valid TrainingTypeDto trainingTypeDto) {
+        TrainingType trainingType = convertToEntity(trainingTypeDto);
+        return convertToDto(trainingTypeService.save(trainingType));
     }
 
     @PutMapping("/edit/{id}")
-    public TrainingType editTrainingType
+    public TrainingTypeDto editTrainingType
             (@PathVariable @Min(value = 1, message = "*Please provide id grater than 0") Long id,
-             @RequestBody @Valid TrainingType trainingType) {
-        return trainingTypeService.edit(trainingType, id);
+             @RequestBody @Valid TrainingTypeDto trainingTypeDto) {
+        TrainingType trainingType = convertToEntity(trainingTypeDto);
+        return convertToDto(trainingTypeService.edit(trainingType, id));
     }
 
     @DeleteMapping("/delete/{id}")
@@ -36,6 +47,16 @@ public class AdminTrainingTypeController {
             (@PathVariable @Min(value = 1, message = "*Please provide id grater than 0") Long id) {
         return trainingTypeService.deleteById(id);
     }
+
+    private TrainingType convertToEntity(TrainingTypeDto trainingTypeDto) {
+        return modelMapper.map(trainingTypeDto, TrainingType.class);
+    }
+
+    private TrainingTypeDto convertToDto(TrainingType trainingType) {
+        return modelMapper.map(trainingType, TrainingTypeDto.class);
+    }
+
+
 
 // admin can do with training types:
 // - add new training type,

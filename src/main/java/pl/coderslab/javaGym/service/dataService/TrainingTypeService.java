@@ -55,6 +55,7 @@ public class TrainingTypeService implements AbstractDataService<TrainingType> {
     public TrainingType edit(TrainingType newTrainingType, Long id) {
         TrainingType trainingTypeFromDB = getTrainingTypeByIdFromDB(id);
         if (newTrainingType.getName().equals(trainingTypeFromDB.getName())) {
+            newTrainingType.setId(trainingTypeFromDB.getId());
             return trainingTypeRepository.save(newTrainingType);
         } else {
             if (!isTrainingTypeNameAlreadyInDB(newTrainingType)) {

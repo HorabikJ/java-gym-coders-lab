@@ -9,7 +9,6 @@ public class GuestController {
 //    TODO
 //    - show all classes in future for 2 weeks
 //    - show all instructors
-//    - show instructor by
 //    - show instructor by names
 //    - show all training types
 //    - show training type by id

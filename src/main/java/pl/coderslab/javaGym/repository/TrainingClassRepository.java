@@ -13,6 +13,4 @@ public interface TrainingClassRepository extends JpaRepository<TrainingClass, Lo
 
     List<TrainingClass> findAllByInstructorId(Long instructorId);
 
-    List<TrainingClass> findAllByTrainingTypeId(Long trainingType);
-
 }

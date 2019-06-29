@@ -13,7 +13,7 @@ import pl.coderslab.javaGym.entity.user.Role;
 import pl.coderslab.javaGym.entity.user.User;
 import pl.coderslab.javaGym.enumClass.RoleEnum;
 import pl.coderslab.javaGym.error.customException.*;
-import pl.coderslab.javaGym.model.Email;
+import pl.coderslab.javaGym.dataTransferObject.EmailDto;
 import pl.coderslab.javaGym.repository.RoleRepository;
 import pl.coderslab.javaGym.repository.UserRepository;
 
@@ -73,17 +73,19 @@ public class UserService implements AbstractUserService<User> {
     @Transactional
     public User save(User user, Boolean asAdmin) {
         if (user.getId() == null) {
-            try {
-                setUserProperties(user, asAdmin);
-                emailSender.sendAccountActivationEmail(user);
-                return userRepository.save(user);
-            } catch (MailException e) {
-                throw new EmailSendingException();
-            } catch (DataIntegrityViolationException e) {
+            if (!userRepository.existsByEmailIgnoreCase(user.getEmail())) {
+                try {
+                    setUserProperties(user, asAdmin);
+                    emailSender.sendAccountActivationEmail(user);
+                    return userRepository.save(user);
+                } catch (MailException e) {
+                    throw new EmailSendingException();
+                }
+            } else {
                 throw new UniqueDBFieldException();
             }
         } else {
-            throw new UserUnauthorizedException();
+            throw new ActionNotAllowedException();
         }
     }
 
@@ -253,10 +255,10 @@ public class UserService implements AbstractUserService<User> {
     }
 
     @Transactional
-    public Boolean sendEmailToUser(Long userId, Email email) {
+    public Boolean sendEmailToUser(Long userId, EmailDto emailData) {
         User user = getUserByIdFromDB(userId);
         try {
-            emailSender.sendEmailToPerson(user, email);
+            emailSender.sendEmailToPerson(user, emailData);
             return true;
         } catch (MailException e) {
             throw new EmailSendingException();
@@ -275,7 +277,7 @@ public class UserService implements AbstractUserService<User> {
     }
 
     @Transactional
-    public Boolean sendNewsletter(Email newsletter) {
+    public Boolean sendNewsletter(EmailDto newsletter) {
         try {
             List<User> newsletterUsers = userRepository.findAllByNewsletterIsTrue();
             emailSender.sendNewsletter(newsletter, newsletterUsers);
