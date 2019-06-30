@@ -35,5 +35,5 @@ public class SuperAdminController {
 }
 
 // super admin can do:
-// - delete any regular admin and user
+// - delete any regular admin and any user
 // - set admin account as inactive/active

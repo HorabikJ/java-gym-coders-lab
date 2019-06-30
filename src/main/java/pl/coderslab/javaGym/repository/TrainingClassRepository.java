@@ -36,4 +36,8 @@ public interface TrainingClassRepository extends JpaRepository<TrainingClass, Lo
     @Query("SELECT t.awaitingCustomers FROM TrainingClass t WHERE t.id = :classId")
     List<User> findAllUsersOnClassAwaitingListForByClassId(@Param("classId") Long classId);
 
+    List<TrainingClass> findAllByInstructorIdAndStartDateIsAfter(Long id, LocalDateTime startDate);
+
+    List<TrainingClass> findAllByTrainingTypeIdAndStartDateIsAfter(Long id, LocalDateTime startDate);
+
 }

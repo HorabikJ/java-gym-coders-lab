@@ -172,6 +172,18 @@ public class AdminTrainingClassController {
         return convertTrainingClassEntityToDtoList(trainingClassService.findAllByStartDateIsInPast());
     }
 
+    @GetMapping("/all-future-instructor/{instructorId}")
+    public List<TrainingClassDto> showAllFutureClassesForGivenInstructor(@PathVariable @Min(1) Long instructorId) {
+        return convertTrainingClassEntityToDtoList
+                (trainingClassService.findAllFutureClassesForInstructor(instructorId));
+    }
+
+    @GetMapping("/all-future-training-type/{trainingTypeId}")
+    public List<TrainingClassDto> showAllFutureClassesForGivenTrainingType(@PathVariable @Min(1) Long trainingTypeId) {
+        return convertTrainingClassEntityToDtoList
+                (trainingClassService.findAllFutureClassesForInstructor(trainingTypeId));
+    }
+
     @PostMapping("/send-email/{classId}")
     public Boolean sendEmailToAllClassCustomers(@PathVariable @Min(1) Long classId,
                                                 @RequestBody @Valid EmailDto email) {
@@ -214,7 +226,7 @@ public class AdminTrainingClassController {
 
 }
 
-// admin can do:
+// admin can do with training classes:
 //  - add training classes
 //
 //  do by id and classGroupId (only for future classes):
@@ -226,11 +238,13 @@ public class AdminTrainingClassController {
 //      - change start hour
 //
 //  - show all future classes where trainingType or instructor is null
-//  - show any by id
+//  - show any training class by id
 //  - show all by classGroupId
 //  - show all reserved users for trainingClassById
 //  - show all awaiting users for trainingClassById
 //  - show all in future
 //  - show all in past
 //  - send email to all participants for given classes
+//  - show all future classes for given instructor
+//  - show all future classes for given training type
 

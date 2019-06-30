@@ -284,6 +284,7 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
             trainingClass.setDurationInMinutes(newDuration);
             return trainingClassRepository.save(trainingClass);
         } else {
+//            TODO change this exception to a new one?
             throw new ActionNotAllowedException("*This time is already reserved." +
                     " Please see reserved time details: "
                     + errorMessage);
@@ -408,4 +409,25 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
         return null;
     }
 
+    public List<TrainingClass> findAllFutureClassesForInstructor(Long instructorId) {
+        Instructor instructor = getInstructorById(instructorId);
+        List<TrainingClass> classes = trainingClassRepository
+                .findAllByInstructorIdAndStartDateIsAfter(instructor.getId(), LocalDateTime.now());
+        if (classes.size() > 0) {
+            return classes;
+        } else {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    public List<TrainingClass> findAllByTrainingTypeId(Long trainingTypeId) {
+        TrainingType trainingType = getTrainingTypeById(trainingTypeId);
+        List<TrainingClass> classes = trainingClassRepository
+                .findAllByTrainingTypeIdAndStartDateIsAfter(trainingType.getId(), LocalDateTime.now());
+        if (classes.size() > 0) {
+            return classes;
+        } else {
+            throw new ResourceNotFoundException();
+        }
+    }
 }
