@@ -38,14 +38,12 @@ public class AdminController {
     }
 
     @GetMapping("/show-user/{id}")
-    public UserDto showUserDetails(@PathVariable
-            @Min(value = 1, message = "*Please provide id grater than 0.") Long id) {
+    public UserDto showUserDetails(@PathVariable @Min(1) Long id) {
         return convertToDto(userService.findById(id));
     }
 
     @DeleteMapping("/delete-user/{id}")
-    public Boolean deleteUser(@PathVariable
-              @Min(value = 1, message = "*Please provide id grater than 0.") Long id) {
+    public Boolean deleteUser(@PathVariable @Min(1) Long id) {
         return userService.deleteUserById(id);
     }
 
@@ -60,51 +58,42 @@ public class AdminController {
     }
 
     @GetMapping("/users-by-email")
-    public List<UserDto> searchForUsersByEmail
-            (@RequestParam @NotBlank(message = "*Please provide not blank input.")
-            String email) {
+    public List<UserDto> searchForUsersByEmail(@RequestParam @NotBlank String email) {
         return convertEntityToDtoList(userService.searchForUsersByEmail(email));
     }
 
     @GetMapping("/admins-by-email")
     public List<UserDto> searchForAdminsByEmail
-            (@RequestParam @NotBlank(message = "*Please provide not blank input.")
-            String email) {
+            (@RequestParam @NotBlank String email) {
         return convertEntityToDtoList(userService.searchForAdminsByEmail(email));
     }
 
     @GetMapping("/users-by-names")
-    public List<UserDto> searchForUsersByNames
-            (@RequestParam @NotBlank(message = "*Please provide not blank input.") String firstName,
-             @RequestParam @NotBlank(message = "*Please provide not blank input.") String lastName) {
+    public List<UserDto> searchForUsersByNames(@RequestParam @NotBlank String firstName,
+                                               @RequestParam @NotBlank String lastName) {
         return convertEntityToDtoList(userService.findAllUsersByNames(firstName, lastName));
     }
 
     @GetMapping("/admins-by-names")
-    public List<UserDto> searchForAdminsByNames
-            (@RequestParam @NotBlank(message = "*Please provide not blank input.") String firstName,
-             @RequestParam @NotBlank(message = "*Please provide not blank input.") String lastName) {
+    public List<UserDto> searchForAdminsByNames(@RequestParam @NotBlank String firstName,
+                                                @RequestParam @NotBlank String lastName) {
         return convertEntityToDtoList(userService.findAllAdminsByNames(firstName, lastName));
     }
 
     @PatchMapping("/set-active/{id}")
-    public UserDto changeAccountActiveValue
-            (@PathVariable @Min(value = 1,  message = "*Please provide user id grater than 0.") Long id,
-             @RequestParam @NotNull(message = "*Active can not be null.") Boolean active) {
+    public UserDto changeAccountActiveValue(@PathVariable @Min(1) Long id,
+                                            @RequestParam @NotNull Boolean active) {
         return convertToDto(userService.changeUserActiveAccount(id, active));
     }
 
     @GetMapping("/send-activation-email/{id}")
-    public Boolean sendActivationEmail
-            (@PathVariable @Min( value = 1, message = "*Please provide user id grater than 0.")
-             Long id) {
+    public Boolean sendActivationEmail(@PathVariable @Min(1) Long id) {
         return userService.sendActivationEmail(id);
     }
 
     @PostMapping("/send-email/{id}")
-    public Boolean sendEmailToUser
-            (@PathVariable @Min(value = 1, message = "*Please provide user id grater than 0.") Long id,
-            @RequestBody @Valid EmailDto emailData) {
+    public Boolean sendEmailToUser(@PathVariable @Min(1) Long id,
+                                   @RequestBody @Valid EmailDto emailData) {
         return userService.sendEmailToUser(id, emailData);
     }
 

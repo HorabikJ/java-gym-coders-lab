@@ -38,12 +38,15 @@ public class User implements Person {
     @Column
     private Boolean newsletter;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "customers")
     private List<TrainingClass> trainingClasses = new LinkedList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "awaitingCustomers")
     private List<TrainingClass> awaitingClasses = new LinkedList<>();
 
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();

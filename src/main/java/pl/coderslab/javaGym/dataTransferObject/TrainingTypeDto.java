@@ -1,5 +1,6 @@
 package pl.coderslab.javaGym.dataTransferObject;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ public class TrainingTypeDto {
     @Size(min = 1, max = 1000, message = "*Description can not be empty and can not be longer that 1000 signs.")
     private String description;
 
+    @JsonIgnore
     private List<TrainingClass> trainingClasses = new ArrayList<>();
 
 //    public TrainingTypeDto(String name, String description) {

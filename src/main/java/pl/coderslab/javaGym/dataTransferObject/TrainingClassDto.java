@@ -18,7 +18,7 @@ public class TrainingClassDto {
 
     private Long id;
 
-    private String uniqueClassId;
+    private String classGroupId;
 
     @NotNull
     @Min(value = 1, message = "*Minimum value for capacity is 1.")
@@ -26,7 +26,6 @@ public class TrainingClassDto {
 
     private Integer reservedPlaces;
 
-//  local date time correct format  "2019-06-29T14:34:50"
     @NotNull
     @Future(message = "*Start date for a class must be in future.")
     private LocalDateTime startDate;

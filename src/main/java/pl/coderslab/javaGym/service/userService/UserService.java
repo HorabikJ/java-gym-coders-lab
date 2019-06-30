@@ -1,7 +1,6 @@
 package pl.coderslab.javaGym.service.userService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mail.MailException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -280,7 +279,7 @@ public class UserService implements AbstractUserService<User> {
     public Boolean sendNewsletter(EmailDto newsletter) {
         try {
             List<User> newsletterUsers = userRepository.findAllByNewsletterIsTrue();
-            emailSender.sendNewsletter(newsletter, newsletterUsers);
+            emailSender.sendEmailToUsers(newsletter, newsletterUsers);
             return true;
         } catch (MailException e) {
             throw new EmailSendingException();

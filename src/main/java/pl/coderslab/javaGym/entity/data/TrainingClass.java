@@ -23,7 +23,7 @@ public class TrainingClass {
     private Long id;
 
     @Column
-    private String uniqueClassId;
+    private String classGroupId;
 
     @Column
     private Integer maxCapacity;

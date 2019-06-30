@@ -35,16 +35,14 @@ public class AdminTrainingTypeController {
     }
 
     @PutMapping("/edit/{id}")
-    public TrainingTypeDto editTrainingType
-            (@PathVariable @Min(value = 1, message = "*Please provide id grater than 0") Long id,
-             @RequestBody @Valid TrainingTypeDto trainingTypeDto) {
+    public TrainingTypeDto editTrainingType(@PathVariable @Min(1) Long id,
+                                            @RequestBody @Valid TrainingTypeDto trainingTypeDto) {
         TrainingType trainingType = convertToEntity(trainingTypeDto);
         return convertToDto(trainingTypeService.edit(trainingType, id));
     }
 
     @DeleteMapping("/delete/{id}")
-    public Boolean deleteTrainingType
-            (@PathVariable @Min(value = 1, message = "*Please provide id grater than 0") Long id) {
+    public Boolean deleteTrainingType(@PathVariable @Min(1) Long id) {
         return trainingTypeService.deleteById(id);
     }
 

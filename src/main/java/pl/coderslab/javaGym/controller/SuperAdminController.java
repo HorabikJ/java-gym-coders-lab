@@ -22,16 +22,13 @@ public class SuperAdminController {
     }
 
     @DeleteMapping("/delete-user/{id}")
-    public Boolean deleteAnyUser
-            (@PathVariable @Min(value = 1, message = "*Please provide user id grater than 0.")
-            Long id) {
+    public Boolean deleteAnyUser(@PathVariable @Min(1) Long id) {
         return userService.deleteAnyUserById(id);
     }
 
     @PatchMapping("/set-active/{id}")
-    public User changeAccountActiveValue
-            (@PathVariable @Min(value = 1,  message = "*Please provide user id grater than 0.") Long id,
-             @RequestParam @NotNull(message = "*Active can not be null.") Boolean active) {
+    public User changeAccountActiveValue(@PathVariable @Min(1) Long id,
+                                         @RequestParam @NotNull Boolean active) {
         return userService.changeAnyUserActiveAccount(id, active);
     }
 

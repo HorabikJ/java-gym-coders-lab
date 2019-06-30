@@ -27,10 +27,7 @@ public class ResetPasswordController {
 
     @PostMapping(value = "/request", produces = "text/html")
     @ResponseBody
-    public String sendResetPasswordRequest(@RequestParam
-               @Email(message = "*Please provide a valid email.")
-               @NotBlank(message = "*Please provide an email.")
-               String userEmail) {
+    public String sendResetPasswordRequest(@RequestParam @Email @NotBlank String userEmail) {
         Boolean result = userService.resetUserPassword(userEmail);
         return result.toString();
     }
@@ -44,9 +41,7 @@ public class ResetPasswordController {
     @PostMapping("/reset")
     @ResponseBody
     public Boolean resetPassword(@RequestParam @NotBlank String param,
-             @Size(min = 5, message = "*Your password must have at least 5 characters.")
-             @NotBlank(message = "*Please provide your password.")
-             String password) {
+                                 @Size(min = 5) @NotBlank String password) {
         return resetPasswordEmailService.resetPassword(param, password);
     }
 }

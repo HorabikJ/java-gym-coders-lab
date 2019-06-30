@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import pl.coderslab.javaGym.entity.data.TrainingClass;
 import pl.coderslab.javaGym.entity.user.Role;
 
-import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -43,10 +42,13 @@ public class UserDto {
     @NotNull(message = "*Please agree or disagree for newsletter.")
     private Boolean newsletter;
 
+    @JsonIgnore
     private List<TrainingClass> trainingClasses = new LinkedList<>();
 
+    @JsonIgnore
     private List<TrainingClass> awaitingClasses = new LinkedList<>();
 
+    @JsonIgnore
     private Set<Role> roles = new HashSet<>();
 
 }

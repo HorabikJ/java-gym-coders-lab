@@ -39,22 +39,19 @@ public class AdminInstructorController {
     }
 
     @PutMapping("/edit/{id}")
-    public InstructorDto updateInstructor
-            (@PathVariable @Min(value = 1, message = "*Please provide id grater than 0.") Long id,
-             @RequestBody @Valid InstructorDto instructorDto) {
+    public InstructorDto updateInstructor(@PathVariable @Min(1) Long id,
+                                          @RequestBody @Valid InstructorDto instructorDto) {
         Instructor instructor = convertToEntity(instructorDto);
         return convertToDto(instructorService.edit(instructor, id));
     }
 
     @DeleteMapping("/delete/{id}")
-    public Boolean deleteInstructor
-            (@PathVariable @Min(value = 1, message = "*Please provide id grater than 0.") Long id) {
+    public Boolean deleteInstructor(@PathVariable @Min(1) Long id) {
         return instructorService.deleteById(id);
     }
 
     @GetMapping("/find-by-email")
-    public List<InstructorDto> findInstructorByEmail
-            (@RequestParam @NotBlank(message = "*Please provide not blank input.") String email) {
+    public List<InstructorDto> findInstructorByEmail(@RequestParam @NotBlank String email) {
         return instructorService.findByEmail(email)
                 .stream()
                 .map(instructor -> convertToDto(instructor))
@@ -62,9 +59,8 @@ public class AdminInstructorController {
     }
 
     @PostMapping("/send-email/{id}")
-    public Boolean sendEmailToInstructor
-            (@PathVariable @Min(value = 1, message = "*Please provide id grater than 0.") Long id,
-             @RequestBody @Valid EmailDto emailDto) {
+    public Boolean sendEmailToInstructor(@PathVariable @Min(1) Long id,
+                                         @RequestBody @Valid EmailDto emailDto) {
         return instructorService.sendEmailToInstructor(emailDto, id);
     }
 

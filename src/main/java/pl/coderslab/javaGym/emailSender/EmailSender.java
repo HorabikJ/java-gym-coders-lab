@@ -135,12 +135,12 @@ public class EmailSender {
         javaMailSender.send(message);
     }
 
-    public void sendNewsletter(EmailDto newsletter, List<User> newsletterUsers) {
+    public void sendEmailToUsers(EmailDto email, List<User> users) {
         SimpleMailMessage message = new SimpleMailMessage();
-        for (User user : newsletterUsers) {
+        for (User user : users) {
             message.setTo(user.getEmail());
-            message.setSubject(newsletter.getTitle());
-            message.setText(newsletter.getText());
+            message.setSubject(email.getTitle());
+            message.setText(email.getText());
             javaMailSender.send(message);
         }
     }

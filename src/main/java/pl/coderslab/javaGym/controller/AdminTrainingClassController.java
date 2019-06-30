@@ -6,12 +6,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.javaGym.customValidator.Occurrence;
+import pl.coderslab.javaGym.dataTransferObject.EmailDto;
 import pl.coderslab.javaGym.dataTransferObject.TrainingClassDto;
+import pl.coderslab.javaGym.dataTransferObject.UserDto;
 import pl.coderslab.javaGym.entity.data.TrainingClass;
+import pl.coderslab.javaGym.entity.user.User;
 import pl.coderslab.javaGym.service.dataService.TrainingClassService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,25 +40,197 @@ public class AdminTrainingClassController {
     public List<TrainingClassDto> addNewTrainingClass
             (@RequestBody @Valid TrainingClassDto trainingClassDto,
              @RequestParam @Occurrence Integer occurrence,
-             @RequestParam @Min(value = 1, message = "*Please provide number grater than 0.") Integer repeat) {
-        return convertEntityToDtoList
+             @RequestParam @Min(1) Integer repeat) {
+        return convertTrainingClassEntityToDtoList
                 (trainingClassService.saveTrainingClass(trainingClassDto, occurrence, repeat));
     }
 
-    private TrainingClass convertToEntity(TrainingClassDto trainingClassDto) {
+    @PatchMapping("/set-instructor/{classGroupId}/{instructorId}")
+    public List<TrainingClassDto> setInstructorByClassGroupIdWhereClassesInFuture
+            (@PathVariable @NotBlank String classGroupId,
+             @PathVariable @Min(1) Long instructorId) {
+        return convertTrainingClassEntityToDtoList
+                (trainingClassService.setInstructorByClassGroupId(classGroupId, instructorId));
+    }
+
+    @PatchMapping("/set-training-type/{classGroupId}/{trainingTypeId}")
+    public List<TrainingClassDto> setTrainingTypeByClassGroupIdWhereClassesInFuture
+            (@PathVariable @NotBlank String classGroupId,
+             @PathVariable @Min(1) Long trainingTypeId) {
+        return convertTrainingClassEntityToDtoList
+                (trainingClassService.setTrainingTypeByClassGroupId(classGroupId, trainingTypeId));
+    }
+
+    @PatchMapping("/change-max-capacity/{classGroupId}")
+    public List<TrainingClassDto> changeMaxCapacityByClassGroupIdWhereClassesInFuture
+            (@PathVariable @NotBlank String classGroupId,
+             @RequestParam @Min(1) Integer maxCapacity) {
+        return convertTrainingClassEntityToDtoList(trainingClassService
+                .changeMaxCapacityByClassGroupId(classGroupId, maxCapacity));
+    }
+
+   @PatchMapping("/change-duration/{classGroupId}")
+    public List<TrainingClassDto> changeDurationByClassGroupIdWhereClassesInFuture
+            (@PathVariable @NotBlank String classGroupId,
+             @RequestParam @Min(1) Integer duration) {
+        return convertTrainingClassEntityToDtoList(trainingClassService
+                .changeDurationByClassGroupId(classGroupId, duration));
+    }
+
+   @PatchMapping("/change-hour/{classGroupId}")
+   public List<TrainingClassDto> changeClassStartHourByClassGroupIdWhereClassesInFuture
+           (@PathVariable @NotBlank String classGroupId,
+            @RequestParam @Min(0) @Max(23) Integer hour,
+            @RequestParam @Min(0) @Max(59)  Integer minute) {
+        return convertTrainingClassEntityToDtoList(trainingClassService
+                .changeClassStartHourByClassGroupId(classGroupId, hour, minute));
+   }
+
+   @DeleteMapping("/delete/{classGroupId}")
+   public Boolean deleteClassByClassGroupIdWhereClassesInFuture
+           (@PathVariable @NotBlank String classGroupId) {
+        return trainingClassService.deleteClassByClassGroupId(classGroupId);
+   }
+
+    @PatchMapping("/set-instructor-one/{classId}/{instructorId}")
+    public TrainingClassDto setInstructorForClassIdWhereClassInFuture
+                                    (@PathVariable @Min(1) Long classId,
+                                    @PathVariable @Min(1) Long instructorId) {
+        return convertTrainingClassToDto
+                (trainingClassService.setInstructorByClassId(classId, instructorId));
+    }
+
+    @PatchMapping("/set-training-type-one/{classId}/{trainingTypeId}")
+    public TrainingClassDto setTrainingTypeForClassIdWhereClassInFuture
+                                    (@PathVariable @Min(1) Long classId,
+                                    @PathVariable @Min(1) Long trainingTypeId) {
+        return convertTrainingClassToDto
+                (trainingClassService.setTrainingTypeByClassId(classId, trainingTypeId));
+    }
+
+    @PatchMapping("/change-max-capacity-one/{classId}")
+    public TrainingClassDto changeMaxCapacityForClassIdWhereClassInFuture
+                                    (@PathVariable @Min(1) Long classId,
+                                    @RequestParam @Min(1) Integer maxCapacity) {
+        return convertTrainingClassToDto(trainingClassService.changeMaxCapacityByClassId(classId, maxCapacity));
+    }
+
+    @PatchMapping("/change-duration-one/{classId}")
+    public TrainingClassDto changeDurationForClassIdWhereClassInFuture
+                                    (@PathVariable @Min(1) Long classId,
+                                     @RequestParam @Min(1) Integer duration) {
+        return convertTrainingClassToDto(trainingClassService.changeDurationForClassId(classId, duration));
+    }
+
+    @PatchMapping("/change-hour-one/{classId}")
+    public TrainingClassDto changeClassStartHourByClassIdWhereClassInFuture
+            (@PathVariable @Min(1) Long classId,
+             @RequestParam @Min(0) @Max(23) Integer hour,
+             @RequestParam @Min(0) @Max(59)  Integer minute) {
+        return convertTrainingClassToDto(trainingClassService.changeClassStartHourByClassId(classId, hour, minute));
+    }
+
+    @DeleteMapping("/delete-one/{classId}")
+    public Boolean deleteClassByClassIdWhereClassInFuture(@PathVariable @Min(1) Long classId) {
+        return trainingClassService.deleteClassByClassId(classId);
+    }
+
+    @GetMapping("/null-relation")
+    public List<TrainingClassDto> showAllTrainingClassInFutureWhereInstructorOrTrainingTypeIsNull() {
+        return convertTrainingClassEntityToDtoList(trainingClassService.findAllInFutureWhereAnyRelationIsNull());
+    }
+
+    @GetMapping("/by-id/{classId}")
+    public TrainingClassDto showAnyTrainingClass(@PathVariable @Min(1) Long classId) {
+        return convertTrainingClassToDto(trainingClassService.findById(classId));
+    }
+
+    @GetMapping("/by-class-group-id/{classGroupId}")
+    public List<TrainingClassDto> showAllTrainingClassesByClassGroupId(@PathVariable @NotBlank String classGroupId) {
+        return convertTrainingClassEntityToDtoList(trainingClassService.findAllByClassGroupId(classGroupId));
+    }
+
+    @GetMapping("/reserved-users/{classId}")
+    public List<UserDto> showAllUsersOnClassReservationList(@PathVariable @Min(1) Long classId) {
+        return convertUserEntityToDtoList
+                (trainingClassService.findAllUsersOnClassReservationListByClassId(classId));
+    }
+
+    @GetMapping("/awaiting-users/{classId}")
+    public List<UserDto> showAllUsersOnClassAwaitingList(@PathVariable @Min(1) Long classId) {
+        return convertUserEntityToDtoList
+                (trainingClassService.findAllUsersOnClassAwaitingListByClassId(classId));
+    }
+
+    @GetMapping("/all-future")
+    public List<TrainingClassDto> showAllTrainingClassesInFuture() {
+        return convertTrainingClassEntityToDtoList(trainingClassService.findAllByStartDateIsInFuture());
+    }
+
+    @GetMapping("/all-past")
+    public List<TrainingClassDto> showAllTrainingClassesInPast() {
+        return convertTrainingClassEntityToDtoList(trainingClassService.findAllByStartDateIsInPast());
+    }
+
+    @PostMapping("/send-email/{classId}")
+    public Boolean sendEmailToAllClassCustomers(@PathVariable @Min(1) Long classId,
+                                                @RequestBody @Valid EmailDto email) {
+        return trainingClassService.sendEmailToAllClassByIdCustomers(classId, email);
+    }
+
+    private TrainingClass convertTrainingClassToEntity(TrainingClassDto trainingClassDto) {
         return modelMapper.map(trainingClassDto, TrainingClass.class);
     }
 
-    private TrainingClassDto convertToDto(TrainingClass trainingClass) {
+    private TrainingClassDto convertTrainingClassToDto(TrainingClass trainingClass) {
         TrainingClassDto trainingClassDto = modelMapper
                 .map(trainingClass, TrainingClassDto.class);
         trainingClassDto.setReservedPlaces(trainingClass.getCustomers().size());
         return trainingClassDto;
     }
 
-    private List<TrainingClassDto> convertEntityToDtoList(List<TrainingClass> trainingClasses) {
+    private List<TrainingClassDto> convertTrainingClassEntityToDtoList(List<TrainingClass> trainingClasses) {
         return trainingClasses.stream()
-                .map(trainingClass -> convertToDto(trainingClass))
+                .map(trainingClass -> convertTrainingClassToDto(trainingClass))
                 .collect(Collectors.toList());
     }
+
+    private UserDto convertUserToDto(User user) {
+        UserDto userDto = modelMapper.map(user, UserDto.class);
+        userDto.setPassword(null);
+        return userDto;
+    }
+
+    private User convertUserToEntity(UserDto userDto) {
+        return modelMapper.map(userDto, User.class);
+    }
+
+    private List<UserDto> convertUserEntityToDtoList(List<User> users) {
+        return users.stream()
+                .map(user -> convertUserToDto(user))
+                .collect(Collectors.toList());
+    }
+
+
 }
+
+// admin can do:
+//  - add training classes
+//
+//  do by id and classGroupId (only for future classes):
+//      - delete
+//      - set instructor
+//      - set training type
+//      - change max capacity
+//      - change duration
+//      - change start hour
+//
+//  - show all future classes where trainingType or instructor is null
+//  - show any by id
+//  - show all by classGroupId
+//  - show all reserved users for trainingClassById
+//  - show all awaiting users for trainingClassById
+//  - show all in future
+//  - show all in past
+//  - send email to all participants for given classes
+

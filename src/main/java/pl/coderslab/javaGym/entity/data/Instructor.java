@@ -1,5 +1,6 @@
 package pl.coderslab.javaGym.entity.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,6 +38,7 @@ public class Instructor implements Person {
     @Column(length = 1000)
     private String description;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "instructor", cascade = CascadeType.REMOVE)
     private List<TrainingClass> trainingClassList = new ArrayList<>();
 
