@@ -27,7 +27,8 @@ public interface TrainingClassRepository extends JpaRepository<TrainingClass, Lo
 
     List<TrainingClass> findByIdIsNotAndStartDateIsAfter(Long id, LocalDateTime startDate);
 
-    @Query("SELECT t FROM TrainingClass t WHERE t.startDate > :startDate AND (t.instructor = null OR t.trainingType = null )")
+    @Query("SELECT t FROM TrainingClass t WHERE t.startDate > :startDate AND " +
+            "(t.instructor IS NULL OR t.trainingType IS NULL)")
     List<TrainingClass> findAllTrainingClassesInFutureWhereAnyRelationIsNull(@Param("startDate")LocalDateTime startDate);
 
     @Query("SELECT t.customers FROM TrainingClass t WHERE t.id = :classId")
@@ -39,5 +40,16 @@ public interface TrainingClassRepository extends JpaRepository<TrainingClass, Lo
     List<TrainingClass> findAllByInstructorIdAndStartDateIsAfter(Long id, LocalDateTime startDate);
 
     List<TrainingClass> findAllByTrainingTypeIdAndStartDateIsAfter(Long id, LocalDateTime startDate);
+
+    @Query("SELECT t FROM TrainingClass t WHERE t.instructor IS NOT NULL AND t.trainingType IS NOT NULL " +
+            "AND t.startDate BETWEEN :showStartDate AND :showEndDate")
+    List<TrainingClass> findAllClassesAvailableForUser(@Param("showStartDate") LocalDateTime showStartDate,
+                                                       @Param("showEndDate") LocalDateTime showEndDate);
+
+    @Query("SELECT t FROM TrainingClass t WHERE t.instructor IS NOT NULL AND t.trainingType IS NOT NULL " +
+            "AND t.startDate BETWEEN :showStartDate AND :showEndDate AND t.id = :classId")
+    TrainingClass findTrainingClassByIdAvailableForUser(@Param("showStartDate") LocalDateTime showStartDate,
+                                                        @Param("showEndDate") LocalDateTime showEndDate,
+                                                        @Param("classId") Long classId);
 
 }

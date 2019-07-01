@@ -8,35 +8,40 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.coderslab.javaGym.emailSender.EmailSender;
+import pl.coderslab.javaGym.entity.data.TrainingClass;
 import pl.coderslab.javaGym.entity.user.Role;
 import pl.coderslab.javaGym.entity.user.User;
 import pl.coderslab.javaGym.enumClass.RoleEnum;
 import pl.coderslab.javaGym.error.customException.*;
 import pl.coderslab.javaGym.dataTransferObject.EmailDto;
 import pl.coderslab.javaGym.repository.RoleRepository;
+import pl.coderslab.javaGym.repository.TrainingClassRepository;
 import pl.coderslab.javaGym.repository.UserRepository;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class UserService implements AbstractUserService<User> {
+
+    private static final Integer SHOW_CLASSES_DAYS_NUMBER = 14;
 
     private EmailSender emailSender;
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private TrainingClassRepository trainingClassRepository;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
+                       TrainingClassRepository trainingClassRepository,
                        BCryptPasswordEncoder bCryptPasswordEncoder,
                        EmailSender emailSender) {
         this.emailSender = emailSender;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.trainingClassRepository = trainingClassRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
@@ -297,4 +302,23 @@ public class UserService implements AbstractUserService<User> {
         }
     }
 
+    @Transactional
+    public TrainingClass reserveClassById(Long userId, Long classId) {
+        User user = getAuthenticatedUser(userId);
+        TrainingClass trainingClass = findTrainingClassByIdAvailableForUser(classId);
+
+
+
+        return null;
+    }
+
+    private TrainingClass findTrainingClassByIdAvailableForUser(Long classId) {
+        TrainingClass trainingClass = trainingClassRepository.findTrainingClassByIdAvailableForUser
+                (LocalDateTime.now(), LocalDateTime.now().plusDays(SHOW_CLASSES_DAYS_NUMBER), classId);
+        if (trainingClass != null) {
+            return trainingClass;
+        } else {
+            throw new ResourceNotFoundException();
+        }
+    }
 }
