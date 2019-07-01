@@ -29,7 +29,7 @@ public class SuperAdminController {
     @PatchMapping("/set-active/{id}")
     public User changeAccountActiveValue(@PathVariable @Min(1) Long id,
                                          @RequestParam @NotNull Boolean active) {
-        return userService.changeAnyUserActiveAccount(id, active);
+        return userService.changeUserActiveAccountStatus(id, active);
     }
 
 }

@@ -4,8 +4,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import pl.coderslab.javaGym.dataTransferObject.ReservationDto;
 import pl.coderslab.javaGym.dataTransferObject.TrainingClassDto;
 import pl.coderslab.javaGym.dataTransferObject.UserDto;
+import pl.coderslab.javaGym.entity.data.Reservation;
 import pl.coderslab.javaGym.entity.data.TrainingClass;
 import pl.coderslab.javaGym.entity.user.User;
 import pl.coderslab.javaGym.service.userService.UserService;
@@ -59,15 +61,21 @@ public class UserController {
         return userService.sendUserEmailChangeMessage(id, newEmail);
     }
 
-    @GetMapping("/reserve-classes/{userId}/{classId}")
-    public TrainingClassDto reserveClassesById(@PathVariable @Min(1) Long userId,
-                                                  @PathVariable @Min(1) Long classId) {
-        return convertTrainingClassToDto(userService.reserveClassById(userId, classId));
+    @GetMapping("/reserve-class/{classId}/{userId}")
+    public ReservationDto reserveClassById(@PathVariable @Min(1) Long classId,
+                                           @PathVariable @Min(1) Long userId) {
+        return convertReservationToDto(userService.reserveClassById(userId, classId));
+    }
+
+    @GetMapping("/cancel-class/{classId}/{userId}")
+    public Boolean cancelClassById(@PathVariable @Min(1) Long classId,
+                                   @PathVariable @Min(1) Long userId) {
+        return userService.cancelClass(classId, userId);
     }
 
     private UserDto convertUserToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
-        user.setPassword(null);
+        userDto.setPassword(null);
         return userDto;
     }
 
@@ -75,14 +83,28 @@ public class UserController {
         return modelMapper.map(userDto, User.class);
     }
 
+    private ReservationDto convertReservationToDto(Reservation reservation) {
+        ReservationDto reservationDto  = modelMapper.map(reservation, ReservationDto.class);
+        reservationDto.setUserDto(convertUserToDto(reservation.getUser()));
+        reservationDto.setTrainingClassDto(convertTrainingClassToDto(reservation.getTrainingClass()));
+        return reservationDto;
+    }
+
+    //    TODO wywal nie uzywane metody
+    private Reservation convertReservationToEntity(ReservationDto reservationDto) {
+        return modelMapper.map(reservationDto, Reservation.class);
+    }
+
     private TrainingClass convertTrainingClassToEntity(TrainingClassDto trainingClassDto) {
         return modelMapper.map(trainingClassDto, TrainingClass.class);
     }
 
+
     private TrainingClassDto convertTrainingClassToDto(TrainingClass trainingClass) {
         TrainingClassDto trainingClassDto = modelMapper
                 .map(trainingClass, TrainingClassDto.class);
-        trainingClassDto.setReservedPlaces(trainingClass.getCustomers().size());
+        trainingClassDto.setReservedPlaces(trainingClass.getReservations().size());
+// TODO
         return trainingClassDto;
     }
 

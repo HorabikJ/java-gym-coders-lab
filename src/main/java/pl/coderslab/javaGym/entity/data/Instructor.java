@@ -42,12 +42,8 @@ public class Instructor implements Person {
     @OneToMany(mappedBy = "instructor", cascade = CascadeType.REMOVE)
     private List<TrainingClass> trainingClassList = new ArrayList<>();
 
-//    public Instructor(String email, String firstName, String lastName,
-//                      LocalDate dateOfBirth, String description) {
-//        this.email = email;
-//        this.firstName = firstName;
-//        this.lastName = lastName;
-//        this.dateOfBirth = dateOfBirth;
-//        this.description = description;
-//    }
+    public String getFullName() {
+        return this.firstName + " " + this.lastName;
+    }
+
 }

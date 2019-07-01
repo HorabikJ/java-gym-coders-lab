@@ -28,7 +28,9 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
             PasswordDoNotMatchException.class,
             LinkExpiredException.class,
             EmailSendingException.class,
-            ActionNotAllowedException.class})
+            ActionNotAllowedException.class,
+            ClassTimeReservedException.class,
+            ReservationException.class})
     public ResponseEntity<CustomErrorResponse> handleCustomException
             (Exception exception, WebRequest request) {
 

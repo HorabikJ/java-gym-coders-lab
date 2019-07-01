@@ -1,20 +1,13 @@
 package pl.coderslab.javaGym.dataTransferObject;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pl.coderslab.javaGym.entity.data.TrainingClass;
-import pl.coderslab.javaGym.entity.user.Role;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,14 +34,5 @@ public class UserDto {
 
     @NotNull(message = "*Please agree or disagree for newsletter.")
     private Boolean newsletter;
-
-    @JsonIgnore
-    private List<TrainingClass> trainingClasses = new LinkedList<>();
-
-    @JsonIgnore
-    private List<TrainingClass> awaitingClasses = new LinkedList<>();
-
-    @JsonIgnore
-    private Set<Role> roles = new HashSet<>();
 
 }

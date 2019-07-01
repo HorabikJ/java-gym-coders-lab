@@ -31,12 +31,6 @@ public interface TrainingClassRepository extends JpaRepository<TrainingClass, Lo
             "(t.instructor IS NULL OR t.trainingType IS NULL)")
     List<TrainingClass> findAllTrainingClassesInFutureWhereAnyRelationIsNull(@Param("startDate")LocalDateTime startDate);
 
-    @Query("SELECT t.customers FROM TrainingClass t WHERE t.id = :classId")
-    List<User> findAllUsersOnClassReservationListForByClassId(@Param("classId") Long classId);
-
-    @Query("SELECT t.awaitingCustomers FROM TrainingClass t WHERE t.id = :classId")
-    List<User> findAllUsersOnClassAwaitingListForByClassId(@Param("classId") Long classId);
-
     List<TrainingClass> findAllByInstructorIdAndStartDateIsAfter(Long id, LocalDateTime startDate);
 
     List<TrainingClass> findAllByTrainingTypeIdAndStartDateIsAfter(Long id, LocalDateTime startDate);

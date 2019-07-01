@@ -19,8 +19,6 @@ import java.util.UUID;
 public class ChangeEmailDetailsService implements
         AbstractConfirmationEmailService<ChangeEmailDetails>  {
 
-    private final static ZoneId ZONE_POLAND = ZoneId.of("Poland");
-
     private UserRepository userRepository;
     private ChangeEmailDetailsRepository changeEmailDetailsRepository;
 
@@ -75,7 +73,7 @@ public class ChangeEmailDetailsService implements
         Integer linkExpirationTimeInMinutes = emailDetails.getMinutesExpirationTime();
         LocalDateTime sendTime = emailDetails.getSendTime();
         LocalDateTime nowTime = LocalDateTime.now();
-        return nowTime.isBefore(sendTime.plusSeconds(60 * linkExpirationTimeInMinutes));
+        return nowTime.isBefore(sendTime.plusMinutes(linkExpirationTimeInMinutes));
     }
 
 }

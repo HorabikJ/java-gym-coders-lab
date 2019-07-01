@@ -1,5 +1,6 @@
 package pl.coderslab.javaGym.entity.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,18 +41,8 @@ public class TrainingClass {
     @ManyToOne
     private TrainingType trainingType;
 
-    @ManyToMany
-    private List<User> customers = new LinkedList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "trainingClass", cascade = CascadeType.REMOVE)
+    private List<Reservation> reservations = new LinkedList<>();
 
-    @ManyToMany
-    private List<User> awaitingCustomers = new LinkedList<>();
-
-//    public TrainingClass(String uniqueClassId, Integer maxCapacity, ZonedDateTime startDate,
-//                         Instructor instructor, TrainingType trainingTypeEntity) {
-//        this.uniqueClassId = uniqueClassId;
-//        this.maxCapacity = maxCapacity;
-//        this.startDate = startDate;
-//        this.instructor = instructor;
-//        this.trainingTypeEntity = trainingTypeEntity;
-//    }
 }

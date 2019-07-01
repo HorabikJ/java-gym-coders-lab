@@ -18,9 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByEmail(String email);
 
-    @Query("SELECT u.email FROM User u")
-    List<String> getAllUsersEmails();
-
     Boolean existsByEmailIgnoreCase(String email);
 
     List<User> findAllByRolesIsNotContaining(Set<Role> roles);

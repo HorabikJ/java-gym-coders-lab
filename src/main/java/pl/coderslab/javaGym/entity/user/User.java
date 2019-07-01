@@ -3,6 +3,7 @@ package pl.coderslab.javaGym.entity.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import pl.coderslab.javaGym.entity.Person;
+import pl.coderslab.javaGym.entity.data.Reservation;
 import pl.coderslab.javaGym.entity.data.TrainingClass;
 
 import javax.persistence.*;
@@ -39,24 +40,13 @@ public class User implements Person {
     private Boolean newsletter;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "customers")
-    private List<TrainingClass> trainingClasses = new LinkedList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Reservation> reservations = new LinkedList<>();
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "awaitingCustomers")
-    private List<TrainingClass> awaitingClasses = new LinkedList<>();
-
-    @JsonIgnore
-    @ManyToMany(cascade = CascadeType.MERGE)
+    @ManyToMany
+//     TODO       (cascade = CascadeType.MERGE)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
-
-//    public User(String email, String password, String firstName, String lastName, Boolean newsletter) {
-//        this.email = email;
-//        this.password = password;
-//        this.firstName = firstName;
-//        this.lastName = lastName;
-//        this.newsletter = newsletter;
-//    }
 
 }

@@ -6,9 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.javaGym.customValidator.Occurrence;
-import pl.coderslab.javaGym.dataTransferObject.EmailDto;
-import pl.coderslab.javaGym.dataTransferObject.TrainingClassDto;
-import pl.coderslab.javaGym.dataTransferObject.UserDto;
+import pl.coderslab.javaGym.dataTransferObject.*;
+import pl.coderslab.javaGym.entity.data.Reservation;
 import pl.coderslab.javaGym.entity.data.TrainingClass;
 import pl.coderslab.javaGym.entity.user.User;
 import pl.coderslab.javaGym.service.dataService.TrainingClassService;
@@ -150,16 +149,10 @@ public class AdminTrainingClassController {
         return convertTrainingClassEntityToDtoList(trainingClassService.findAllByClassGroupId(classGroupId));
     }
 
-    @GetMapping("/reserved-users/{classId}")
-    public List<UserDto> showAllUsersOnClassReservationList(@PathVariable @Min(1) Long classId) {
-        return convertUserEntityToDtoList
-                (trainingClassService.findAllUsersOnClassReservationListByClassId(classId));
-    }
-
-    @GetMapping("/awaiting-users/{classId}")
-    public List<UserDto> showAllUsersOnClassAwaitingList(@PathVariable @Min(1) Long classId) {
-        return convertUserEntityToDtoList
-                (trainingClassService.findAllUsersOnClassAwaitingListByClassId(classId));
+    @GetMapping("/reservations/{classId}")
+    public List<ReservationDto> showAllUsersOnClassReservationList(@PathVariable @Min(1) Long classId) {
+        return convertReservationEntityToDtoList
+                (trainingClassService.findAllReservationsByClassId(classId));
     }
 
     @GetMapping("/all-future")
@@ -175,19 +168,19 @@ public class AdminTrainingClassController {
     @GetMapping("/all-future-instructor/{instructorId}")
     public List<TrainingClassDto> showAllFutureClassesForGivenInstructor(@PathVariable @Min(1) Long instructorId) {
         return convertTrainingClassEntityToDtoList
-                (trainingClassService.findAllFutureClassesForInstructor(instructorId));
+                (trainingClassService.findAllFutureClassesByInstructor(instructorId));
     }
 
     @GetMapping("/all-future-training-type/{trainingTypeId}")
     public List<TrainingClassDto> showAllFutureClassesForGivenTrainingType(@PathVariable @Min(1) Long trainingTypeId) {
         return convertTrainingClassEntityToDtoList
-                (trainingClassService.findAllFutureClassesForInstructor(trainingTypeId));
+                (trainingClassService.findAllFutureClassesByTrainingType(trainingTypeId));
     }
 
     @PostMapping("/send-email/{classId}")
     public Boolean sendEmailToAllClassCustomers(@PathVariable @Min(1) Long classId,
                                                 @RequestBody @Valid EmailDto email) {
-        return trainingClassService.sendEmailToAllClassByIdCustomers(classId, email);
+        return trainingClassService.sendEmailToAllCustomersByTrainingClass(classId, email);
     }
 
     private TrainingClass convertTrainingClassToEntity(TrainingClassDto trainingClassDto) {
@@ -197,13 +190,32 @@ public class AdminTrainingClassController {
     private TrainingClassDto convertTrainingClassToDto(TrainingClass trainingClass) {
         TrainingClassDto trainingClassDto = modelMapper
                 .map(trainingClass, TrainingClassDto.class);
-        trainingClassDto.setReservedPlaces(trainingClass.getCustomers().size());
+        trainingClassDto.setReservedPlaces(trainingClass.getReservations().size());
+//        TODO
         return trainingClassDto;
     }
 
     private List<TrainingClassDto> convertTrainingClassEntityToDtoList(List<TrainingClass> trainingClasses) {
         return trainingClasses.stream()
                 .map(trainingClass -> convertTrainingClassToDto(trainingClass))
+                .collect(Collectors.toList());
+    }
+
+    private ReservationDto convertReservationToDto(Reservation reservation) {
+        ReservationDto reservationDto  = modelMapper.map(reservation, ReservationDto.class);
+        reservationDto.setUserDto(convertUserToDto(reservation.getUser()));
+        reservationDto.setTrainingClassDto(convertTrainingClassToDto(reservation.getTrainingClass()));
+        return reservationDto;
+    }
+
+//    TODO wywal nie uzywane metody
+    private Reservation convertReservationToEntity(ReservationDto reservationDto) {
+        return modelMapper.map(reservationDto, Reservation.class);
+    }
+
+    private List<ReservationDto> convertReservationEntityToDtoList(List<Reservation> reservations) {
+        return reservations.stream()
+                .map(reservation -> convertReservationToDto(reservation))
                 .collect(Collectors.toList());
     }
 
@@ -216,13 +228,6 @@ public class AdminTrainingClassController {
     private User convertUserToEntity(UserDto userDto) {
         return modelMapper.map(userDto, User.class);
     }
-
-    private List<UserDto> convertUserEntityToDtoList(List<User> users) {
-        return users.stream()
-                .map(user -> convertUserToDto(user))
-                .collect(Collectors.toList());
-    }
-
 
 }
 
@@ -240,8 +245,7 @@ public class AdminTrainingClassController {
 //  - show all future classes where trainingType or instructor is null
 //  - show any training class by id
 //  - show all by classGroupId
-//  - show all reserved users for trainingClassById
-//  - show all awaiting users for trainingClassById
+//  - show all reservations for any TrainingClass by classId
 //  - show all in future
 //  - show all in past
 //  - send email to all participants for given classes

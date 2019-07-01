@@ -19,8 +19,6 @@ import java.util.UUID;
 public class ResetPasswordEmailService implements
         AbstractConfirmationEmailService<ResetPasswordEmailDetails> {
 
-    private final static ZoneId ZONE_POLAND = ZoneId.of("Poland");
-
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private UserRepository userRepository;
     private ResetPasswordEmailRepository resetPasswordEmailRepository;
@@ -66,7 +64,7 @@ public class ResetPasswordEmailService implements
         Integer linkExpirationTimeInMinutes = emailDetails.getMinutesExpirationTime();
         LocalDateTime sendTime = emailDetails.getSendTime();
         LocalDateTime nowTime = LocalDateTime.now();
-        return nowTime.isBefore(sendTime.plusSeconds(60 * linkExpirationTimeInMinutes));
+        return nowTime.isBefore(sendTime.plusMinutes(linkExpirationTimeInMinutes));
     }
 
     private void resetPassword(String password, ResetPasswordEmailDetails emailDetails) {

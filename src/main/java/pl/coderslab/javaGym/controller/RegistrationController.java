@@ -53,11 +53,7 @@ public class RegistrationController {
 
     private void sendWelcomeEmail(User activatedUser) {
         if (activatedUser != null) {
-            try {
-                emailSender.sendUserWelcomeEmail(activatedUser);
-            } catch (MailException e) {
-                throw new EmailSendingException();
-            }
+            emailSender.sendUserWelcomeEmail(activatedUser);
         }
     }
 
@@ -68,9 +64,6 @@ public class RegistrationController {
     private UserDto convertToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
         userDto.setPassword(null);
-        userDto.setTrainingClasses(null);
-        userDto.setAwaitingClasses(null);
-        userDto.setRoles(null);
         return userDto;
     }
 

@@ -34,10 +34,10 @@ public class InstructorService implements AbstractDataService<Instructor> {
 
     @Override
     public Instructor findById(Long id) {
-        return getInstructorByIdFromDB(id);
+        return getInstructorById(id);
     }
 
-    private Instructor getInstructorByIdFromDB(Long id) {
+    private Instructor getInstructorById(Long id) {
         Instructor instructor = instructorRepository.findById(id).orElse(null);
         if (instructor != null) {
             return instructor;
@@ -62,7 +62,7 @@ public class InstructorService implements AbstractDataService<Instructor> {
 
     @Transactional
     public Instructor edit(Instructor newInstructor, Long id) {
-        Instructor instructorFromDB = getInstructorByIdFromDB(id);
+        Instructor instructorFromDB = getInstructorById(id);
         if (newInstructor.getEmail().equals(instructorFromDB.getEmail())) {
             newInstructor.setId(instructorFromDB.getId());
             return instructorRepository.save(newInstructor);
@@ -83,7 +83,7 @@ public class InstructorService implements AbstractDataService<Instructor> {
     @Override
     @Transactional
     public Boolean deleteById(Long id) {
-        Instructor instructor = getInstructorByIdFromDB(id);
+        Instructor instructor = getInstructorById(id);
         instructorRepository.delete(instructor);
         return true;
     }
@@ -100,12 +100,8 @@ public class InstructorService implements AbstractDataService<Instructor> {
 
     @Transactional
     public Boolean sendEmailToInstructor(EmailDto emailData, Long id) {
-        try {
-            Instructor instructor = getInstructorByIdFromDB(id);
-            emailSender.sendEmailToPerson(instructor, emailData);
-            return true;
-        } catch (MailException e) {
-            throw new EmailSendingException();
-        }
+        Instructor instructor = getInstructorById(id);
+        emailSender.sendEmailToPerson(instructor, emailData);
+        return true;
     }
 }

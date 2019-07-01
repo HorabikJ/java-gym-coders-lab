@@ -6,12 +6,14 @@ import pl.coderslab.javaGym.dataTransferObject.EmailDto;
 import pl.coderslab.javaGym.dataTransferObject.TrainingClassDto;
 import pl.coderslab.javaGym.emailSender.EmailSender;
 import pl.coderslab.javaGym.entity.data.Instructor;
+import pl.coderslab.javaGym.entity.data.Reservation;
 import pl.coderslab.javaGym.entity.data.TrainingClass;
 import pl.coderslab.javaGym.entity.data.TrainingType;
 import pl.coderslab.javaGym.entity.user.User;
-import pl.coderslab.javaGym.error.customException.ActionNotAllowedException;
+import pl.coderslab.javaGym.error.customException.ClassTimeReservedException;
 import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
 import pl.coderslab.javaGym.repository.InstructorRepository;
+import pl.coderslab.javaGym.repository.ReservationRepository;
 import pl.coderslab.javaGym.repository.TrainingClassRepository;
 import pl.coderslab.javaGym.repository.TrainingTypeRepository;
 
@@ -19,12 +21,15 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class TrainingClassService implements AbstractDataService<TrainingClass> {
 
+    private ReservationRepository reservationRepository;
     private TrainingClassRepository trainingClassRepository;
     private InstructorRepository instructorRepository;
     private TrainingTypeRepository trainingTypeRepository;
@@ -33,7 +38,9 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
     public TrainingClassService(TrainingClassRepository trainingClassRepository,
                                 InstructorRepository instructorRepository,
                                 TrainingTypeRepository trainingTypeRepository,
+                                ReservationRepository reservationRepository,
                                 EmailSender emailSender) {
+        this.reservationRepository = reservationRepository;
         this.trainingClassRepository = trainingClassRepository;
         this.instructorRepository = instructorRepository;
         this.trainingTypeRepository = trainingTypeRepository;
@@ -55,7 +62,7 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
             if (errorMessage == null) {
                 saveTrainingClass(trainingClassDto, savedTrainingClasses, groupClassId, eachStartTime);
             } else {
-                throw new ActionNotAllowedException("*This time is already reserved." +
+                throw new ClassTimeReservedException("*This time is already reserved." +
                         " Please see reserved time details: "
                         + errorMessage);
             }
@@ -68,12 +75,11 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
             List<TrainingClass> futureClassesToCheckTimeWith) {
         LocalDateTime eachEndDate = eachStartDate.plusMinutes(durationInMinutes);
         StringBuffer sb = new StringBuffer();
-
         for (TrainingClass trainingClass : futureClassesToCheckTimeWith) {
             LocalDateTime anyTrainingStartDate = trainingClass.getStartDate();
             LocalDateTime anyTrainingEndDate = trainingClass.getStartDate()
                     .plusMinutes(trainingClass.getDurationInMinutes());
-            if (isNewTrainingTimeNotColliedWithAnyOtherTime
+            if (isNewTrainingTimeNotColliedWithAnyOtherTrainingTime
                     (eachStartDate, eachEndDate, anyTrainingStartDate, anyTrainingEndDate)) {
                 return sb.append("Start time: ")
                         .append(anyTrainingStartDate)
@@ -86,7 +92,7 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
         return null;
     }
 
-    private boolean isNewTrainingTimeNotColliedWithAnyOtherTime
+    private boolean isNewTrainingTimeNotColliedWithAnyOtherTrainingTime
             (LocalDateTime eachStartDate, LocalDateTime eachEndDate, LocalDateTime anyTrainingStartDate,
              LocalDateTime anyTrainingEndDate) {
         return (eachStartDate.isAfter(anyTrainingStartDate) &&
@@ -151,9 +157,9 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
     }
 
     private TrainingType getTrainingTypeById(Long id) {
-        TrainingType trainingTypeEntity = trainingTypeRepository.findById(id).orElse(null);
-        if (trainingTypeEntity != null) {
-            return trainingTypeEntity;
+        TrainingType trainingType = trainingTypeRepository.findById(id).orElse(null);
+        if (trainingType != null) {
+            return trainingType;
         } else {
             throw new ResourceNotFoundException();
         }
@@ -183,7 +189,7 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
                 trainingClass.setDurationInMinutes(newDuration);
                 trainingClassRepository.save(trainingClass);
             } else {
-                throw new ActionNotAllowedException("*This time is already reserved." +
+                throw new ClassTimeReservedException("*This time is already reserved." +
                         " Please see reserved time details: "
                         + errorMessage);
             }
@@ -191,7 +197,8 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
         return classesToChange;
     }
 
-    private List<TrainingClass> findAllByClassGroupIdAndStartDateIsAfter(String classGroupId, LocalDateTime startDate) {
+    private List<TrainingClass> findAllByClassGroupIdAndStartDateIsAfter
+            (String classGroupId, LocalDateTime startDate) {
         List<TrainingClass> classes = trainingClassRepository
                 .findAllByClassGroupIdAndStartDateIsAfter(classGroupId, startDate);
         if (classes.size() > 0) {
@@ -220,7 +227,7 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
             if (errorMessage == null) {
                 trainingClassRepository.save(trainingClass);
             } else {
-                throw new ActionNotAllowedException("*This time is already reserved." +
+                throw new ClassTimeReservedException("*This time is already reserved." +
                         " Please see reserved time details: "
                         + errorMessage);
             }
@@ -284,15 +291,14 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
             trainingClass.setDurationInMinutes(newDuration);
             return trainingClassRepository.save(trainingClass);
         } else {
-//            TODO change this exception to a new one?
-            throw new ActionNotAllowedException("*This time is already reserved." +
+            throw new ClassTimeReservedException("*This time is already reserved." +
                     " Please see reserved time details: "
                     + errorMessage);
         }
     }
 
     private List<TrainingClass> findByIdIsNotAndStartDateIsAfter(Long id, LocalDateTime startDate) {
-        return trainingClassRepository.findByIdIsNotAndStartDateIsAfter(id, LocalDateTime.now());
+        return trainingClassRepository.findByIdIsNotAndStartDateIsAfter(id, startDate);
     }
 
     @Transactional
@@ -307,7 +313,7 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
         if (errorMessage == null) {
             return trainingClassRepository.save(trainingClass);
         } else {
-            throw new ActionNotAllowedException("*This time is already reserved." +
+            throw new ClassTimeReservedException("*This time is already reserved." +
                     " Please see reserved time details: "
                     + errorMessage);
         }
@@ -334,26 +340,20 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
         }
     }
 
-    public List<User> findAllUsersOnClassReservationListByClassId(Long classId) {
-        List<User> users = trainingClassRepository.findAllUsersOnClassReservationListForByClassId(classId);
-        if (users.size() > 0) {
-            return users;
-        } else {
-            throw new ResourceNotFoundException();
-        }
-    }
-
-    public List<User> findAllUsersOnClassAwaitingListByClassId(Long classId) {
-        List<User> users = trainingClassRepository.findAllUsersOnClassAwaitingListForByClassId(classId);
-        if (users.size() > 0) {
-            return users;
+    public List<Reservation> findAllReservationsByClassId(Long classId) {
+        TrainingClass trainingClass = findById(classId);
+        LinkedList<Reservation> reservations = reservationRepository
+                .findAllByTrainingClassIdOrderByReservationTimeAsc(trainingClass.getId());
+        if (reservations.size() > 0) {
+            return reservations;
         } else {
             throw new ResourceNotFoundException();
         }
     }
 
     public List<TrainingClass> findAllByStartDateIsInFuture() {
-        List<TrainingClass> trainingClasses = trainingClassRepository.findAllByStartDateIsAfter(LocalDateTime.now());
+        List<TrainingClass> trainingClasses = trainingClassRepository
+                .findAllByStartDateIsAfter(LocalDateTime.now());
         if (trainingClasses != null) {
             return trainingClasses;
         } else {
@@ -362,7 +362,8 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
     }
 
     public List<TrainingClass> findAllByStartDateIsInPast() {
-        List<TrainingClass> trainingClasses = trainingClassRepository.findAllByStartDateIsBefore(LocalDateTime.now());
+        List<TrainingClass> trainingClasses = trainingClassRepository
+                .findAllByStartDateIsBefore(LocalDateTime.now());
         if (trainingClasses != null) {
             return trainingClasses;
         } else {
@@ -370,12 +371,12 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
         }
     }
 
-    public Boolean sendEmailToAllClassByIdCustomers(Long classId, EmailDto email) {
-        TrainingClass trainingClass = findById(classId);
-        List<User> allUsers = new ArrayList<>();
-        allUsers.addAll(trainingClass.getCustomers());
-        allUsers.addAll(trainingClass.getAwaitingCustomers());
-        emailSender.sendEmailToUsers(email, allUsers);
+    public Boolean sendEmailToAllCustomersByTrainingClass(Long classId, EmailDto email) {
+        List<User> users = findAllReservationsByClassId(classId)
+                .stream()
+                .map(Reservation::getUser)
+                .collect(Collectors.toList());
+        emailSender.sendEmailToUsers(email, users);
         return true;
     }
 
@@ -409,7 +410,7 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
         return null;
     }
 
-    public List<TrainingClass> findAllFutureClassesForInstructor(Long instructorId) {
+    public List<TrainingClass> findAllFutureClassesByInstructor(Long instructorId) {
         Instructor instructor = getInstructorById(instructorId);
         List<TrainingClass> classes = trainingClassRepository
                 .findAllByInstructorIdAndStartDateIsAfter(instructor.getId(), LocalDateTime.now());
@@ -420,7 +421,7 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
         }
     }
 
-    public List<TrainingClass> findAllByTrainingTypeId(Long trainingTypeId) {
+    public List<TrainingClass> findAllFutureClassesByTrainingType(Long trainingTypeId) {
         TrainingType trainingType = getTrainingTypeById(trainingTypeId);
         List<TrainingClass> classes = trainingClassRepository
                 .findAllByTrainingTypeIdAndStartDateIsAfter(trainingType.getId(), LocalDateTime.now());

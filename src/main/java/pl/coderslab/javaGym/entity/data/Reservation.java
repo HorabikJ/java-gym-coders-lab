@@ -7,6 +7,7 @@ import pl.coderslab.javaGym.entity.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,16 +20,24 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     private User user;
 
-    @OneToOne
+    @ManyToOne
     private TrainingClass trainingClass;
 
     @Column
-    private LocalDateTime reservationCreated;
+    private LocalDateTime reservationTime;
 
     @Column
-    private Boolean hasReservedClasses;
+    private Boolean onTrainingList;
+
+    public Reservation(User user, TrainingClass trainingClass, LocalDateTime reservationTime,
+                       Boolean onTrainingList) {
+        this.user = user;
+        this.trainingClass = trainingClass;
+        this.reservationTime = reservationTime;
+        this.onTrainingList = onTrainingList;
+    }
 
 }

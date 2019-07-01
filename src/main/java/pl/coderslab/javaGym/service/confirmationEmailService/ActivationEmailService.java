@@ -18,8 +18,6 @@ import java.util.UUID;
 public class ActivationEmailService implements
         AbstractConfirmationEmailService<ActivationEmailDetails> {
 
-    private final static ZoneId ZONE_POLAND = ZoneId.of("Poland");
-
     private UserRepository userRepository;
     private ActivationEmailRepository activationEmailRepository;
 
@@ -61,7 +59,7 @@ public class ActivationEmailService implements
         Integer linkExpirationTimeInMinutes = emailDetails.getMinutesExpirationTime();
         LocalDateTime sendTime = emailDetails.getSendTime();
         LocalDateTime nowTime = LocalDateTime.now();
-        return nowTime.isBefore(sendTime.plusSeconds(60 * linkExpirationTimeInMinutes));
+        return nowTime.isBefore(sendTime.plusMinutes(linkExpirationTimeInMinutes));
     }
 
     private void activateUserAccount(ActivationEmailDetails emailDetails) {
