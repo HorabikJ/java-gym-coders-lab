@@ -94,7 +94,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return new ResponseEntity<>(errors, headers, status);
     }
 
-    //  @Validate For Validating Path Variables and Request Parameters
+    //error handle for validating PathVariable's and RequestParameter's
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<CustomErrorResponse> handleConstraintViolation(
             ConstraintViolationException ex, WebRequest request) {

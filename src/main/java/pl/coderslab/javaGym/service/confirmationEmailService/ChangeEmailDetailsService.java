@@ -12,7 +12,6 @@ import pl.coderslab.javaGym.repository.ChangeEmailDetailsRepository;
 import pl.coderslab.javaGym.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.UUID;
 
 @Service

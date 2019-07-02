@@ -27,8 +27,4 @@ public class TrainingTypeDto {
     @JsonIgnore
     private List<TrainingClass> trainingClasses = new ArrayList<>();
 
-//    public TrainingTypeDto(String name, String description) {
-//        this.name = name;
-//        this.description = description;
-//    }
 }

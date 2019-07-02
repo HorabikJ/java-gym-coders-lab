@@ -104,7 +104,6 @@ public class UserService {
         return user.getRoles().contains(roleRepository.findByRole(RoleEnum.ROLE_SUPER.toString()));
     }
 
-    //TODO to check if needed
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
