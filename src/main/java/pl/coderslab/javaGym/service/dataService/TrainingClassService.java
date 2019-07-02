@@ -400,7 +400,7 @@ public class TrainingClassService {
     }
 
     private List<Reservation> getReservationListIfNotEmpty(List<Reservation> reservations) {
-        if (reservations != null) {
+        if (reservations.size() > 0) {
             return reservations;
         } else {
             throw new ResourceNotFoundException("*Reservation not found!");

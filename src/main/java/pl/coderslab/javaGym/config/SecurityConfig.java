@@ -44,9 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
-                .antMatchers("/", "/change-email",
-                        "/swagger-ui.html", "/swagger-ui.html/**" ,
-                        "/test").permitAll()
+                .antMatchers("/", "/guest/**", "/change-email", "/test").permitAll()
                 .antMatchers("/login", "/register/**", "/reset-password/**").anonymous()
                 .antMatchers("/logout").authenticated()
                 .antMatchers("/user/**").hasRole("USER")
@@ -64,33 +62,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/");
     }
 
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//
-//        http
-//                .authorizeRequests()
-//                .antMatchers( "/login", "/register").anonymous()
-//                .antMatchers("/logout").authenticated()
-//                .antMatchers("/").permitAll()
-//                .antMatchers("/user/**").hasRole("USER")
-//                .antMatchers("/admin/**").hasRole("ADMIN")
-//                .anyRequest().authenticated()
-//                .and()
-//                .csrf().disable()
-//                .formLogin()
-//                .loginPage("/login")
-//                .defaultSuccessUrl("/",true)
-//                .failureUrl("/login?error=true")
-//                .usernameParameter("confirmationEmail")
-//                .passwordParameter("password")
-//                .and()
-//                .logout()
-//                .logoutUrl("/logout")
-//                .logoutSuccessUrl("/");
-//    }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         web
                 .ignoring()
                 .antMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**");
