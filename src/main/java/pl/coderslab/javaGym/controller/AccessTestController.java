@@ -43,12 +43,4 @@ public class AccessTestController {
         return userService.findUserByEmail(authentication.getName());
     }
 
-
-//    @GetMapping("/test")
-//    public String test() {
-//        User user = userRepository.findById(4L).orElse(null);
-//        emailSender.sendAccountActivationEmail(user);
-//        return "aaaa";
-//    }
-
 }

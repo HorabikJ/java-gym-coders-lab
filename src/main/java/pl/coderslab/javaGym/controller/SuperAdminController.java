@@ -14,6 +14,10 @@ import javax.validation.constraints.NotNull;
 @Validated
 public class SuperAdminController {
 
+// Super admin can do:
+// - delete any regular admin and any user,
+// - set admin account as inactive/active,
+
     private UserService userService;
 
     @Autowired
@@ -33,7 +37,3 @@ public class SuperAdminController {
     }
 
 }
-
-// super admin can do:
-// - delete any regular admin and any user
-// - set admin account as inactive/active

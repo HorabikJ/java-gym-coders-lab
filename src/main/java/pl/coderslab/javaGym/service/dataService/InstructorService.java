@@ -1,22 +1,20 @@
 package pl.coderslab.javaGym.service.dataService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.coderslab.javaGym.dataTransferObject.EmailDto;
 import pl.coderslab.javaGym.emailSender.EmailSender;
 import pl.coderslab.javaGym.entity.data.Instructor;
 import pl.coderslab.javaGym.error.customException.ActionNotAllowedException;
-import pl.coderslab.javaGym.error.customException.UniqueDBFieldException;
-import pl.coderslab.javaGym.error.customException.EmailSendingException;
 import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
+import pl.coderslab.javaGym.error.customException.UniqueDBFieldException;
 import pl.coderslab.javaGym.repository.InstructorRepository;
 
 import java.util.List;
 
 @Service
-public class InstructorService implements AbstractDataService<Instructor> {
+public class InstructorService {
 
     private InstructorRepository instructorRepository;
     private EmailSender emailSender;
@@ -27,26 +25,14 @@ public class InstructorService implements AbstractDataService<Instructor> {
         this.emailSender = emailSender;
     }
 
-    @Override
     public List<Instructor> findAll() {
-        return null;
+        return getInstructorListIfNotEmpty(instructorRepository.findAll());
     }
 
-    @Override
-    public Instructor findById(Long id) {
-        return getInstructorById(id);
+    public Instructor findInstructorById(Long id) {
+        return getInstructorIfNotNull(instructorRepository.findById(id).orElse(null));
     }
 
-    private Instructor getInstructorById(Long id) {
-        Instructor instructor = instructorRepository.findById(id).orElse(null);
-        if (instructor != null) {
-            return instructor;
-        } else {
-            throw new ResourceNotFoundException();
-        }
-    }
-
-    @Override
     @Transactional
     public Instructor save(Instructor instructor) {
         if (instructor.getId() == null) {
@@ -62,7 +48,7 @@ public class InstructorService implements AbstractDataService<Instructor> {
 
     @Transactional
     public Instructor edit(Instructor newInstructor, Long id) {
-        Instructor instructorFromDB = getInstructorById(id);
+        Instructor instructorFromDB = findInstructorById(id);
         if (newInstructor.getEmail().equals(instructorFromDB.getEmail())) {
             newInstructor.setId(instructorFromDB.getId());
             return instructorRepository.save(newInstructor);
@@ -80,28 +66,44 @@ public class InstructorService implements AbstractDataService<Instructor> {
         return instructorRepository.existsByEmailIgnoreCase(instructor.getEmail());
     }
 
-    @Override
     @Transactional
     public Boolean deleteById(Long id) {
-        Instructor instructor = getInstructorById(id);
+        Instructor instructor = findInstructorById(id);
         instructorRepository.delete(instructor);
         return true;
     }
 
     public List<Instructor> findByEmail(String email) {
-        return instructorRepository.findAllByEmailIsContainingIgnoreCase(email);
+        return getInstructorListIfNotEmpty(instructorRepository
+                .findAllByEmailIsContainingIgnoreCase(email));
     }
 
     public List<Instructor> findByNames(String firstName, String lastName) {
-        return instructorRepository
+        return getInstructorListIfNotEmpty(instructorRepository
                 .findAllByFirstNameIsContainingAndLastNameIsContainingAllIgnoreCase
-                        (firstName, lastName);
+                        (firstName, lastName));
     }
 
     @Transactional
     public Boolean sendEmailToInstructor(EmailDto emailData, Long id) {
-        Instructor instructor = getInstructorById(id);
+        Instructor instructor = findInstructorById(id);
         emailSender.sendEmailToPerson(instructor, emailData);
         return true;
+    }
+
+    private List<Instructor> getInstructorListIfNotEmpty(List<Instructor> instructors) {
+        if (instructors.size() > 0) {
+            return instructors;
+        } else {
+            throw new ResourceNotFoundException("*Instructors not found!");
+        }
+    }
+
+    private Instructor getInstructorIfNotNull(Instructor instructor) {
+        if (instructor != null) {
+            return instructor;
+        } else {
+            throw new ResourceNotFoundException("*Instructor not found!");
+        }
     }
 }

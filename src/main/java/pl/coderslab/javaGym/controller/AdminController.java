@@ -21,6 +21,21 @@ import java.util.stream.Collectors;
 @Validated
 public class AdminController {
 
+// Regular admin can do:
+// - add new admin,
+// - show any user by id,
+// - delete any user,
+// - show all users,
+// - show all admins,
+// - search for user by email,
+// - search for admin by email,
+// - search for user by names,
+// - search for admin by names,
+// - set any user as active/inactive,
+// - send email any to user,
+// - send new activation email to any user,
+// - send newsletter email,
+
     private UserService userService;
     private ModelMapper modelMapper;
 
@@ -39,7 +54,7 @@ public class AdminController {
 
     @GetMapping("/show-user/{id}")
     public UserDto showUserDetails(@PathVariable @Min(1) Long id) {
-        return convertToDto(userService.findById(id));
+        return convertToDto(userService.findUserById(id));
     }
 
     @DeleteMapping("/delete-user/{id}")
@@ -81,8 +96,8 @@ public class AdminController {
     }
 
     @PatchMapping("/set-active/{id}")
-    public UserDto changeAccountActiveValue(@PathVariable @Min(1) Long id,
-                                            @RequestParam @NotNull Boolean active) {
+    public UserDto changeUserAccountActiveValue(@PathVariable @Min(1) Long id,
+                                                @RequestParam @NotNull Boolean active) {
         return convertToDto(userService.changeUserActiveAccount(id, active));
     }
 
@@ -119,19 +134,4 @@ public class AdminController {
     }
 
 }
-
-// regular admin can do:
-// - add new admin
-// - show any user by id
-// - delete any user
-// - show all users
-// - show all admins
-// - search for user by email
-// - search for admin by email
-// - search for user by names
-// - search for admin by names
-// - set any user as active/inactive
-// - send email any to user
-// - send new activation email to any user
-// - send newsletter email
 

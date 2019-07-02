@@ -66,6 +66,4 @@ public class RegistrationController {
         userDto.setPassword(null);
         return userDto;
     }
-
-
 }

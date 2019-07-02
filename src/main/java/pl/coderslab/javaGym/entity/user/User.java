@@ -1,14 +1,17 @@
 package pl.coderslab.javaGym.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import pl.coderslab.javaGym.entity.Person;
 import pl.coderslab.javaGym.entity.data.Reservation;
-import pl.coderslab.javaGym.entity.data.TrainingClass;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor

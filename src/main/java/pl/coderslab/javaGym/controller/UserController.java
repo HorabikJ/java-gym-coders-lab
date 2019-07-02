@@ -14,11 +14,23 @@ import pl.coderslab.javaGym.service.userService.UserService;
 
 import javax.validation.constraints.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
 @Validated
 public class UserController {
+
+//    Regular user can do:
+//    - show his details,
+//    - change his password,
+//    - change newsletter consent,
+//    - change his names,
+//    - change his email,
+//    - reserve class,
+//    - cancel future reserved classes,
+//    - show future reservations,
+//    - show past reservations,
 
     private UserService userService;
     private ModelMapper modelMapper;
@@ -61,16 +73,26 @@ public class UserController {
         return userService.sendUserEmailChangeMessage(id, newEmail);
     }
 
-    @GetMapping("/reserve-class/{classId}/{userId}")
+    @PostMapping("/reserve-class/{classId}/{userId}")
     public ReservationDto reserveClassById(@PathVariable @Min(1) Long classId,
                                            @PathVariable @Min(1) Long userId) {
         return convertReservationToDto(userService.reserveClassById(userId, classId));
     }
 
-    @GetMapping("/cancel-class/{classId}/{userId}")
+    @DeleteMapping("/cancel-class/{classId}/{userId}")
     public Boolean cancelClassById(@PathVariable @Min(1) Long classId,
                                    @PathVariable @Min(1) Long userId) {
-        return userService.cancelClass(classId, userId);
+        return userService.cancelClassById(classId, userId);
+    }
+
+    @GetMapping("/future-reservations/{userId}")
+    public List<ReservationDto> showFutureReservationsByUserId(@PathVariable @Min(1) Long userId) {
+        return convertReservationToDtoList(userService.showFutureReservationsByUserId(userId));
+    }
+
+    @GetMapping("/past-reservations/{userId}")
+    public List<ReservationDto> showPastReservationsByUserId(@PathVariable @Min(1) Long userId) {
+        return convertReservationToDtoList(userService.showPastReservationsByUserId(userId));
     }
 
     private UserDto convertUserToDto(User user) {
@@ -79,45 +101,23 @@ public class UserController {
         return userDto;
     }
 
-    private User convertUserToEntity(UserDto userDto) {
-        return modelMapper.map(userDto, User.class);
-    }
-
     private ReservationDto convertReservationToDto(Reservation reservation) {
-        ReservationDto reservationDto  = modelMapper.map(reservation, ReservationDto.class);
-        reservationDto.setUserDto(convertUserToDto(reservation.getUser()));
+        ReservationDto reservationDto = modelMapper.map(reservation, ReservationDto.class);
+        reservationDto.setUserDto(null);
         reservationDto.setTrainingClassDto(convertTrainingClassToDto(reservation.getTrainingClass()));
         return reservationDto;
     }
-
-    //    TODO wywal nie uzywane metody
-    private Reservation convertReservationToEntity(ReservationDto reservationDto) {
-        return modelMapper.map(reservationDto, Reservation.class);
-    }
-
-    private TrainingClass convertTrainingClassToEntity(TrainingClassDto trainingClassDto) {
-        return modelMapper.map(trainingClassDto, TrainingClass.class);
-    }
-
 
     private TrainingClassDto convertTrainingClassToDto(TrainingClass trainingClass) {
         TrainingClassDto trainingClassDto = modelMapper
                 .map(trainingClass, TrainingClassDto.class);
         trainingClassDto.setReservedPlaces(trainingClass.getReservations().size());
-// TODO
         return trainingClassDto;
     }
 
+    private List<ReservationDto> convertReservationToDtoList(List<Reservation> reservations) {
+        return reservations.stream()
+                .map(reservation -> convertReservationToDto(reservation))
+                .collect(Collectors.toList());
+    }
 }
-
-//    User can do:
-//    - show his details
-//    - change his password
-//    - change newsletter consent
-//    - change his names
-//    - change his email
-//    TODO
-//     - reserve classes,
-//     - cancel reserved classes if future,
-//     - show reserved classes,
-//     - show reserved classes in past,

@@ -21,6 +21,13 @@ import java.util.stream.Collectors;
 @Validated
 public class AdminInstructorController {
 
+// Admin can do with instructors:
+// - add new instructor,
+// - editTrainingType existing instructor,
+// - delete instructor,
+// - send email to instructor,
+// - find instructor by email
+
     private InstructorService instructorService;
     private ModelMapper modelMapper;
 
@@ -34,15 +41,15 @@ public class AdminInstructorController {
     @PostMapping("/add-new")
     @ResponseStatus(HttpStatus.CREATED)
     public InstructorDto saveInstructor(@RequestBody @Valid InstructorDto instructorDto) {
-        Instructor instructor = convertToEntity(instructorDto);
-        return convertToDto(instructorService.save(instructor));
+        Instructor instructor = convertInstructorToEntity(instructorDto);
+        return convertInstructorToDto(instructorService.save(instructor));
     }
 
     @PutMapping("/edit/{id}")
     public InstructorDto updateInstructor(@PathVariable @Min(1) Long id,
                                           @RequestBody @Valid InstructorDto instructorDto) {
-        Instructor instructor = convertToEntity(instructorDto);
-        return convertToDto(instructorService.edit(instructor, id));
+        Instructor instructor = convertInstructorToEntity(instructorDto);
+        return convertInstructorToDto(instructorService.edit(instructor, id));
     }
 
     @DeleteMapping("/delete/{id}")
@@ -54,7 +61,7 @@ public class AdminInstructorController {
     public List<InstructorDto> findInstructorByEmail(@RequestParam @NotBlank String email) {
         return instructorService.findByEmail(email)
                 .stream()
-                .map(instructor -> convertToDto(instructor))
+                .map(instructor -> convertInstructorToDto(instructor))
                 .collect(Collectors.toList());
     }
 
@@ -64,20 +71,11 @@ public class AdminInstructorController {
         return instructorService.sendEmailToInstructor(emailDto, id);
     }
 
-    private Instructor convertToEntity(InstructorDto instructorDto) {
+    private Instructor convertInstructorToEntity(InstructorDto instructorDto) {
         return modelMapper.map(instructorDto, Instructor.class);
     }
 
-    private InstructorDto convertToDto(Instructor instructor) {
+    private InstructorDto convertInstructorToDto(Instructor instructor) {
         return modelMapper.map(instructor, InstructorDto.class);
     }
-
-// admin can do with instructors:
-// - add new instructor,
-// - edit existing instructor,
-// - delete instructor,
-// - send email to instructor,
-// - find instructor by email
-
-
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pl.coderslab.javaGym.entity.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

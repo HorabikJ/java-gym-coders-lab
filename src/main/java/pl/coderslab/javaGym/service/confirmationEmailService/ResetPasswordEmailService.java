@@ -16,8 +16,7 @@ import java.time.ZoneId;
 import java.util.UUID;
 
 @Service
-public class ResetPasswordEmailService implements
-        AbstractConfirmationEmailService<ResetPasswordEmailDetails> {
+public class ResetPasswordEmailService {
 
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private UserRepository userRepository;
@@ -32,7 +31,6 @@ public class ResetPasswordEmailService implements
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    @Override
     public ResetPasswordEmailDetails save(ResetPasswordEmailDetails newResetPasswordEmailDetails) {
         Long userId = newResetPasswordEmailDetails.getUser().getId();
         ResetPasswordEmailDetails oldResetPasswordEmailDetails = resetPasswordEmailRepository

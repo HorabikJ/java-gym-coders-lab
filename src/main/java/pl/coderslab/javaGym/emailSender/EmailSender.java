@@ -29,17 +29,17 @@ public class EmailSender {
     private final static String CHANGE_EMAIL_URL = "http://localhost:8080/change-email?param=";
     private final static String CHANGE_EMAIL_SUBJECT = "JavaSpringGym change of email.";
     private final static String CHANGE_EMAIL_TEXT = "Please click below link to confirm change of your email,\n" +
-                                        "this link will expire in " + LINK_EXPIRATION_TIME + " minutes.\n";
+            "this link will expire in " + LINK_EXPIRATION_TIME + " minutes.\n";
 
     private final static String CONFIRM_ACCOUNT_URL = "http://localhost:8080/register/confirm-account?param=";
     private final static String CONFIRM_ACCOUNT_SUBJECT = "JavaSpringGym account activation email.";
     private final static String CONFIRM_ACCOUNT_TEXT = "Please click below link to activate your account,\n" +
-                                        "this link will expire in " + LINK_EXPIRATION_TIME + " minutes.\n";
+            "this link will expire in " + LINK_EXPIRATION_TIME + " minutes.\n";
 
     private final static String RESET_PASSWORD_URL = "http://localhost:8080/reset-password/show-form?param=";
     private final static String RESET_PASSWORD_SUBJECT = "JavaSpringGym reset password.";
     private final static String RESET_PASSWORD_TEXT = "Please click below link to go to reset password site,\n" +
-                                        "it will be possible for the next " + LINK_EXPIRATION_TIME + " minutes.\n";
+            "it will be possible for the next " + LINK_EXPIRATION_TIME + " minutes.\n";
 
     private final static String WELCOME_EMAIL_SUBJECT = ", welcome in JavaSpringGym application!";
     private final static String WELCOME_EMAIL_TEXT = ", we are very pleased that you joined us!";
@@ -88,8 +88,8 @@ public class EmailSender {
 
             ActivationEmailDetails activationEmailDetails =
                     new ActivationEmailDetails
-                    (user, param, LocalDateTime.now(),
-                            LINK_EXPIRATION_TIME);
+                            (user, param, LocalDateTime.now(),
+                                    LINK_EXPIRATION_TIME);
 
             activationEmailService.save(activationEmailDetails);
             javaMailSender.send(message);
@@ -113,7 +113,7 @@ public class EmailSender {
             message.setText(messageText.toString());
             ChangeEmailDetails emailDetails =
                     new ChangeEmailDetails(user, param, LocalDateTime.now(),
-                        newEmail, LINK_EXPIRATION_TIME);
+                            newEmail, LINK_EXPIRATION_TIME);
 
             changeEmailDetailsService.save(emailDetails);
             javaMailSender.send(message);
@@ -137,7 +137,7 @@ public class EmailSender {
             message.setText(messageText.toString());
             ResetPasswordEmailDetails resetPasswordEmailDetails =
                     new ResetPasswordEmailDetails
-                    (user, param, LocalDateTime.now(), LINK_EXPIRATION_TIME);
+                            (user, param, LocalDateTime.now(), LINK_EXPIRATION_TIME);
 
             resetPasswordEmailService.save(resetPasswordEmailDetails);
             javaMailSender.send(message);
@@ -178,7 +178,7 @@ public class EmailSender {
             StringBuffer messageSubject = new StringBuffer();
             messageSubject.append("JavaGymSpring - ")
                     .append(reservation.getTrainingClass().getTrainingType().getName())
-                    .append(" class reservation");
+                    .append(" - class reservation.");
 
             message.setTo(reservation.getUser().getEmail());
             message.setSubject(messageSubject.toString());
@@ -213,7 +213,7 @@ public class EmailSender {
             StringBuffer messageSubject = new StringBuffer();
             messageSubject.append("JavaGymSpring - ")
                     .append(reservation.getTrainingClass().getTrainingType().getName())
-                    .append(" cancellation confirmation");
+                    .append(" - cancellation confirmation.");
 
             message.setTo(reservation.getUser().getEmail());
             message.setSubject(messageSubject.toString());
@@ -236,6 +236,38 @@ public class EmailSender {
                 .append(", class duration: ").append(reservation.getTrainingClass().getDurationInMinutes())
                 .append(" minutes.\n")
                 .append("We hope that you will visit us again soon!")
+                .toString();
+    }
+
+    public void sendJumpToTrainingEmail(Reservation reservation) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            StringBuffer messageSubject = new StringBuffer();
+            messageSubject.append("JavaGymSpring - ")
+                    .append(reservation.getTrainingClass().getTrainingType().getName())
+                    .append(" - you got the reservation!");
+
+            message.setTo(reservation.getUser().getEmail());
+            message.setSubject(messageSubject.toString());
+            message.setText(getJumpToTrainingMessageText(reservation));
+            javaMailSender.send(message);
+        } catch (MailException e) {
+            throw new EmailSendingException();
+        }
+    }
+
+    private String getJumpToTrainingMessageText(Reservation reservation) {
+        StringBuffer messageText = new StringBuffer();
+        return messageText.append("Welcome ")
+                .append(reservation.getUser().getFirstName()).append("!")
+                .append("\nYou have just jumped to reservation list for the below class:")
+                .append("\nClass details:")
+                .append("\nTrainer: ").append(reservation.getTrainingClass().getInstructor().getFullName())
+                .append("\nTraining: ").append(reservation.getTrainingClass().getTrainingType().getName())
+                .append("\nClass start date: ").append(reservation.getTrainingClass().getStartDate())
+                .append(", class duration: ").append(reservation.getTrainingClass().getDurationInMinutes())
+                .append(" minutes.\n")
+                .append("See you on the training!")
                 .toString();
     }
 }

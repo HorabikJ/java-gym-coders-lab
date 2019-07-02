@@ -1,6 +1,8 @@
 package pl.coderslab.javaGym.entity.user;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -19,7 +21,4 @@ public class Role {
     @Column
     private String role;
 
-//    public Role(String role) {
-//        this.role = role;
-//    }
 }

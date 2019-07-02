@@ -24,6 +24,26 @@ import java.util.stream.Collectors;
 @Validated
 public class AdminTrainingClassController {
 
+// Admin can do with training classes:
+//  - add training classes,
+//  do by classId and classGroupId (only for future classes):
+//      - delete
+//      - set instructor
+//      - set training type
+//      - change max capacity
+//      - change duration
+//      - change start hour
+//
+//  - show all future classes where trainingType or instructor is null
+//  - show any training class by id
+//  - show all by classGroupId
+//  - show all reservations for any TrainingClass by classId
+//  - show all TrainingClasses in future
+//  - show all TrainingClasses in past
+//  - send email to all participants for given classes
+//  - show all future classes for given instructor
+//  - show all future classes for given training type
+
     private TrainingClassService trainingClassService;
     private ModelMapper modelMapper;
 
@@ -141,7 +161,7 @@ public class AdminTrainingClassController {
 
     @GetMapping("/by-id/{classId}")
     public TrainingClassDto showAnyTrainingClass(@PathVariable @Min(1) Long classId) {
-        return convertTrainingClassToDto(trainingClassService.findById(classId));
+        return convertTrainingClassToDto(trainingClassService.findTrainingClassById(classId));
     }
 
     @GetMapping("/by-class-group-id/{classGroupId}")
@@ -150,7 +170,7 @@ public class AdminTrainingClassController {
     }
 
     @GetMapping("/reservations/{classId}")
-    public List<ReservationDto> showAllUsersOnClassReservationList(@PathVariable @Min(1) Long classId) {
+    public List<ReservationDto> showAllReservationsByClassId(@PathVariable @Min(1) Long classId) {
         return convertReservationEntityToDtoList
                 (trainingClassService.findAllReservationsByClassId(classId));
     }
@@ -166,13 +186,13 @@ public class AdminTrainingClassController {
     }
 
     @GetMapping("/all-future-instructor/{instructorId}")
-    public List<TrainingClassDto> showAllFutureClassesForGivenInstructor(@PathVariable @Min(1) Long instructorId) {
+    public List<TrainingClassDto> showAllFutureClassesByInstructorId(@PathVariable @Min(1) Long instructorId) {
         return convertTrainingClassEntityToDtoList
                 (trainingClassService.findAllFutureClassesByInstructor(instructorId));
     }
 
     @GetMapping("/all-future-training-type/{trainingTypeId}")
-    public List<TrainingClassDto> showAllFutureClassesForGivenTrainingType(@PathVariable @Min(1) Long trainingTypeId) {
+    public List<TrainingClassDto> showAllFutureClassesByTrainingTypeId(@PathVariable @Min(1) Long trainingTypeId) {
         return convertTrainingClassEntityToDtoList
                 (trainingClassService.findAllFutureClassesByTrainingType(trainingTypeId));
     }
@@ -183,15 +203,10 @@ public class AdminTrainingClassController {
         return trainingClassService.sendEmailToAllCustomersByTrainingClass(classId, email);
     }
 
-    private TrainingClass convertTrainingClassToEntity(TrainingClassDto trainingClassDto) {
-        return modelMapper.map(trainingClassDto, TrainingClass.class);
-    }
-
     private TrainingClassDto convertTrainingClassToDto(TrainingClass trainingClass) {
         TrainingClassDto trainingClassDto = modelMapper
                 .map(trainingClass, TrainingClassDto.class);
         trainingClassDto.setReservedPlaces(trainingClass.getReservations().size());
-//        TODO
         return trainingClassDto;
     }
 
@@ -208,11 +223,6 @@ public class AdminTrainingClassController {
         return reservationDto;
     }
 
-//    TODO wywal nie uzywane metody
-    private Reservation convertReservationToEntity(ReservationDto reservationDto) {
-        return modelMapper.map(reservationDto, Reservation.class);
-    }
-
     private List<ReservationDto> convertReservationEntityToDtoList(List<Reservation> reservations) {
         return reservations.stream()
                 .map(reservation -> convertReservationToDto(reservation))
@@ -224,31 +234,4 @@ public class AdminTrainingClassController {
         userDto.setPassword(null);
         return userDto;
     }
-
-    private User convertUserToEntity(UserDto userDto) {
-        return modelMapper.map(userDto, User.class);
-    }
-
 }
-
-// admin can do with training classes:
-//  - add training classes
-//
-//  do by id and classGroupId (only for future classes):
-//      - delete
-//      - set instructor
-//      - set training type
-//      - change max capacity
-//      - change duration
-//      - change start hour
-//
-//  - show all future classes where trainingType or instructor is null
-//  - show any training class by id
-//  - show all by classGroupId
-//  - show all reservations for any TrainingClass by classId
-//  - show all in future
-//  - show all in past
-//  - send email to all participants for given classes
-//  - show all future classes for given instructor
-//  - show all future classes for given training type
-

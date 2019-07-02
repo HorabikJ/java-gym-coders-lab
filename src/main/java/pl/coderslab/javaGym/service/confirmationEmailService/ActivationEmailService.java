@@ -15,8 +15,7 @@ import java.time.ZoneId;
 import java.util.UUID;
 
 @Service
-public class ActivationEmailService implements
-        AbstractConfirmationEmailService<ActivationEmailDetails> {
+public class ActivationEmailService  {
 
     private UserRepository userRepository;
     private ActivationEmailRepository activationEmailRepository;
@@ -28,7 +27,6 @@ public class ActivationEmailService implements
         this.userRepository = userRepository;
     }
 
-    @Override
     public ActivationEmailDetails save(ActivationEmailDetails newEmailDetails) {
         Long userId = newEmailDetails.getUser().getId();
         ActivationEmailDetails oldEmailDetails = activationEmailRepository.findByUserId(userId);

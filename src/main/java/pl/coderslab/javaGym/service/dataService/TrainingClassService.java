@@ -12,6 +12,7 @@ import pl.coderslab.javaGym.entity.data.TrainingType;
 import pl.coderslab.javaGym.entity.user.User;
 import pl.coderslab.javaGym.error.customException.ClassTimeReservedException;
 import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
+import pl.coderslab.javaGym.globalValue.GlobalValue;
 import pl.coderslab.javaGym.repository.InstructorRepository;
 import pl.coderslab.javaGym.repository.ReservationRepository;
 import pl.coderslab.javaGym.repository.TrainingClassRepository;
@@ -21,13 +22,12 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Period;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class TrainingClassService implements AbstractDataService<TrainingClass> {
+public class TrainingClassService {
 
     private ReservationRepository reservationRepository;
     private TrainingClassRepository trainingClassRepository;
@@ -60,7 +60,7 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
             String errorMessage = getErrorMessageIfNewClassTimeIsReserved
                     (eachStartTime, trainingClassDto.getDurationInMinutes(), allFutureClasses);
             if (errorMessage == null) {
-                saveTrainingClass(trainingClassDto, savedTrainingClasses, groupClassId, eachStartTime);
+                insertTrainingClass(trainingClassDto, savedTrainingClasses, groupClassId, eachStartTime);
             } else {
                 throw new ClassTimeReservedException("*This time is already reserved." +
                         " Please see reserved time details: "
@@ -72,7 +72,7 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
 
     private String getErrorMessageIfNewClassTimeIsReserved
             (LocalDateTime eachStartDate, Integer durationInMinutes,
-            List<TrainingClass> futureClassesToCheckTimeWith) {
+             List<TrainingClass> futureClassesToCheckTimeWith) {
         LocalDateTime eachEndDate = eachStartDate.plusMinutes(durationInMinutes);
         StringBuffer sb = new StringBuffer();
         for (TrainingClass trainingClass : futureClassesToCheckTimeWith) {
@@ -96,14 +96,14 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
             (LocalDateTime eachStartDate, LocalDateTime eachEndDate, LocalDateTime anyTrainingStartDate,
              LocalDateTime anyTrainingEndDate) {
         return (eachStartDate.isAfter(anyTrainingStartDate) &&
-            eachStartDate.isBefore(anyTrainingEndDate)) ||
-            (eachEndDate.isAfter(anyTrainingStartDate) &&
-            eachEndDate.isBefore(anyTrainingEndDate)) ||
-            (eachStartDate.isBefore(anyTrainingStartDate) &&
-            eachEndDate.isAfter(anyTrainingEndDate));
+                eachStartDate.isBefore(anyTrainingEndDate)) ||
+                (eachEndDate.isAfter(anyTrainingStartDate) &&
+                        eachEndDate.isBefore(anyTrainingEndDate)) ||
+                (eachStartDate.isBefore(anyTrainingStartDate) &&
+                        eachEndDate.isAfter(anyTrainingEndDate));
     }
 
-    private void saveTrainingClass(TrainingClassDto trainingClassDto, List<TrainingClass> trainingClasses,
+    private void insertTrainingClass(TrainingClassDto trainingClassDto, List<TrainingClass> trainingClasses,
                                    String classGroupId, LocalDateTime eachStartTime) {
         TrainingClass trainingClass = new TrainingClass();
         trainingClass.setClassGroupId(classGroupId);
@@ -118,7 +118,7 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
     public List<TrainingClass> setInstructorByClassGroupId(String classGroupId, Long instructorId) {
         List<TrainingClass> classes = findAllByClassGroupIdAndStartDateIsAfter
                 (classGroupId, LocalDateTime.now());
-        Instructor instructor = getInstructorById(instructorId);
+        Instructor instructor = findInstructorById(instructorId);
         for (TrainingClass trainingClass : classes) {
             trainingClass.setInstructor(instructor);
             trainingClassRepository.save(trainingClass);
@@ -127,28 +127,18 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
     }
 
     public List<TrainingClass> findAllByClassGroupId(String classGroupId) {
-        List<TrainingClass> classes = trainingClassRepository.findAllByClassGroupId(classGroupId);
-        if (classes.size() > 0) {
-            return classes;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        return getTrainingClassListIfNotEmpty(trainingClassRepository.findAllByClassGroupId(classGroupId));
     }
 
-    private Instructor getInstructorById(Long id) {
-        Instructor instructor = instructorRepository.findById(id).orElse(null);
-        if (instructor != null) {
-            return instructor;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+    private Instructor findInstructorById(Long id) {
+        return getInstructorIfNotNull(instructorRepository.findById(id).orElse(null));
     }
 
     @Transactional
     public List<TrainingClass> setTrainingTypeByClassGroupId(String classGroupId, Long trainingTypeId) {
         List<TrainingClass> classes = findAllByClassGroupIdAndStartDateIsAfter
                 (classGroupId, LocalDateTime.now());
-        TrainingType trainingType = getTrainingTypeById(trainingTypeId);
+        TrainingType trainingType = findTrainingTypeById(trainingTypeId);
         for (TrainingClass trainingClass : classes) {
             trainingClass.setTrainingType(trainingType);
             trainingClassRepository.save(trainingClass);
@@ -156,13 +146,8 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
         return classes;
     }
 
-    private TrainingType getTrainingTypeById(Long id) {
-        TrainingType trainingType = trainingTypeRepository.findById(id).orElse(null);
-        if (trainingType != null) {
-            return trainingType;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+    private TrainingType findTrainingTypeById(Long id) {
+        return getTrainingTypeIfNotNull(trainingTypeRepository.findById(id).orElse(null));
     }
 
     @Transactional
@@ -199,13 +184,8 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
 
     private List<TrainingClass> findAllByClassGroupIdAndStartDateIsAfter
             (String classGroupId, LocalDateTime startDate) {
-        List<TrainingClass> classes = trainingClassRepository
-                .findAllByClassGroupIdAndStartDateIsAfter(classGroupId, startDate);
-        if (classes.size() > 0) {
-            return classes;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        return getTrainingClassListIfNotEmpty(trainingClassRepository
+                .findAllByClassGroupIdAndStartDateIsAfter(classGroupId, startDate));
     }
 
     private List<TrainingClass> findAllByClassGroupIdIsNotAndStartDateIsAfter
@@ -241,33 +221,28 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
 
     @Transactional
     public Boolean deleteClassByClassGroupId(String classGroupId) {
-        List<TrainingClass> classes = findAllByClassGroupIdAndStartDateIsAfter
-                (classGroupId, LocalDateTime.now());
-        trainingClassRepository.deleteInBatch(classes);
+        trainingClassRepository.deleteInBatch(getTrainingClassListIfNotEmpty
+                (findAllByClassGroupIdAndStartDateIsAfter(classGroupId, LocalDateTime.now())));
         return true;
     }
 
     @Transactional
     public TrainingClass setInstructorByClassId(Long classId, Long instructorId) {
         TrainingClass trainingClass = findByIdAndStartDateIsAfter(classId, LocalDateTime.now());
-        Instructor instructor = getInstructorById(instructorId);
+        Instructor instructor = findInstructorById(instructorId);
         trainingClass.setInstructor(instructor);
         return trainingClassRepository.save(trainingClass);
     }
 
     private TrainingClass findByIdAndStartDateIsAfter(Long id, LocalDateTime startDate) {
-        TrainingClass trainingClass = trainingClassRepository.findByIdAndStartDateIsAfter(id, startDate);
-        if (trainingClass != null) {
-            return trainingClass;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        return getTrainingClassIfNotNull(trainingClassRepository
+                .findByIdAndStartDateIsAfter(id, startDate));
     }
 
     @Transactional
     public TrainingClass setTrainingTypeByClassId(Long classId, Long trainingTypeId) {
         TrainingClass trainingClass = findByIdAndStartDateIsAfter(classId, LocalDateTime.now());
-        TrainingType trainingType = getTrainingTypeById(trainingTypeId);
+        TrainingType trainingType = findTrainingTypeById(trainingTypeId);
         trainingClass.setTrainingType(trainingType);
         return trainingClassRepository.save(trainingClass);
     }
@@ -321,54 +296,31 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
 
     @Transactional
     public Boolean deleteClassByClassId(Long classId) {
-        TrainingClass trainingClass = findByIdAndStartDateIsAfter(classId, LocalDateTime.now());
-        if (trainingClass != null) {
-            trainingClassRepository.delete(trainingClass);
-            return true;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        TrainingClass trainingClass = getTrainingClassIfNotNull
+                (findByIdAndStartDateIsAfter(classId, LocalDateTime.now()));
+        trainingClassRepository.delete(trainingClass);
+        return true;
     }
 
     public List<TrainingClass> findAllInFutureWhereAnyRelationIsNull() {
-        List<TrainingClass> trainingClasses = trainingClassRepository
-                .findAllTrainingClassesInFutureWhereAnyRelationIsNull(LocalDateTime.now());
-        if (trainingClasses.size() > 0) {
-            return trainingClasses;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        return getTrainingClassListIfNotEmpty(trainingClassRepository
+                .findAllTrainingClassesInFutureWhereAnyRelationIsNull(LocalDateTime.now()));
     }
 
     public List<Reservation> findAllReservationsByClassId(Long classId) {
-        TrainingClass trainingClass = findById(classId);
-        LinkedList<Reservation> reservations = reservationRepository
-                .findAllByTrainingClassIdOrderByReservationTimeAsc(trainingClass.getId());
-        if (reservations.size() > 0) {
-            return reservations;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        TrainingClass trainingClass = findTrainingClassById(classId);
+        return getReservationListIfNotEmpty(reservationRepository
+                .findAllByTrainingClassIdOrderByReservationTimeAsc(trainingClass.getId()));
     }
 
     public List<TrainingClass> findAllByStartDateIsInFuture() {
-        List<TrainingClass> trainingClasses = trainingClassRepository
-                .findAllByStartDateIsAfter(LocalDateTime.now());
-        if (trainingClasses != null) {
-            return trainingClasses;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        return getTrainingClassListIfNotEmpty(trainingClassRepository
+                .findAllByStartDateIsAfter(LocalDateTime.now()));
     }
 
     public List<TrainingClass> findAllByStartDateIsInPast() {
-        List<TrainingClass> trainingClasses = trainingClassRepository
-                .findAllByStartDateIsBefore(LocalDateTime.now());
-        if (trainingClasses != null) {
-            return trainingClasses;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        return getTrainingClassListIfNotEmpty(trainingClassRepository
+                .findAllByStartDateIsBefore(LocalDateTime.now()));
     }
 
     public Boolean sendEmailToAllCustomersByTrainingClass(Long classId, EmailDto email) {
@@ -380,55 +332,80 @@ public class TrainingClassService implements AbstractDataService<TrainingClass> 
         return true;
     }
 
-    @Override
-    public TrainingClass save(TrainingClass trainingClass) {
-        return null;
-    }
-
-    @Override
-    public List<TrainingClass> findAll() {
-        return null;
-    }
-
-    @Override
-    public TrainingClass findById(Long id) {
-        TrainingClass trainingClass = trainingClassRepository.findById(id).orElse(null);
-        if (trainingClass != null) {
-            return  trainingClass;
-        } else {
-            throw new ResourceNotFoundException();
-        }
-    }
-
-    @Override
-    public Boolean deleteById(Long id) {
-        return null;
-    }
-
-    @Override
-    public TrainingClass edit(TrainingClass trainingClass, Long id) {
-        return null;
+    public TrainingClass findTrainingClassById(Long id) {
+        return getTrainingClassIfNotNull(trainingClassRepository.findById(id).orElse(null));
     }
 
     public List<TrainingClass> findAllFutureClassesByInstructor(Long instructorId) {
-        Instructor instructor = getInstructorById(instructorId);
-        List<TrainingClass> classes = trainingClassRepository
-                .findAllByInstructorIdAndStartDateIsAfter(instructor.getId(), LocalDateTime.now());
-        if (classes.size() > 0) {
-            return classes;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        Instructor instructor = findInstructorById(instructorId);
+        return getTrainingClassListIfNotEmpty(trainingClassRepository
+                .findAllByInstructorIdAndStartDateIsAfter(instructor.getId(), LocalDateTime.now()));
     }
 
     public List<TrainingClass> findAllFutureClassesByTrainingType(Long trainingTypeId) {
-        TrainingType trainingType = getTrainingTypeById(trainingTypeId);
-        List<TrainingClass> classes = trainingClassRepository
-                .findAllByTrainingTypeIdAndStartDateIsAfter(trainingType.getId(), LocalDateTime.now());
-        if (classes.size() > 0) {
-            return classes;
+        TrainingType trainingType = findTrainingTypeById(trainingTypeId);
+        return getTrainingClassListIfNotEmpty(trainingClassRepository
+                .findAllByTrainingTypeIdAndStartDateIsAfter(trainingType.getId(), LocalDateTime.now()));
+    }
+
+    public List<TrainingClass> findAllClassesAvailableForUsers() {
+        return getTrainingClassListIfNotEmpty(trainingClassRepository.findAllTrainingClassesAvailableForUsers
+                (LocalDateTime.now(), LocalDateTime.now().plusDays(GlobalValue.CLASSES_SHOW_PERIOD_IN_DAYS)));
+    }
+
+    public List<TrainingClass> findAllTrainingClassesForUsersByInstructorId(Long instructorId) {
+        Instructor instructor = findInstructorById(instructorId);
+        return getTrainingClassListIfNotEmpty(findAllClassesAvailableForUsers().stream()
+                .filter(trainingClass -> trainingClass.getInstructor().equals(instructor))
+                .collect(Collectors.toList()));
+    }
+
+    public List<TrainingClass> findAllTrainingClassesForUsersByTrainingTypeId(Long trainingTypeId) {
+        TrainingType trainingType = findTrainingTypeById(trainingTypeId);
+        return getTrainingClassListIfNotEmpty(findAllClassesAvailableForUsers().stream()
+                .filter(trainingClass -> trainingClass.getTrainingType().equals(trainingType))
+                .collect(Collectors.toList()));
+    }
+
+    private Instructor getInstructorIfNotNull(Instructor instructor) {
+        if (instructor != null) {
+            return instructor;
         } else {
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException("*Instructor not found!");
         }
     }
+
+    private TrainingType getTrainingTypeIfNotNull(TrainingType trainingType) {
+        if (trainingType != null) {
+            return trainingType;
+        } else {
+            throw new ResourceNotFoundException("*TrainingType not found!");
+        }
+    }
+
+    private List<TrainingClass> getTrainingClassListIfNotEmpty(List<TrainingClass> trainingClasses) {
+        if (trainingClasses.size() > 0) {
+            return trainingClasses;
+        } else {
+            throw new ResourceNotFoundException("*TrainingClasses not found!");
+        }
+    }
+
+    private TrainingClass getTrainingClassIfNotNull(TrainingClass trainingClass) {
+        if (trainingClass != null) {
+            return trainingClass;
+        } else {
+            throw new ResourceNotFoundException("*TrainingClass not found!");
+        }
+    }
+
+    private List<Reservation> getReservationListIfNotEmpty(List<Reservation> reservations) {
+        if (reservations != null) {
+            return reservations;
+        } else {
+            throw new ResourceNotFoundException("*Reservation not found!");
+        }
+    }
+
+
 }

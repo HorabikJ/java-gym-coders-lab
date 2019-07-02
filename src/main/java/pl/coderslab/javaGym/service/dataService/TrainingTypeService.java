@@ -11,7 +11,7 @@ import pl.coderslab.javaGym.repository.TrainingTypeRepository;
 import java.util.List;
 
 @Service
-public class TrainingTypeService implements AbstractDataService<TrainingType> {
+public class TrainingTypeService {
 
     private TrainingTypeRepository trainingTypeRepository;
 
@@ -20,8 +20,7 @@ public class TrainingTypeService implements AbstractDataService<TrainingType> {
     }
 
     @Transactional
-    @Override
-    public TrainingType save(TrainingType trainingType) {
+    public TrainingType saveTrainingType(TrainingType trainingType) {
         if (trainingType.getId() == null) {
             if (!isTrainingTypeNameAlreadyInDB(trainingType)) {
                 return trainingTypeRepository.save(trainingType);
@@ -33,27 +32,19 @@ public class TrainingTypeService implements AbstractDataService<TrainingType> {
         }
     }
 
-    @Override
-    public List<TrainingType> findAll() {
-        return null;
-    }
-
-    @Override
-    public TrainingType findById(Long id) {
-        return null;
+    public List<TrainingType> findAllTrainingTypes() {
+        return getTrainingTypeListIfNotEmpty(trainingTypeRepository.findAll());
     }
 
     @Transactional
-    @Override
-    public Boolean deleteById(Long id) {
-        TrainingType trainingType = getTrainingTypeByIdFromDB(id);
+    public Boolean deleteTrainingTypeById(Long id) {
+        TrainingType trainingType = findTrainingTypeBy(id);
         trainingTypeRepository.delete(trainingType);
         return true;
     }
 
-    @Override
-    public TrainingType edit(TrainingType newTrainingType, Long id) {
-        TrainingType trainingTypeFromDB = getTrainingTypeByIdFromDB(id);
+    public TrainingType editTrainingType(TrainingType newTrainingType, Long id) {
+        TrainingType trainingTypeFromDB = findTrainingTypeBy(id);
         if (newTrainingType.getName().equals(trainingTypeFromDB.getName())) {
             newTrainingType.setId(trainingTypeFromDB.getId());
             return trainingTypeRepository.save(newTrainingType);
@@ -67,16 +58,28 @@ public class TrainingTypeService implements AbstractDataService<TrainingType> {
         }
     }
 
-    private TrainingType getTrainingTypeByIdFromDB(Long id) {
-        TrainingType trainingType = trainingTypeRepository.findById(id).orElse(null);
-        if (trainingType != null) {
-            return trainingType;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+    public TrainingType findTrainingTypeBy(Long id) {
+        return getTrainingTypeIfNotNull
+                (trainingTypeRepository.findById(id).orElse(null));
     }
 
     private Boolean isTrainingTypeNameAlreadyInDB(TrainingType trainingType) {
         return trainingTypeRepository.existsByNameIgnoreCase(trainingType.getName());
+    }
+
+    private TrainingType getTrainingTypeIfNotNull(TrainingType trainingType) {
+        if (trainingType != null) {
+            return trainingType;
+        } else {
+            throw new ResourceNotFoundException("*TrainingType not found!");
+        }
+    }
+
+    private List<TrainingType> getTrainingTypeListIfNotEmpty(List<TrainingType> trainingTypes) {
+        if (trainingTypes.size() > 0) {
+            return trainingTypes;
+        } else {
+            throw new ResourceNotFoundException("*TrainingTypes not found!");
+        }
     }
 }

@@ -16,8 +16,7 @@ import java.time.ZoneId;
 import java.util.UUID;
 
 @Service
-public class ChangeEmailDetailsService implements
-        AbstractConfirmationEmailService<ChangeEmailDetails>  {
+public class ChangeEmailDetailsService  {
 
     private UserRepository userRepository;
     private ChangeEmailDetailsRepository changeEmailDetailsRepository;
@@ -29,7 +28,6 @@ public class ChangeEmailDetailsService implements
         this.userRepository = userRepository;
     }
 
-    @Override
     public ChangeEmailDetails save(ChangeEmailDetails newChangeEmailDetails) {
         Long userId = newChangeEmailDetails.getUser().getId();
         ChangeEmailDetails oldChangeEmailDetails = changeEmailDetailsRepository.findByUserId(userId);

@@ -17,6 +17,11 @@ import javax.validation.constraints.Min;
 @Validated
 public class AdminTrainingTypeController {
 
+// Admin can do with training types:
+// - add new training type,
+// - editTrainingType existing training type,
+// - delete training type,
+
     private TrainingTypeService trainingTypeService;
     private ModelMapper modelMapper;
 
@@ -30,36 +35,28 @@ public class AdminTrainingTypeController {
     @PostMapping("/add-new")
     @ResponseStatus(HttpStatus.CREATED)
     public TrainingTypeDto addTrainingType(@RequestBody @Valid TrainingTypeDto trainingTypeDto) {
-        TrainingType trainingType = convertToEntity(trainingTypeDto);
-        return convertToDto(trainingTypeService.save(trainingType));
+        TrainingType trainingType = convertTrainingTypeToEntity(trainingTypeDto);
+        return convertTrainingTypeToDto(trainingTypeService.saveTrainingType(trainingType));
     }
 
     @PutMapping("/edit/{id}")
     public TrainingTypeDto editTrainingType(@PathVariable @Min(1) Long id,
                                             @RequestBody @Valid TrainingTypeDto trainingTypeDto) {
-        TrainingType trainingType = convertToEntity(trainingTypeDto);
-        return convertToDto(trainingTypeService.edit(trainingType, id));
+        TrainingType trainingType = convertTrainingTypeToEntity(trainingTypeDto);
+        return convertTrainingTypeToDto(trainingTypeService.editTrainingType(trainingType, id));
     }
 
     @DeleteMapping("/delete/{id}")
     public Boolean deleteTrainingType(@PathVariable @Min(1) Long id) {
-        return trainingTypeService.deleteById(id);
+        return trainingTypeService.deleteTrainingTypeById(id);
     }
 
-    private TrainingType convertToEntity(TrainingTypeDto trainingTypeDto) {
+    private TrainingType convertTrainingTypeToEntity(TrainingTypeDto trainingTypeDto) {
         return modelMapper.map(trainingTypeDto, TrainingType.class);
     }
 
-    private TrainingTypeDto convertToDto(TrainingType trainingType) {
+    private TrainingTypeDto convertTrainingTypeToDto(TrainingType trainingType) {
         return modelMapper.map(trainingType, TrainingTypeDto.class);
     }
-
-
-
-// admin can do with training types:
-// - add new training type,
-// - edit existing training type,
-// - delete training type,
-
 
 }

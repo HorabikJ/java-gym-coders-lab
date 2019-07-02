@@ -31,8 +31,4 @@ public class TrainingType {
     @OneToMany(mappedBy = "trainingType", cascade = CascadeType.REMOVE)
     private List<TrainingClass> trainingClasses = new ArrayList<>();
 
-//    public TrainingType(String name, String description) {
-//        this.name = name;
-//        this.description = description;
-//    }
 }

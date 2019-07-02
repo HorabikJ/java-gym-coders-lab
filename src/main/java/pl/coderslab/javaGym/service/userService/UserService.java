@@ -14,6 +14,7 @@ import pl.coderslab.javaGym.entity.user.User;
 import pl.coderslab.javaGym.enumClass.RoleEnum;
 import pl.coderslab.javaGym.error.customException.*;
 import pl.coderslab.javaGym.dataTransferObject.EmailDto;
+import pl.coderslab.javaGym.globalValue.GlobalValue;
 import pl.coderslab.javaGym.repository.ReservationRepository;
 import pl.coderslab.javaGym.repository.RoleRepository;
 import pl.coderslab.javaGym.repository.TrainingClassRepository;
@@ -25,14 +26,12 @@ import java.util.*;
 @Service
 public class UserService {
 
-    private static final Integer SHOW_CLASSES_DAYS_NUMBER = 14;
-
     private EmailSender emailSender;
     private UserRepository userRepository;
     private RoleRepository roleRepository;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
     private TrainingClassRepository trainingClassRepository;
     private ReservationRepository reservationRepository;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository,
@@ -49,22 +48,13 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public User findById(Long userId) {
-        return getUserById(userId);
-    }
-
-    private User getUserById(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user != null) {
-            return user;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+    public User findUserById(Long userId) {
+        return getUserIfNotNull(userRepository.findById(userId).orElse(null));
     }
 
     @Transactional
     public Boolean deleteUserById(Long userId) {
-        User user = getUserById(userId);
+        User user = findUserById(userId);
         if (!isUserAnAdmin(user)) {
             userRepository.delete(user);
             return true;
@@ -92,18 +82,16 @@ public class UserService {
         Set<Role> roles = new HashSet<>();
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setActive(false);
-        Role userRole = roleRepository.findByRole(RoleEnum.ROLE_USER.toString());
-        roles.add(userRole);
+        roles.add(getUserRole());
         if (asAdmin) {
-            Role adminRole = roleRepository.findByRole(RoleEnum.ROLE_ADMIN.toString());
-            roles.add(adminRole);
+            roles.add(getAdminRole());
         }
         user.setRoles(roles);
     }
 
     @Transactional
     public Boolean deleteAnyUserById(Long userId) {
-        User user = getUserById(userId);
+        User user = findUserById(userId);
         if (!isUserASuperAdmin(user)) {
             userRepository.delete(user);
             return true;
@@ -136,7 +124,7 @@ public class UserService {
     public User getAuthenticatedUserById(Long userId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        User user = getUserById(userId);
+        User user = findUserById(userId);
         if (user.getEmail().equals(email)) {
             return user;
         } else {
@@ -173,73 +161,41 @@ public class UserService {
 
     @Transactional
     public Boolean resetUserPassword(String userEmail) {
-        User user = userRepository.findByEmail(userEmail);
-        if (user != null) {
-            emailSender.sendResetPasswordEmail(user);
-            return true;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        User user = getUserIfNotNull(userRepository.findByEmail(userEmail));
+        emailSender.sendResetPasswordEmail(user);
+        return true;
     }
 
     public List<User> showAllUsersWithUserRoleOnly() {
-        List<User> users = userRepository.findAllByRolesIsNotContaining(getSetWithAdminRoleOnly());
-        if (users.size() > 0) {
-            return users;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        return getUserListIfNotEmpty(userRepository
+                .findAllByRolesIsNotContaining(getSetWithAdminRoleOnly()));
     }
 
     public List<User> showAllAdmins() {
-        List<User> admins = userRepository.findAllByRolesIsContaining(getSetWithAdminRoleOnly());
-        if (admins.size() > 0) {
-            return admins;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        return getUserListIfNotEmpty(userRepository
+                .findAllByRolesIsContaining(getSetWithAdminRoleOnly()));
     }
 
     public List<User> searchForUsersByEmail(String email) {
-        List<User> users = userRepository.findAllByRolesIsNotContainingAndEmailIsContainingIgnoreCase
-                (getSetWithAdminRoleOnly(), email);
-        if (users.size() > 0) {
-            return users;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        return getUserListIfNotEmpty(userRepository.findAllByRolesIsNotContainingAndEmailIsContainingIgnoreCase
+                (getSetWithAdminRoleOnly(), email));
     }
 
     public List<User> searchForAdminsByEmail(String email) {
-        List<User> admins = userRepository.findAllByRolesIsContainingAndEmailIsContainingIgnoreCase
-                (getSetWithAdminRoleOnly(), email);
-        if (admins.size() > 0) {
-            return admins;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        return getUserListIfNotEmpty(userRepository.findAllByRolesIsContainingAndEmailIsContainingIgnoreCase
+                (getSetWithAdminRoleOnly(), email));
     }
 
     public List<User> findAllUsersByNames(String firstName, String lastName) {
-        List<User> users = userRepository
+        return getUserListIfNotEmpty(userRepository
                 .findAllByRolesIsNotContainingAndFirstNameIsContainingAndLastNameIsContainingAllIgnoreCase
-                        (getSetWithAdminRoleOnly(), firstName, lastName);
-        if (users.size() > 0) {
-            return users;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+                        (getSetWithAdminRoleOnly(), firstName, lastName));
     }
 
     public List<User> findAllAdminsByNames(String firstName, String lastName) {
-        List<User> admins = userRepository
+        return getUserListIfNotEmpty(userRepository
                 .findAllByRolesIsContainingAndFirstNameIsContainingAndLastNameIsContainingAllIgnoreCase
-                        (getSetWithAdminRoleOnly(), firstName, lastName);
-        if (admins.size() > 0) {
-            return admins;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+                        (getSetWithAdminRoleOnly(), firstName, lastName));
     }
 
     private Set<Role> getSetWithAdminRoleOnly() {
@@ -255,9 +211,18 @@ public class UserService {
         }
     }
 
+    private Role getUserRole() {
+        Role role = roleRepository.findByRole(RoleEnum.ROLE_USER.toString());
+        if (role != null) {
+            return role;
+        } else {
+            throw new ResourceNotFoundException("Critical Exception! User Role not found!");
+        }
+    }
+
     @Transactional
     public User changeUserActiveAccount(Long userId, Boolean active) {
-        User user = getUserById(userId);
+        User user = findUserById(userId);
         if (!isUserAnAdmin(user)) {
             user.setActive(active);
             return userRepository.save(user);
@@ -271,15 +236,15 @@ public class UserService {
     }
 
     @Transactional
-    public Boolean sendEmailToUser(Long userId, EmailDto emailData) {
-        User user = getUserById(userId);
-        emailSender.sendEmailToPerson(user, emailData);
+    public Boolean sendEmailToUser(Long userId, EmailDto email) {
+        User user = findUserById(userId);
+        emailSender.sendEmailToPerson(user, email);
         return true;
     }
 
     @Transactional
     public Boolean sendActivationEmail(Long userId) {
-        User user = getUserById(userId);
+        User user = findUserById(userId);
         emailSender.sendAccountActivationEmail(user);
         return true;
     }
@@ -293,7 +258,7 @@ public class UserService {
 
     @Transactional
     public User changeUserActiveAccountStatus(Long userId, Boolean active) {
-        User user = getUserById(userId);
+        User user = findUserById(userId);
         if (!isUserASuperAdmin(user)) {
             user.setActive(active);
             return userRepository.save(user);
@@ -308,7 +273,7 @@ public class UserService {
         TrainingClass trainingClass = findTrainingClassAvailableForUser(classId);
         if (!isTrainingClassAlreadyReservedByUser(user.getId(), trainingClass.getId())) {
             Integer currentCapacity = trainingClass.getReservations().size();
-            Boolean onTrainingList = false;
+            boolean onTrainingList = false;
             if (currentCapacity < trainingClass.getMaxCapacity()) {
                 onTrainingList = true;
             }
@@ -317,18 +282,14 @@ public class UserService {
             emailSender.sendClassReservationEmail(reservation, onTrainingList);
             return reservationRepository.save(reservation);
         } else {
-            throw new ReservationException("*User already has reservation for this class.");
+            throw new ReservationException("*User already has a reservation for this training class.");
         }
     }
 
     private TrainingClass findTrainingClassAvailableForUser(Long classId) {
-        TrainingClass trainingClass = trainingClassRepository.findTrainingClassByIdAvailableForUser
-                (LocalDateTime.now(), LocalDateTime.now().plusDays(SHOW_CLASSES_DAYS_NUMBER), classId);
-        if (trainingClass != null) {
-            return trainingClass;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        return getTrainingClassIfNotNull(trainingClassRepository.findTrainingClassByIdAvailableForUser
+                (LocalDateTime.now(), LocalDateTime.now().plusDays
+                        (GlobalValue.CLASSES_SHOW_PERIOD_IN_DAYS), classId));
     }
 
     private Boolean isTrainingClassAlreadyReservedByUser(Long userId, Long classId) {
@@ -336,20 +297,24 @@ public class UserService {
     }
 
     @Transactional
-    public Boolean cancelClass(Long classId, Long userId) {
+    public Boolean cancelClassById(Long classId, Long userId) {
         User user = getAuthenticatedUserById(userId);
         TrainingClass trainingClass = findTrainingClassById(classId);
         if (isTrainingClassAlreadyReservedByUser(user.getId(), trainingClass.getId())) {
             Reservation reservation =
                     findReservationByUserIdAndTrainingClassId(user.getId(), trainingClass.getId());
-            if (reservation.getOnTrainingList()) {
-                deleteUserFromTrainingListAndMoveFirstUserFromWaitingListToTraining(classId, reservation);
+            if (trainingClass.getStartDate().isAfter(LocalDateTime.now())) {
+                if (reservation.getOnTrainingList()) {
+                    deleteUserFromTrainingListAndMoveFirstUserFromWaitingToTrainingList(classId, reservation);
+                } else {
+                    deleteUserFromWaitingList(reservation);
+                }
+                return true;
             } else {
-                deleteUserFromWaitingList(reservation);
+                throw new ReservationException("*Can not editTrainingType reservation for past training class.");
             }
-            return true;
         } else {
-            throw new ReservationException("*User do not have reservation for this class.");
+            throw new ReservationException("*User do not have a reservation for this training class.");
         }
     }
 
@@ -358,7 +323,7 @@ public class UserService {
         emailSender.sendClassCancellationEmail(reservation);
     }
 
-    private void deleteUserFromTrainingListAndMoveFirstUserFromWaitingListToTraining
+    private void deleteUserFromTrainingListAndMoveFirstUserFromWaitingToTrainingList
             (Long classId, Reservation reservation) {
         reservationRepository.delete(reservation);
         emailSender.sendClassCancellationEmail(reservation);
@@ -367,26 +332,16 @@ public class UserService {
         if (awaitingReservation != null) {
             awaitingReservation.setOnTrainingList(true);
             reservationRepository.save(awaitingReservation);
-            emailSender.sendClassReservationEmail(awaitingReservation, true);
+            emailSender.sendJumpToTrainingEmail(awaitingReservation);
         }
     }
 
     private TrainingClass findTrainingClassById(Long classId) {
-        TrainingClass trainingClass = trainingClassRepository.findById(classId).orElse(null);
-        if (trainingClass != null) {
-            return trainingClass;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        return getTrainingClassIfNotNull(trainingClassRepository.findById(classId).orElse(null));
     }
 
     private Reservation findReservationByUserIdAndTrainingClassId(Long userId, Long classId) {
-        Reservation reservation = reservationRepository.findByUserIdAndTrainingClassId(userId, classId);
-        if (reservation != null) {
-            return reservation;
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        return getReservationIfNotNull(reservationRepository.findByUserIdAndTrainingClassId(userId, classId));
     }
 
     private Reservation findFirstReservationOnAwaitingListByClassId(Long classId) {
@@ -394,4 +349,55 @@ public class UserService {
                 .findFirstByTrainingClassIdAndOnTrainingListIsFalseOrderByReservationTimeAsc(classId);
     }
 
+    public List<Reservation> showFutureReservationsByUserId(Long userId) {
+        User user = getAuthenticatedUserById(userId);
+        return getReservationListIfNotEmpty(reservationRepository
+                .findAllFutureClassReservationsByUserId(user.getId(), LocalDateTime.now()));
+    }
+
+    public List<Reservation> showPastReservationsByUserId(Long userId) {
+        User user = getAuthenticatedUserById(userId);
+        return getReservationListIfNotEmpty(reservationRepository
+                .findAllPastClassReservationsByUserId(user.getId(), LocalDateTime.now()));
+    }
+
+    private List<User> getUserListIfNotEmpty(List<User> users) {
+        if (users.size() > 0) {
+            return users;
+        } else {
+            throw new ResourceNotFoundException("*Users not found!");
+        }
+    }
+
+    private User getUserIfNotNull(User user) {
+        if (user != null) {
+            return user;
+        } else {
+            throw new ResourceNotFoundException("*User not found!");
+        }
+    }
+
+    private List<Reservation> getReservationListIfNotEmpty(List<Reservation> reservations) {
+        if (reservations.size() > 0) {
+            return reservations;
+        } else {
+            throw new ResourceNotFoundException("*Reservations not found!");
+        }
+    }
+
+    private Reservation getReservationIfNotNull(Reservation reservation) {
+        if (reservation != null) {
+            return reservation;
+        } else {
+            throw new ResourceNotFoundException("*Reservation not found!");
+        }
+    }
+
+    private TrainingClass getTrainingClassIfNotNull(TrainingClass trainingClass) {
+        if (trainingClass != null) {
+            return trainingClass;
+        } else {
+            throw new ResourceNotFoundException("*Training class not found!");
+        }
+    }
 }

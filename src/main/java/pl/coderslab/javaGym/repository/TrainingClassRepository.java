@@ -37,7 +37,7 @@ public interface TrainingClassRepository extends JpaRepository<TrainingClass, Lo
 
     @Query("SELECT t FROM TrainingClass t WHERE t.instructor IS NOT NULL AND t.trainingType IS NOT NULL " +
             "AND t.startDate BETWEEN :showStartDate AND :showEndDate")
-    List<TrainingClass> findAllClassesAvailableForUser(@Param("showStartDate") LocalDateTime showStartDate,
+    List<TrainingClass> findAllTrainingClassesAvailableForUsers(@Param("showStartDate") LocalDateTime showStartDate,
                                                        @Param("showEndDate") LocalDateTime showEndDate);
 
     @Query("SELECT t FROM TrainingClass t WHERE t.instructor IS NOT NULL AND t.trainingType IS NOT NULL " +
