@@ -40,13 +40,4 @@ public class InstructorDto {
     @JsonIgnore
     private List<TrainingClass> trainingClassList = new ArrayList<>();
 
-//    public InstructorDto(String email, String firstName, String lastName,
-//                      LocalDate dateOfBirth, String description) {
-//        this.email = email;
-//        this.firstName = firstName;
-//        this.lastName = lastName;
-//        this.dateOfBirth = dateOfBirth;
-//        this.description = description;
-//    }
-
 }

@@ -119,7 +119,7 @@ public class AdminController {
 
     private UserDto convertToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
-        user.setPassword(null);
+        userDto.setPassword(null);
         return userDto;
     }
 
