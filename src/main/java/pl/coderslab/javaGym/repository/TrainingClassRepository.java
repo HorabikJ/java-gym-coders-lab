@@ -13,30 +13,30 @@ import java.util.List;
 @Repository
 public interface TrainingClassRepository extends JpaRepository<TrainingClass, Long> {
 
-    List<TrainingClass> findAllByStartDateIsAfter(LocalDateTime startDate);
+    List<TrainingClass> findAllByStartDateIsAfterOrderByStartDateAsc(LocalDateTime startDate);
 
-    List<TrainingClass> findAllByStartDateIsBefore(LocalDateTime startDate);
+    List<TrainingClass> findAllByStartDateIsBeforeOrderByStartDateAsc(LocalDateTime startDate);
 
-    List<TrainingClass> findAllByClassGroupId(String classGroupId);
+    List<TrainingClass> findAllByClassGroupIdOrderByStartDateAsc(String classGroupId);
 
-    List<TrainingClass> findAllByClassGroupIdAndStartDateIsAfter(String classGroupId, LocalDateTime startDate);
+    List<TrainingClass> findAllByClassGroupIdAndStartDateIsAfterOrderByStartDateAsc(String classGroupId, LocalDateTime startDate);
 
-    List<TrainingClass> findAllByClassGroupIdIsNotAndStartDateIsAfter(String classGroupId, LocalDateTime startDate);
+    List<TrainingClass> findAllByClassGroupIdIsNotAndStartDateIsAfterOrderByStartDateAsc(String classGroupId, LocalDateTime startDate);
 
     TrainingClass findByIdAndStartDateIsAfter(Long id, LocalDateTime startDate);
 
-    List<TrainingClass> findByIdIsNotAndStartDateIsAfter(Long id, LocalDateTime startDate);
+    List<TrainingClass> findByIdIsNotAndStartDateIsAfterOrderByStartDateAsc(Long id, LocalDateTime startDate);
 
     @Query("SELECT t FROM TrainingClass t WHERE t.startDate > :startDate AND " +
-            "(t.instructor IS NULL OR t.trainingType IS NULL)")
+            "(t.instructor IS NULL OR t.trainingType IS NULL) ORDER BY t.startDate ASC")
     List<TrainingClass> findAllTrainingClassesInFutureWhereAnyRelationIsNull(@Param("startDate")LocalDateTime startDate);
 
-    List<TrainingClass> findAllByInstructorIdAndStartDateIsAfter(Long id, LocalDateTime startDate);
+    List<TrainingClass> findAllByInstructorIdAndStartDateIsAfterOrderByStartDateAsc(Long id, LocalDateTime startDate);
 
-    List<TrainingClass> findAllByTrainingTypeIdAndStartDateIsAfter(Long id, LocalDateTime startDate);
+    List<TrainingClass> findAllByTrainingTypeIdAndStartDateIsAfterOrderByStartDateAsc(Long id, LocalDateTime startDate);
 
     @Query("SELECT t FROM TrainingClass t WHERE t.instructor IS NOT NULL AND t.trainingType IS NOT NULL " +
-            "AND t.startDate BETWEEN :showStartDate AND :showEndDate")
+            "AND t.startDate BETWEEN :showStartDate AND :showEndDate ORDER BY t.startDate ASC")
     List<TrainingClass> findAllTrainingClassesAvailableForUsers(@Param("showStartDate") LocalDateTime showStartDate,
                                                        @Param("showEndDate") LocalDateTime showEndDate);
 

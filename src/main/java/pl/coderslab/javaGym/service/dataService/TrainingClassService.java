@@ -52,7 +52,7 @@ public class TrainingClassService {
             (TrainingClassDto trainingClassDto, Integer occurrence, Integer repeat) {
         List<TrainingClass> savedTrainingClasses = new ArrayList<>();
         List<TrainingClass> allFutureClasses = trainingClassRepository
-                .findAllByStartDateIsAfter(LocalDateTime.now());
+                .findAllByStartDateIsAfterOrderByStartDateAsc(LocalDateTime.now());
         String groupClassId = UUID.randomUUID().toString();
         LocalDateTime startTime = trainingClassDto.getStartDate();
         for (int i = 0; i < repeat; i++) {
@@ -127,7 +127,8 @@ public class TrainingClassService {
     }
 
     public List<TrainingClass> findAllByClassGroupId(String classGroupId) {
-        return getTrainingClassListIfNotEmpty(trainingClassRepository.findAllByClassGroupId(classGroupId));
+        return getTrainingClassListIfNotEmpty(trainingClassRepository
+                .findAllByClassGroupIdOrderByStartDateAsc(classGroupId));
     }
 
     private Instructor findInstructorById(Long id) {
@@ -185,12 +186,13 @@ public class TrainingClassService {
     private List<TrainingClass> findAllByClassGroupIdAndStartDateIsAfter
             (String classGroupId, LocalDateTime startDate) {
         return getTrainingClassListIfNotEmpty(trainingClassRepository
-                .findAllByClassGroupIdAndStartDateIsAfter(classGroupId, startDate));
+                .findAllByClassGroupIdAndStartDateIsAfterOrderByStartDateAsc(classGroupId, startDate));
     }
 
     private List<TrainingClass> findAllByClassGroupIdIsNotAndStartDateIsAfter
             (String classGroupId, LocalDateTime startTime) {
-        return trainingClassRepository.findAllByClassGroupIdIsNotAndStartDateIsAfter(classGroupId, startTime);
+        return trainingClassRepository
+                .findAllByClassGroupIdIsNotAndStartDateIsAfterOrderByStartDateAsc(classGroupId, startTime);
     }
 
     @Transactional
@@ -273,7 +275,8 @@ public class TrainingClassService {
     }
 
     private List<TrainingClass> findByIdIsNotAndStartDateIsAfter(Long id, LocalDateTime startDate) {
-        return trainingClassRepository.findByIdIsNotAndStartDateIsAfter(id, startDate);
+        return trainingClassRepository
+                .findByIdIsNotAndStartDateIsAfterOrderByStartDateAsc(id, startDate);
     }
 
     @Transactional
@@ -315,12 +318,12 @@ public class TrainingClassService {
 
     public List<TrainingClass> findAllByStartDateIsInFuture() {
         return getTrainingClassListIfNotEmpty(trainingClassRepository
-                .findAllByStartDateIsAfter(LocalDateTime.now()));
+                .findAllByStartDateIsAfterOrderByStartDateAsc(LocalDateTime.now()));
     }
 
     public List<TrainingClass> findAllByStartDateIsInPast() {
         return getTrainingClassListIfNotEmpty(trainingClassRepository
-                .findAllByStartDateIsBefore(LocalDateTime.now()));
+                .findAllByStartDateIsBeforeOrderByStartDateAsc(LocalDateTime.now()));
     }
 
     public Boolean sendEmailToAllCustomersByTrainingClass(Long classId, EmailDto email) {
@@ -339,13 +342,15 @@ public class TrainingClassService {
     public List<TrainingClass> findAllFutureClassesByInstructor(Long instructorId) {
         Instructor instructor = findInstructorById(instructorId);
         return getTrainingClassListIfNotEmpty(trainingClassRepository
-                .findAllByInstructorIdAndStartDateIsAfter(instructor.getId(), LocalDateTime.now()));
+                .findAllByInstructorIdAndStartDateIsAfterOrderByStartDateAsc
+                        (instructor.getId(), LocalDateTime.now()));
     }
 
     public List<TrainingClass> findAllFutureClassesByTrainingType(Long trainingTypeId) {
         TrainingType trainingType = findTrainingTypeById(trainingTypeId);
         return getTrainingClassListIfNotEmpty(trainingClassRepository
-                .findAllByTrainingTypeIdAndStartDateIsAfter(trainingType.getId(), LocalDateTime.now()));
+                .findAllByTrainingTypeIdAndStartDateIsAfterOrderByStartDateAsc
+                        (trainingType.getId(), LocalDateTime.now()));
     }
 
     public List<TrainingClass> findAllClassesAvailableForUsers() {
