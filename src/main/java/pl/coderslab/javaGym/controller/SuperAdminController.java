@@ -3,7 +3,8 @@ package pl.coderslab.javaGym.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.coderslab.javaGym.entity.user.User;
+import pl.coderslab.javaGym.dataTransferObject.UserDto;
+import pl.coderslab.javaGym.entityDtoConverter.UserEntityDtoConverter;
 import pl.coderslab.javaGym.service.userService.UserService;
 
 import javax.validation.constraints.Min;
@@ -19,10 +20,13 @@ public class SuperAdminController {
 // - set admin account as inactive/active,
 
     private UserService userService;
+    private UserEntityDtoConverter userEntityDtoConverter;
 
     @Autowired
-    public SuperAdminController(UserService userService) {
+    public SuperAdminController(UserService userService,
+                                UserEntityDtoConverter userEntityDtoConverter) {
         this.userService = userService;
+        this.userEntityDtoConverter = userEntityDtoConverter;
     }
 
     @DeleteMapping("/delete-user/{id}")
@@ -31,9 +35,9 @@ public class SuperAdminController {
     }
 
     @PatchMapping("/set-active/{id}")
-    public User changeAccountActiveValue(@PathVariable @Min(1) Long id,
-                                         @RequestParam @NotNull Boolean active) {
-        return userService.changeUserActiveAccountStatus(id, active);
+    public UserDto changeAccountActiveValue(@PathVariable @Min(1) Long id,
+                                            @RequestParam @NotNull Boolean active) {
+        return userEntityDtoConverter.convertUserToDto(userService.changeUserActiveAccountStatus(id, active));
     }
 
 }

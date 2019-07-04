@@ -1,15 +1,15 @@
 package pl.coderslab.javaGym.controller;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.javaGym.customValidator.Occurrence;
-import pl.coderslab.javaGym.dataTransferObject.*;
-import pl.coderslab.javaGym.entity.data.Reservation;
-import pl.coderslab.javaGym.entity.data.TrainingClass;
-import pl.coderslab.javaGym.entity.user.User;
+import pl.coderslab.javaGym.dataTransferObject.EmailDto;
+import pl.coderslab.javaGym.dataTransferObject.ReservationDto;
+import pl.coderslab.javaGym.dataTransferObject.TrainingClassDto;
+import pl.coderslab.javaGym.entityDtoConverter.ReservationEntityDtoConverter;
+import pl.coderslab.javaGym.entityDtoConverter.TrainingClassEntityDtoConverter;
 import pl.coderslab.javaGym.service.dataService.TrainingClassService;
 
 import javax.validation.Valid;
@@ -17,7 +17,6 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin/training-class/")
@@ -45,13 +44,16 @@ public class AdminTrainingClassController {
 //  - show all future classes for given training type
 
     private TrainingClassService trainingClassService;
-    private ModelMapper modelMapper;
+    private TrainingClassEntityDtoConverter trainingClassEntityDtoConverter;
+    private ReservationEntityDtoConverter reservationEntityDtoConverter;
 
     @Autowired
     public AdminTrainingClassController(TrainingClassService trainingClassService,
-                                        ModelMapper modelMapper) {
+                                        TrainingClassEntityDtoConverter trainingClassEntityDtoConverter,
+                                        ReservationEntityDtoConverter reservationEntityDtoConverter) {
         this.trainingClassService = trainingClassService;
-        this.modelMapper = modelMapper;
+        this.trainingClassEntityDtoConverter = trainingClassEntityDtoConverter;
+        this.reservationEntityDtoConverter = reservationEntityDtoConverter;
     }
 
     @PostMapping("/add-new")
@@ -60,7 +62,7 @@ public class AdminTrainingClassController {
             (@RequestBody @Valid TrainingClassDto trainingClassDto,
              @RequestParam @Occurrence Integer occurrence,
              @RequestParam @Min(1) Integer repeat) {
-        return convertTrainingClassEntityToDtoList
+        return trainingClassEntityDtoConverter.convertTrainingClassToDtoList
                 (trainingClassService.saveTrainingClass(trainingClassDto, occurrence, repeat));
     }
 
@@ -68,7 +70,7 @@ public class AdminTrainingClassController {
     public List<TrainingClassDto> setInstructorByClassGroupIdWhereClassesInFuture
             (@PathVariable @NotBlank String classGroupId,
              @PathVariable @Min(1) Long instructorId) {
-        return convertTrainingClassEntityToDtoList
+        return trainingClassEntityDtoConverter.convertTrainingClassToDtoList
                 (trainingClassService.setInstructorByClassGroupId(classGroupId, instructorId));
     }
 
@@ -76,7 +78,7 @@ public class AdminTrainingClassController {
     public List<TrainingClassDto> setTrainingTypeByClassGroupIdWhereClassesInFuture
             (@PathVariable @NotBlank String classGroupId,
              @PathVariable @Min(1) Long trainingTypeId) {
-        return convertTrainingClassEntityToDtoList
+        return trainingClassEntityDtoConverter.convertTrainingClassToDtoList
                 (trainingClassService.setTrainingTypeByClassGroupId(classGroupId, trainingTypeId));
     }
 
@@ -84,7 +86,7 @@ public class AdminTrainingClassController {
     public List<TrainingClassDto> changeMaxCapacityByClassGroupIdWhereClassesInFuture
             (@PathVariable @NotBlank String classGroupId,
              @RequestParam @Min(1) Integer maxCapacity) {
-        return convertTrainingClassEntityToDtoList(trainingClassService
+        return trainingClassEntityDtoConverter.convertTrainingClassToDtoList(trainingClassService
                 .changeMaxCapacityByClassGroupId(classGroupId, maxCapacity));
     }
 
@@ -92,7 +94,7 @@ public class AdminTrainingClassController {
     public List<TrainingClassDto> changeDurationByClassGroupIdWhereClassesInFuture
             (@PathVariable @NotBlank String classGroupId,
              @RequestParam @Min(1) Integer duration) {
-        return convertTrainingClassEntityToDtoList(trainingClassService
+        return trainingClassEntityDtoConverter.convertTrainingClassToDtoList(trainingClassService
                 .changeDurationByClassGroupId(classGroupId, duration));
     }
 
@@ -101,7 +103,7 @@ public class AdminTrainingClassController {
            (@PathVariable @NotBlank String classGroupId,
             @RequestParam @Min(0) @Max(23) Integer hour,
             @RequestParam @Min(0) @Max(59)  Integer minute) {
-        return convertTrainingClassEntityToDtoList(trainingClassService
+        return trainingClassEntityDtoConverter.convertTrainingClassToDtoList(trainingClassService
                 .changeClassStartHourByClassGroupId(classGroupId, hour, minute));
    }
 
@@ -115,7 +117,7 @@ public class AdminTrainingClassController {
     public TrainingClassDto setInstructorForClassIdWhereClassInFuture
                                     (@PathVariable @Min(1) Long classId,
                                     @PathVariable @Min(1) Long instructorId) {
-        return convertTrainingClassToDto
+        return trainingClassEntityDtoConverter.convertTrainingClassToDto
                 (trainingClassService.setInstructorByClassId(classId, instructorId));
     }
 
@@ -123,7 +125,7 @@ public class AdminTrainingClassController {
     public TrainingClassDto setTrainingTypeForClassIdWhereClassInFuture
                                     (@PathVariable @Min(1) Long classId,
                                     @PathVariable @Min(1) Long trainingTypeId) {
-        return convertTrainingClassToDto
+        return trainingClassEntityDtoConverter.convertTrainingClassToDto
                 (trainingClassService.setTrainingTypeByClassId(classId, trainingTypeId));
     }
 
@@ -131,14 +133,16 @@ public class AdminTrainingClassController {
     public TrainingClassDto changeMaxCapacityForClassIdWhereClassInFuture
                                     (@PathVariable @Min(1) Long classId,
                                     @RequestParam @Min(1) Integer maxCapacity) {
-        return convertTrainingClassToDto(trainingClassService.changeMaxCapacityByClassId(classId, maxCapacity));
+        return trainingClassEntityDtoConverter.convertTrainingClassToDto
+                (trainingClassService.changeMaxCapacityByClassId(classId, maxCapacity));
     }
 
     @PatchMapping("/change-duration-one/{classId}")
     public TrainingClassDto changeDurationForClassIdWhereClassInFuture
                                     (@PathVariable @Min(1) Long classId,
                                      @RequestParam @Min(1) Integer duration) {
-        return convertTrainingClassToDto(trainingClassService.changeDurationForClassId(classId, duration));
+        return trainingClassEntityDtoConverter.convertTrainingClassToDto
+                (trainingClassService.changeDurationForClassId(classId, duration));
     }
 
     @PatchMapping("/change-hour-one/{classId}")
@@ -146,7 +150,8 @@ public class AdminTrainingClassController {
             (@PathVariable @Min(1) Long classId,
              @RequestParam @Min(0) @Max(23) Integer hour,
              @RequestParam @Min(0) @Max(59)  Integer minute) {
-        return convertTrainingClassToDto(trainingClassService.changeClassStartHourByClassId(classId, hour, minute));
+        return trainingClassEntityDtoConverter.convertTrainingClassToDto
+                (trainingClassService.changeClassStartHourByClassId(classId, hour, minute));
     }
 
     @DeleteMapping("/delete-one/{classId}")
@@ -156,44 +161,49 @@ public class AdminTrainingClassController {
 
     @GetMapping("/null-relation")
     public List<TrainingClassDto> showAllTrainingClassInFutureWhereInstructorOrTrainingTypeIsNull() {
-        return convertTrainingClassEntityToDtoList(trainingClassService.findAllInFutureWhereAnyRelationIsNull());
+        return trainingClassEntityDtoConverter.convertTrainingClassToDtoList
+                (trainingClassService.findAllInFutureWhereAnyRelationIsNull());
     }
 
     @GetMapping("/by-id/{classId}")
     public TrainingClassDto showAnyTrainingClass(@PathVariable @Min(1) Long classId) {
-        return convertTrainingClassToDto(trainingClassService.findTrainingClassById(classId));
+        return trainingClassEntityDtoConverter.convertTrainingClassToDto
+                (trainingClassService.findTrainingClassById(classId));
     }
 
     @GetMapping("/by-class-group-id/{classGroupId}")
     public List<TrainingClassDto> showAllTrainingClassesByClassGroupId(@PathVariable @NotBlank String classGroupId) {
-        return convertTrainingClassEntityToDtoList(trainingClassService.findAllByClassGroupId(classGroupId));
+        return trainingClassEntityDtoConverter.convertTrainingClassToDtoList
+                (trainingClassService.findAllByClassGroupId(classGroupId));
     }
 
     @GetMapping("/reservations/{classId}")
     public List<ReservationDto> showAllReservationsByClassId(@PathVariable @Min(1) Long classId) {
-        return convertReservationEntityToDtoList
+        return reservationEntityDtoConverter.convertReservationsToDtoListAdminView
                 (trainingClassService.findAllReservationsByClassId(classId));
     }
 
     @GetMapping("/all-future")
     public List<TrainingClassDto> showAllTrainingClassesInFuture() {
-        return convertTrainingClassEntityToDtoList(trainingClassService.findAllByStartDateIsInFuture());
+        return trainingClassEntityDtoConverter.convertTrainingClassToDtoList
+                (trainingClassService.findAllByStartDateIsInFuture());
     }
 
     @GetMapping("/all-past")
     public List<TrainingClassDto> showAllTrainingClassesInPast() {
-        return convertTrainingClassEntityToDtoList(trainingClassService.findAllByStartDateIsInPast());
+        return trainingClassEntityDtoConverter.convertTrainingClassToDtoList
+                (trainingClassService.findAllByStartDateIsInPast());
     }
 
     @GetMapping("/all-future-instructor/{instructorId}")
     public List<TrainingClassDto> showAllFutureClassesByInstructorId(@PathVariable @Min(1) Long instructorId) {
-        return convertTrainingClassEntityToDtoList
+        return trainingClassEntityDtoConverter.convertTrainingClassToDtoList
                 (trainingClassService.findAllFutureClassesByInstructor(instructorId));
     }
 
     @GetMapping("/all-future-training-type/{trainingTypeId}")
     public List<TrainingClassDto> showAllFutureClassesByTrainingTypeId(@PathVariable @Min(1) Long trainingTypeId) {
-        return convertTrainingClassEntityToDtoList
+        return trainingClassEntityDtoConverter.convertTrainingClassToDtoList
                 (trainingClassService.findAllFutureClassesByTrainingType(trainingTypeId));
     }
 
@@ -201,37 +211,5 @@ public class AdminTrainingClassController {
     public Boolean sendEmailToAllClassCustomers(@PathVariable @Min(1) Long classId,
                                                 @RequestBody @Valid EmailDto email) {
         return trainingClassService.sendEmailToAllCustomersByTrainingClass(classId, email);
-    }
-
-    private TrainingClassDto convertTrainingClassToDto(TrainingClass trainingClass) {
-        TrainingClassDto trainingClassDto = modelMapper
-                .map(trainingClass, TrainingClassDto.class);
-        trainingClassDto.setReservedPlaces(trainingClass.getReservations().size());
-        return trainingClassDto;
-    }
-
-    private List<TrainingClassDto> convertTrainingClassEntityToDtoList(List<TrainingClass> trainingClasses) {
-        return trainingClasses.stream()
-                .map(trainingClass -> convertTrainingClassToDto(trainingClass))
-                .collect(Collectors.toList());
-    }
-
-    private ReservationDto convertReservationToDto(Reservation reservation) {
-        ReservationDto reservationDto  = modelMapper.map(reservation, ReservationDto.class);
-        reservationDto.setUserDto(convertUserToDto(reservation.getUser()));
-        reservationDto.setTrainingClassDto(convertTrainingClassToDto(reservation.getTrainingClass()));
-        return reservationDto;
-    }
-
-    private List<ReservationDto> convertReservationEntityToDtoList(List<Reservation> reservations) {
-        return reservations.stream()
-                .map(reservation -> convertReservationToDto(reservation))
-                .collect(Collectors.toList());
-    }
-
-    private UserDto convertUserToDto(User user) {
-        UserDto userDto = modelMapper.map(user, UserDto.class);
-        userDto.setPassword(null);
-        return userDto;
     }
 }

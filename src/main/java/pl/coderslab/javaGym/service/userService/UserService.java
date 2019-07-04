@@ -1,30 +1,36 @@
 package pl.coderslab.javaGym.service.userService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.coderslab.javaGym.dataTransferObject.EmailDto;
 import pl.coderslab.javaGym.emailSender.EmailSender;
 import pl.coderslab.javaGym.entity.data.Reservation;
 import pl.coderslab.javaGym.entity.data.TrainingClass;
 import pl.coderslab.javaGym.entity.user.Role;
 import pl.coderslab.javaGym.entity.user.User;
-import pl.coderslab.javaGym.enumClass.RoleEnum;
+import pl.coderslab.javaGym.enums.RoleEnum;
 import pl.coderslab.javaGym.error.customException.*;
-import pl.coderslab.javaGym.dataTransferObject.EmailDto;
-import pl.coderslab.javaGym.globalValue.GlobalValue;
 import pl.coderslab.javaGym.repository.ReservationRepository;
 import pl.coderslab.javaGym.repository.RoleRepository;
 import pl.coderslab.javaGym.repository.TrainingClassRepository;
 import pl.coderslab.javaGym.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService {
+
+    @Value("${application.globalvalues.classes-show-period-days}")
+    private Integer CLASSES_SHOW_PERIOD;
 
     private EmailSender emailSender;
     private UserRepository userRepository;
@@ -102,10 +108,6 @@ public class UserService {
 
     private Boolean isUserASuperAdmin(User user) {
         return user.getRoles().contains(roleRepository.findByRole(RoleEnum.ROLE_SUPER.toString()));
-    }
-
-    public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
     }
 
     @Transactional
@@ -288,7 +290,7 @@ public class UserService {
     private TrainingClass findTrainingClassAvailableForUser(Long classId) {
         return getTrainingClassIfNotNull(trainingClassRepository.findTrainingClassByIdAvailableForUser
                 (LocalDateTime.now(), LocalDateTime.now().plusDays
-                        (GlobalValue.CLASSES_SHOW_PERIOD_IN_DAYS), classId));
+                        (CLASSES_SHOW_PERIOD), classId));
     }
 
     private Boolean isTrainingClassAlreadyReservedByUser(Long userId, Long classId) {

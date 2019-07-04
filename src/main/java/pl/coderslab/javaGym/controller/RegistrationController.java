@@ -1,6 +1,5 @@
 package pl.coderslab.javaGym.controller;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -8,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.coderslab.javaGym.dataTransferObject.UserDto;
 import pl.coderslab.javaGym.emailSender.EmailSender;
 import pl.coderslab.javaGym.entity.user.User;
+import pl.coderslab.javaGym.entityDtoConverter.UserEntityDtoConverter;
 import pl.coderslab.javaGym.service.confirmationEmailService.ActivationEmailService;
 import pl.coderslab.javaGym.service.userService.UserService;
 
@@ -22,24 +22,24 @@ public class RegistrationController {
     private UserService userService;
     private ActivationEmailService activationEmailService;
     private EmailSender emailSender;
-    private ModelMapper modelMapper;
+    private UserEntityDtoConverter userEntityDtoConverter;
 
     @Autowired
     public RegistrationController(UserService userService,
                                   ActivationEmailService activationEmailService,
                                   EmailSender emailSender,
-                                  ModelMapper modelMapper) {
+                                  UserEntityDtoConverter userEntityDtoConverter) {
         this.userService = userService;
         this.activationEmailService = activationEmailService;
         this.emailSender = emailSender;
-        this.modelMapper = modelMapper;
+        this.userEntityDtoConverter = userEntityDtoConverter;
     }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto registerUser(@RequestBody @Valid UserDto userDto) {
-        User user = convertToEntity(userDto);
-        return convertToDto(userService.save(user, false));
+        User user = userEntityDtoConverter.convertUserToEntity(userDto);
+        return userEntityDtoConverter.convertUserToDto(userService.save(user, false));
     }
 
     @GetMapping("/confirm-account")
@@ -53,15 +53,5 @@ public class RegistrationController {
         if (activatedUser != null) {
             emailSender.sendUserWelcomeEmail(activatedUser);
         }
-    }
-
-    private User convertToEntity(UserDto userDto) {
-        return modelMapper.map(userDto, User.class);
-    }
-
-    private UserDto convertToDto(User user) {
-        UserDto userDto = modelMapper.map(user, UserDto.class);
-        userDto.setPassword(null);
-        return userDto;
     }
 }

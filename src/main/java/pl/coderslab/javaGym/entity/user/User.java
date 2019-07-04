@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.coderslab.javaGym.entity.Person;
+import pl.coderslab.javaGym.entity.confirmationEmail.ActivationEmailDetails;
+import pl.coderslab.javaGym.entity.confirmationEmail.ChangeEmailDetails;
+import pl.coderslab.javaGym.entity.confirmationEmail.ResetPasswordEmailDetails;
 import pl.coderslab.javaGym.entity.data.Reservation;
 
 import javax.persistence.*;
@@ -51,4 +54,15 @@ public class User implements Person {
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private ActivationEmailDetails activationEmailDetails;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private ChangeEmailDetails changeEmailDetails;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private ResetPasswordEmailDetails resetPasswordEmailDetails;
 }

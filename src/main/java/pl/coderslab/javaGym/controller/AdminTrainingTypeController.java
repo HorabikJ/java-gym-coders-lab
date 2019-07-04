@@ -1,12 +1,12 @@
 package pl.coderslab.javaGym.controller;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.javaGym.dataTransferObject.TrainingTypeDto;
 import pl.coderslab.javaGym.entity.data.TrainingType;
+import pl.coderslab.javaGym.entityDtoConverter.TrainingTypeEntityDtoConverter;
 import pl.coderslab.javaGym.service.dataService.TrainingTypeService;
 
 import javax.validation.Valid;
@@ -23,40 +23,32 @@ public class AdminTrainingTypeController {
 // - delete training type,
 
     private TrainingTypeService trainingTypeService;
-    private ModelMapper modelMapper;
+    private TrainingTypeEntityDtoConverter  trainingTypeEntityDtoConverter;
 
     @Autowired
     public AdminTrainingTypeController(TrainingTypeService trainingTypeService,
-                                       ModelMapper modelMapper) {
+                                       TrainingTypeEntityDtoConverter trainingTypeEntityDtoConverter) {
         this.trainingTypeService = trainingTypeService;
-        this.modelMapper = modelMapper;
+        this.trainingTypeEntityDtoConverter = trainingTypeEntityDtoConverter;
     }
 
     @PostMapping("/add-new")
     @ResponseStatus(HttpStatus.CREATED)
     public TrainingTypeDto addTrainingType(@RequestBody @Valid TrainingTypeDto trainingTypeDto) {
-        TrainingType trainingType = convertTrainingTypeToEntity(trainingTypeDto);
-        return convertTrainingTypeToDto(trainingTypeService.saveTrainingType(trainingType));
+        TrainingType trainingType = trainingTypeEntityDtoConverter.convertTrainingTypeToEntity(trainingTypeDto);
+        return trainingTypeEntityDtoConverter.convertTrainingTypeToDto(trainingTypeService.saveTrainingType(trainingType));
     }
 
     @PutMapping("/edit/{id}")
     public TrainingTypeDto editTrainingType(@PathVariable @Min(1) Long id,
                                             @RequestBody @Valid TrainingTypeDto trainingTypeDto) {
-        TrainingType trainingType = convertTrainingTypeToEntity(trainingTypeDto);
-        return convertTrainingTypeToDto(trainingTypeService.editTrainingType(trainingType, id));
+        TrainingType trainingType = trainingTypeEntityDtoConverter.convertTrainingTypeToEntity(trainingTypeDto);
+        return trainingTypeEntityDtoConverter.convertTrainingTypeToDto(trainingTypeService.editTrainingType(trainingType, id));
     }
 
     @DeleteMapping("/delete/{id}")
     public Boolean deleteTrainingType(@PathVariable @Min(1) Long id) {
         return trainingTypeService.deleteTrainingTypeById(id);
-    }
-
-    private TrainingType convertTrainingTypeToEntity(TrainingTypeDto trainingTypeDto) {
-        return modelMapper.map(trainingTypeDto, TrainingType.class);
-    }
-
-    private TrainingTypeDto convertTrainingTypeToDto(TrainingType trainingType) {
-        return modelMapper.map(trainingType, TrainingTypeDto.class);
     }
 
 }

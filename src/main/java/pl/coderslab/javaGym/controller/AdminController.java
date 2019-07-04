@@ -1,12 +1,12 @@
 package pl.coderslab.javaGym.controller;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.javaGym.dataTransferObject.EmailDto;
 import pl.coderslab.javaGym.dataTransferObject.UserDto;
 import pl.coderslab.javaGym.entity.user.User;
+import pl.coderslab.javaGym.entityDtoConverter.UserEntityDtoConverter;
 import pl.coderslab.javaGym.service.userService.UserService;
 
 import javax.validation.Valid;
@@ -14,7 +14,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin")
@@ -37,24 +36,24 @@ public class AdminController {
 // - send newsletter email,
 
     private UserService userService;
-    private ModelMapper modelMapper;
+    private UserEntityDtoConverter userEntityDtoConverter;
 
     public AdminController(UserService userService,
-                           ModelMapper modelMapper) {
+                           UserEntityDtoConverter userEntityDtoConverter) {
         this.userService = userService;
-        this.modelMapper = modelMapper;
+        this.userEntityDtoConverter = userEntityDtoConverter;
     }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto registerNewAdmin(@RequestBody @Valid UserDto userDto) {
-        User user = convertToEntity(userDto);
-        return convertToDto(userService.save(user, true));
+        User user = userEntityDtoConverter.convertUserToEntity(userDto);
+        return userEntityDtoConverter.convertUserToDto(userService.save(user, true));
     }
 
     @GetMapping("/show-user/{id}")
     public UserDto showUserDetails(@PathVariable @Min(1) Long id) {
-        return convertToDto(userService.findUserById(id));
+        return userEntityDtoConverter.convertUserToDto(userService.findUserById(id));
     }
 
     @DeleteMapping("/delete-user/{id}")
@@ -64,41 +63,43 @@ public class AdminController {
 
     @GetMapping("/show-all-users")
     public List<UserDto> showAllUsers() {
-        return convertEntityToDtoList(userService.showAllUsersWithUserRoleOnly());
+        return userEntityDtoConverter.convertUserToDtoList(userService.showAllUsersWithUserRoleOnly());
     }
 
     @GetMapping("/show-all-admins")
     public List<UserDto> showAllAdmins() {
-        return convertEntityToDtoList(userService.showAllAdmins());
+        return userEntityDtoConverter.convertUserToDtoList(userService.showAllAdmins());
     }
 
     @GetMapping("/users-by-email")
     public List<UserDto> searchForUsersByEmail(@RequestParam @NotBlank String email) {
-        return convertEntityToDtoList(userService.searchForUsersByEmail(email));
+        return userEntityDtoConverter.convertUserToDtoList(userService.searchForUsersByEmail(email));
     }
 
     @GetMapping("/admins-by-email")
     public List<UserDto> searchForAdminsByEmail
             (@RequestParam @NotBlank String email) {
-        return convertEntityToDtoList(userService.searchForAdminsByEmail(email));
+        return userEntityDtoConverter.convertUserToDtoList(userService.searchForAdminsByEmail(email));
     }
 
     @GetMapping("/users-by-names")
     public List<UserDto> searchForUsersByNames(@RequestParam @NotBlank String firstName,
                                                @RequestParam @NotBlank String lastName) {
-        return convertEntityToDtoList(userService.findAllUsersByNames(firstName, lastName));
+        return userEntityDtoConverter.convertUserToDtoList
+                (userService.findAllUsersByNames(firstName, lastName));
     }
 
     @GetMapping("/admins-by-names")
     public List<UserDto> searchForAdminsByNames(@RequestParam @NotBlank String firstName,
                                                 @RequestParam @NotBlank String lastName) {
-        return convertEntityToDtoList(userService.findAllAdminsByNames(firstName, lastName));
+        return userEntityDtoConverter.convertUserToDtoList
+                (userService.findAllAdminsByNames(firstName, lastName));
     }
 
     @PatchMapping("/set-active/{id}")
     public UserDto changeUserAccountActiveValue(@PathVariable @Min(1) Long id,
                                                 @RequestParam @NotNull Boolean active) {
-        return convertToDto(userService.changeUserActiveAccount(id, active));
+        return userEntityDtoConverter.convertUserToDto(userService.changeUserActiveAccount(id, active));
     }
 
     @GetMapping("/send-activation-email/{id}")
@@ -115,22 +116,6 @@ public class AdminController {
     @PostMapping("/send-newsletter")
     public Boolean sendNewsletter(@RequestBody @Valid EmailDto newsletter) {
         return userService.sendNewsletter(newsletter);
-    }
-
-    private UserDto convertToDto(User user) {
-        UserDto userDto = modelMapper.map(user, UserDto.class);
-        userDto.setPassword(null);
-        return userDto;
-    }
-
-    private User convertToEntity(UserDto userDto) {
-        return modelMapper.map(userDto, User.class);
-    }
-
-    private List<UserDto> convertEntityToDtoList(List<User> users) {
-        return users.stream()
-                .map(user -> convertToDto(user))
-                .collect(Collectors.toList());
     }
 
 }

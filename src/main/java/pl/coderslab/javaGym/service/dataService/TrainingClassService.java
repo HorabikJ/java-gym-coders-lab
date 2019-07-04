@@ -1,5 +1,6 @@
 package pl.coderslab.javaGym.service.dataService;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.coderslab.javaGym.dataTransferObject.EmailDto;
@@ -12,7 +13,6 @@ import pl.coderslab.javaGym.entity.data.TrainingType;
 import pl.coderslab.javaGym.entity.user.User;
 import pl.coderslab.javaGym.error.customException.ClassTimeReservedException;
 import pl.coderslab.javaGym.error.customException.ResourceNotFoundException;
-import pl.coderslab.javaGym.globalValue.GlobalValue;
 import pl.coderslab.javaGym.repository.InstructorRepository;
 import pl.coderslab.javaGym.repository.ReservationRepository;
 import pl.coderslab.javaGym.repository.TrainingClassRepository;
@@ -28,6 +28,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class TrainingClassService {
+
+    @Value("${application.globalvalues.classes-show-period-days}")
+    private Integer CLASSES_SHOW_PERIOD;
 
     private ReservationRepository reservationRepository;
     private TrainingClassRepository trainingClassRepository;
@@ -355,7 +358,7 @@ public class TrainingClassService {
 
     public List<TrainingClass> findAllClassesAvailableForUsers() {
         return getTrainingClassListIfNotEmpty(trainingClassRepository.findAllTrainingClassesAvailableForUsers
-                (LocalDateTime.now(), LocalDateTime.now().plusDays(GlobalValue.CLASSES_SHOW_PERIOD_IN_DAYS)));
+                (LocalDateTime.now(), LocalDateTime.now().plusDays(CLASSES_SHOW_PERIOD)));
     }
 
     public List<TrainingClass> findAllTrainingClassesForUsersByInstructorId(Long instructorId) {
@@ -411,6 +414,5 @@ public class TrainingClassService {
             throw new ResourceNotFoundException("*Reservation not found!");
         }
     }
-
 
 }

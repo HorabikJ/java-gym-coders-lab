@@ -1,6 +1,7 @@
 package pl.coderslab.javaGym.emailSender;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -24,26 +25,6 @@ import java.util.UUID;
 @Component
 public class EmailSender {
 
-    private final static Integer LINK_EXPIRATION_TIME = 30;
-
-    private final static String CHANGE_EMAIL_URL = "http://localhost:8080/change-email?param=";
-    private final static String CHANGE_EMAIL_SUBJECT = "JavaSpringGym change of email.";
-    private final static String CHANGE_EMAIL_TEXT = "Please click below link to confirm change of your email,\n" +
-            "this link will expire in " + LINK_EXPIRATION_TIME + " minutes.\n";
-
-    private final static String CONFIRM_ACCOUNT_URL = "http://localhost:8080/register/confirm-account?param=";
-    private final static String CONFIRM_ACCOUNT_SUBJECT = "JavaSpringGym account activation email.";
-    private final static String CONFIRM_ACCOUNT_TEXT = "Please click below link to activate your account,\n" +
-            "this link will expire in " + LINK_EXPIRATION_TIME + " minutes.\n";
-
-    private final static String RESET_PASSWORD_URL = "http://localhost:8080/reset-password/show-form?param=";
-    private final static String RESET_PASSWORD_SUBJECT = "JavaSpringGym reset password.";
-    private final static String RESET_PASSWORD_TEXT = "Please click below link to go to reset password site,\n" +
-            "it will be possible for the next " + LINK_EXPIRATION_TIME + " minutes.\n";
-
-    private final static String WELCOME_EMAIL_SUBJECT = ", welcome in JavaSpringGym application!";
-    private final static String WELCOME_EMAIL_TEXT = ", we are very pleased that you joined us!";
-
     private JavaMailSender javaMailSender;
     private ActivationEmailService activationEmailService;
     private ChangeEmailDetailsService changeEmailDetailsService;
@@ -59,6 +40,35 @@ public class EmailSender {
         this.activationEmailService = activationEmailService;
         this.resetPasswordEmailService = resetPasswordEmailService;
     }
+
+    @Value("${application.globalvalues.link-expiration-time-minutes}")
+    private Integer LINK_EXPIRATION_TIME;
+
+    @Value("${application.globalvalues.confirm-account-url}")
+    private String CONFIRM_ACCOUNT_URL;
+    @Value("${application.globalvalues.email.subject.confirm-account}")
+    private String CONFIRM_ACCOUNT_SUBJECT;
+    @Value("${application.globalvalues.email.text.confirm-account}")
+    private String CONFIRM_ACCOUNT_TEXT;
+
+    @Value("${application.globalvalues.change-email-ulr}")
+    private String CHANGE_EMAIL_URL;
+    @Value("${application.globalvalues.email.subject.change-email}")
+    private String CHANGE_EMAIL_SUBJECT;
+    @Value("${application.globalvalues.email.text.change-email}")
+    private String CHANGE_EMAIL_TEXT;
+
+    @Value("${application.globalvalues.reset-password-url}")
+    private String RESET_PASSWORD_URL;
+    @Value("${application.globalvalues.email.subject.reset-password}")
+    private String RESET_PASSWORD_SUBJECT;
+    @Value("${application.globalvalues.email.text.reset-password}")
+    private String RESET_PASSWORD_TEXT;
+
+    @Value("${application.globalvalues.email.subject.welcome-email}")
+    private String WELCOME_EMAIL_SUBJECT;
+    @Value("${application.globalvalues.email.text.welcome-email}")
+    private String WELCOME_EMAIL_TEXT;
 
     public void sendUserWelcomeEmail(User user) {
         try {
