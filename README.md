@@ -107,7 +107,7 @@ the whole group by its "classGroupId". For example, set the instructor for train
 ### Training classes shown to users:
 
 * Users and guests can only view training classes that are in future but no more than two weeks, and that has training type and
-instructor assigned. So classes tht are ready for reservation.
+instructor assigned. So classes that are ready for reservation.
 
 ![Alt text](src/main/resources/static/images/users-show-classes.PNG?raw=true "Set instructor by class group id.")
 
