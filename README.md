@@ -43,6 +43,11 @@ A simple REST application for gym classes reservation and admin management, writ
     * see all training classes for given instructor or training type
     * register as a user
     
+* User can do:
+    * update all his properties (i.e. name, password, email...)
+    * make and cancel a reservation for his training classes
+    * see his future and past reservations
+    
 * Admin can do:
     * register new admin
     * delete any regular user or set his account as inactive
@@ -62,7 +67,7 @@ A simple REST application for gym classes reservation and admin management, writ
     * delete any regular admin or user account
     * set any regular admin or user account as inactive
     
-## Email service in application
+## Email service in application:
 
 * After registration, user receives an email with unique account activation link, that is valid for next 30 minutes and is clickable only once.
 If user will not click the link within given time, he can ask admin to send him a new activation link.
@@ -79,3 +84,22 @@ The change will be done after the confirmation link is clicked by user.
     * If training class is fully booked, user can make a reservation but he will be moved to awaiting list.
     If enough reservations from proper reservation list will be freed, user automatically will be moved from
     awaiting list to reservation list and at the moment of this action an email with confirmation will be sent to user.
+
+## Sample actions screenshots:
+
+### Add new training class by admin.
+
+* A POST action to add new training class by admin. With one click admin can add a training class and choose the occurrence for this class (weekly or daily) and set
+how many times this class wil repeat in calendar. In below instance we add a training class with start date 2019-07-05 17:00, and this class will repeat every week at the same time for next 10 weeks.
+Every training class has its own "id", and as well as this group of ten classes that has been added by this action has its own "classGroupId". Admin can modify one training class using its "id", can modify 
+the whole group by its "classGroupId". For example, set the instructor for training classes with the same "classGroupId".
+
+![Alt text](src/main/resources/static/images/add-new-training-class-1.PNG?raw=true "POST action - Add new training class, weekly occurrence, repeat 10 times")
+
+* Partial result of above action:
+
+![Alt text](src/main/resources/static/images/add-new-training-class-2.PNG?raw=true "Result - Add new training class, weekly occurrence, repeat 10 times")
+
+* Set instructor for recently added training classes:
+
+![Alt text](src/main/resources/static/images/set-instructor-by-class-group-id.PNG?raw=true "Set instructor by class group id.")
