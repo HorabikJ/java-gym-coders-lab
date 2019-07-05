@@ -68,14 +68,14 @@ A simple REST application for gym classes reservation and admin management, writ
 If user will not click the link within given time, he can ask admin to send him a new activation link.
 
 * User can reset his password, to do it he has to provide his valid email that is in application database and then he will receive an email with
-link to the reset password website, this link also will be valid for next 30 minutes. If password is successful reset, the reset password link expires.
+link to the reset password website, this link also will be valid for next 30 minutes. If password is successfully reset, the reset password link expires.
 
 * User can change his email address in his account, to do so he has to request the change and confirmation email will be sent to new email given by user.
 The change will be done after the confirmation link is clicked by user.
 
 * Classes reservation email service:
-    * For every training class reservation user receives an email with reservation confirmation and training class details.
-    * For every cancellation of reservation user receives an email with confirmation of this action.
+    * For every training class reservation, user receives an email with reservation confirmation and training class details.
+    * For every cancellation of reservation, user receives an email with confirmation of this action.
     * If training class is fully booked, user can make a reservation but he will be moved to awaiting list.
     If enough reservations from proper reservation list will be freed, user automatically will be moved from
     awaiting list to reservation list and at the moment of this action an email with confirmation will be sent to user.
