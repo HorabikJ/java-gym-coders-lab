@@ -109,5 +109,5 @@ the whole group by its "classGroupId". For example, set the instructor for train
 * Users and guests can only view training classes that are in future but no more than two weeks, and that has training type and
 instructor assigned. So classes that are ready for reservation.
 
-![Alt text](src/main/resources/static/images/users-show-classes.PNG?raw=true "Set instructor by class group id.")
+![Alt text](src/main/resources/static/images/users-show-classes.PNG?raw=true "Show classes available for users.")
 
