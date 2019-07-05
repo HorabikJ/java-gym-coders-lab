@@ -103,3 +103,11 @@ the whole group by its "classGroupId". For example, set the instructor for train
 * Set instructor for recently added training classes:
 
 ![Alt text](src/main/resources/static/images/set-instructor-by-class-group-id.PNG?raw=true "Set instructor by class group id.")
+
+### Training classes shown to users:
+
+* Users and guests can only view training classes that are in future but no more than two weeks, and that has training type and
+instructor assigned. So classes tht are ready for reservation.
+
+![Alt text](src/main/resources/static/images/users-show-classes.PNG?raw=true "Set instructor by class group id.")
+
