@@ -21,14 +21,14 @@ import java.util.List;
 public class GuestController {
 
 //    Guest can do:
-//    - show all classes in future for 2 weeks
-//    - show all instructors
-//    - show instructors by names
-//    - show instructor by id
-//    - show all training types
-//    - show training type by id
-//    - show classes for given instructor
-//    - show classes for given training type
+//    - see all classes in future for 2 weeks
+//    - see all instructors
+//    - see instructors by names
+//    - see instructor by id
+//    - see all training types
+//    - see training type by id
+//    - see classes for given instructor
+//    - see classes for given training type
 
     private TrainingClassService trainingClassService;
     private InstructorService instructorService;
