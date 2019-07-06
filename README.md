@@ -32,7 +32,7 @@ A simple REST application for gym classes reservation and admin management, writ
 ## A little more about the application:
     
 *  Access to application resources is based on the user role. 
-    * Guest - unauthorized user
+    * Guest - unauthenticated user
     * User - application customer
     * Admin - application admin
     * Super - super admin
