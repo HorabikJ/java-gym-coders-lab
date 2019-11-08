@@ -19,7 +19,7 @@ A simple REST application for gym classes reservation and admin management, writ
 
 ## What to do to run the application:
 
-1. Download the project from: https://github.com/HorabikJ/javaGym
+1. Download the project from: https://github.com/HorabikJ/java-gym
 2. Open the project in IntelliJ Idea Ultimate and import all Maven dependencies.
 3. Create schema "java_gym" in MySQL 8.0 database.
 4. Change the values of "spring.datasource.username" and "spring.datasource.password" in 
