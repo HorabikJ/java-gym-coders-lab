@@ -51,7 +51,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         String fieldName = "error";
         Class exceptionClass = exception.getClass();
         if (exceptionClass.equals(UserUnauthorizedException.class)) {
-            fieldName = "user:";
+            fieldName = "user";
         } else if (exceptionClass.equals(PasswordDoNotMatchException.class)) {
             fieldName = "password";
         }
